@@ -218,13 +218,18 @@ def query_winget_package(package_id: str, arches: tuple[str, ...] = ("x64", "arm
 
             url = str(inst.get("Installer Url") or "").strip()
             sha = str(inst.get("Installer SHA256") or "").strip().upper()
+            clean_url = url.split("?")[0].lower()
+            if clean_url.endswith(".zip") or inst_type in ("zip", "portable"):
+                engine = "portable"
+            else:
+                engine = ENGINE_MAP.get(inst_type, "exe")
             if url.startswith("https://") and len(sha) == 64 and inst_type not in ("msix", "appx", "msstore"):
                 targets_by_arch[arch] = {
                     "arch": arch,
                     "url": url,
                     "sha256": sha,
                     "type": inst_type,
-                    "engine": ENGINE_MAP.get(inst_type, "exe"),
+                    "engine": engine,
                     "switches": inst.get("Installer Switches") or {},
                 }
 

@@ -263,7 +263,10 @@ def _download_all(args, guided: bool) -> list[Item] | None:
             return None
         console.done_line()
         found = engines.inspect(dl.path)
-        engine = engine_overrides[index] or found.engine
+        if found.format == "zip":
+            engine = "portable"
+        else:
+            engine = engine_overrides[index] or found.engine
         if not engine:
             _die(f"{dl.path.name}: unsupported payload ({found.label}); pass --engine")
             return None
