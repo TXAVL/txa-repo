@@ -58,24 +58,15 @@ def submit(gh: GitHub, upstream: str, login: str, package_id: str, version: str,
         try:
             gh.post(f"repos/{head_repo}/merge-upstream", json={"branch": base_branch})
             log(f"→ fork {head_repo} synced with {upstream}@{base_branch}")
-        except GitHubError as exc:
-            if "workflow" in str(exc).lower() or exc.status == 422:
-                log(f"→ notice: fork {base_branch} sync skipped (upstream workflow update requires workflow scope)")
-            elif exc.status == 409:
-                raise GitHubError(409, f"your fork {head_repo} has diverged from {upstream}; "
-                                       f"reset its {base_branch} branch and retry") from None
-            else:
-                raise
+        except GitHubError:
+            # Fork sync may be skipped if upstream workflows changed without workflow scope or if diverged
+            pass
     else:
         head_repo = upstream
         log(f"→ you can push to {upstream} - creating the branch there directly")
 
-    try:
-        base_sha = _wait_for_branch(gh, upstream, base_branch, 30)
-        base_tree = gh.get(f"repos/{upstream}/git/commits/{base_sha}")["tree"]["sha"]
-    except Exception:
-        base_sha = _wait_for_branch(gh, head_repo, base_branch, 30)
-        base_tree = gh.get(f"repos/{head_repo}/git/commits/{base_sha}")["tree"]["sha"]
+    base_sha = _wait_for_branch(gh, head_repo, base_branch, 30)
+    base_tree = gh.get(f"repos/{head_repo}/git/commits/{base_sha}")["tree"]["sha"]
     tree = gh.post(f"repos/{head_repo}/git/trees", json={
         "base_tree": base_tree,
         "tree": [{"path": path, "mode": "100644", "type": "blob", "content": text} for path, text in sorted(files.items())],
