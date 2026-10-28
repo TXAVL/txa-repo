@@ -7,7 +7,7 @@ name: TXA Agreement
 
 on:
   pull_request_target:
-    types: [opened, reopened, ready_for_review]
+    types: [opened, reopened, ready_for_review, edited]
   issue_comment:
     types: [created]
 

@@ -69,3 +69,4 @@ def print_banner(tool_name: str, subtitle: str) -> None:
     print(f"{mid}  {c_doc}{doc_text:<{width - 4}}{c_reset}{mid}")
     print(bot)
     print()
+

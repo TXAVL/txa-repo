@@ -54,3 +54,4 @@ foreach ($tool in $tools) {
 }
 
 Write-Host "`n✓ All TXA standalone binaries built successfully into '$DistDir'!" -ForegroundColor Green
+

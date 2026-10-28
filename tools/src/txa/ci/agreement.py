@@ -1,11 +1,13 @@
-"""Contributor Agreement - the first thing a contributor does after opening a pull request.
+"""Contributor Agreement & PR Checklist verification.
 
-The bot asks the author to reply with one comment ("@txa-repo agree", optionally
-``agree company="Name"``). It then deletes that comment, records the agreement inside its own comment
-and removes ``txa:needs-agreement``; until then ``txa/agreement`` and ``txa/verified`` stay pending,
-so nothing can merge. Like a real CLA bot it signs **once per person**: maintainers are exempt and
-anyone who already has a merged pull request is recognised without asking again.
-Comments are only ever read as data.
+The bot asks the author to:
+1. Complete and tick the required checkboxes in the PR description.
+2. Accept the TXA Contributor Agreement by commenting "@txa-repo agree" (or "@txa-bot agree").
+
+For new packages, both the checklist and agreement comment are strictly required.
+Once both requirements are satisfied, the bot removes the agreement comment,
+updates its own comment with `signed=<author>`, removes `txa:needs-agreement`,
+sets `txa/agreement` to success, and triggers the 16 validation checks.
 """
 from __future__ import annotations
 
@@ -16,29 +18,66 @@ from txa.core.github import GitHub, GitHubError
 
 MARK = "<!-- txa-bot:agreement"
 PHRASE = "@txa-repo agree"
-_PHRASE_RE = re.compile(r'^\s*@?txa-repo\s+agree(?:\s+company\s*=\s*"([^"\r\n]{1,80})")?\s*[.!]?\s*$', re.I)
+_PHRASE_RE = re.compile(r'^\s*@?(?:txa-repo|txa-bot)\s+agree(?:\s+company\s*=\s*"([^"\r\n]{1,80})")?\s*[.!]?\s*$', re.I)
 LABEL = LABELS["agree"][0]
 CONTEXT = "txa/agreement"
-EXEMPT = {"MEMBER", "COLLABORATOR"}  # repository owners sign like everybody else
+EXEMPT = {"MEMBER", "COLLABORATOR"}  # For updates only; new packages always require explicit agreement
 
 
-def _text(login: str) -> str:
-    return (f"{MARK} -->\nHello @{login},\n\n"
-            "This PR cannot be merged until you accept the **TXA Contributor Agreement** (EULA): you confirm that you "
-            "have the right to submit this manifest, that the installer is the vendor's own official download, and that "
-            "the package follows the repository policy.\n\n"
-            f"To accept, reply to this pull request with a single comment:\n\n```\n{PHRASE}\n```\n\n"
-            f"Contributing for a company? Add it: `{PHRASE} company=\"Example Ltd\"`. "
-            "You only have to do this once - later pull requests are recognised automatically.\n\n"
-            "The bot removes your comment and marks this step as done. Nothing else starts until you do.\n\n"
-            "<sub>Template: txabot/needsAgreement</sub>")
+def pending_checklist_items(body: str | None) -> list[str]:
+    """Returns list of pending required checklist items from PR body."""
+    items: list[str] = []
+    for line in (body or "").splitlines():
+        m = re.match(r"^\s*[-*+]\s*\[\s*\]\s+(.*)$", line)
+        if m:
+            text = m.group(1).strip()
+            # Ignore optional items
+            if "(if applicable)" in text.lower() or text.lower().startswith("resolves #"):
+                continue
+            items.append(text)
+    return items
+
+
+def _needs_action_text(login: str, pending_items: list[str], needs_agree: bool, is_new_pkg: bool) -> str:
+    lines = [
+        f"Hello @{login},", "",
+        "Thank you for opening this pull request! Before the automatic 16-step verification checks can proceed, "
+        "the following requirements must be completed:", "",
+    ]
+    step_num = 1
+    if pending_items:
+        lines.append(f"{step_num}. 🔲 **Complete the PR Checklist**:")
+        lines.append("   Please tick all required checkboxes in the pull request description above "
+                     "(edit the description or click the checkboxes directly on GitHub):")
+        for item in pending_items:
+            lines.append(f"   - [ ] {item}")
+        lines.append("")
+        step_num += 1
+
+    if needs_agree:
+        new_pkg_note = " *(Mandatory for new packages)*" if is_new_pkg else ""
+        lines.append(f"{step_num}. ✍️ **TXA Contributor Agreement**:{new_pkg_note}")
+        lines.append("   You confirm that you have the right to submit this manifest, that the installer is the "
+                     "vendor's own official download, and that the package follows repository policy.")
+        lines.append(f"   To accept, reply to this pull request with a single comment:\n   ```\n   {PHRASE}\n   ```")
+        lines.append(f"   *(Contributing for a company? Use `{PHRASE} company=\"Example Ltd\"`)*\n")
+        step_num += 1
+
+    if not pending_items and needs_agree:
+        lines.append("✓ *The PR checklist is complete!* Waiting for your agreement comment above.\n")
+    elif pending_items and not needs_agree:
+        lines.append("✓ *Contributor Agreement confirmed!* Waiting for you to check the remaining items in the PR checklist above.\n")
+
+    lines.append("Once all requirements are satisfied, the bot will accept the agreement and automatically run all 16 pipeline checks.\n")
+    lines.append("<sub>Template: txabot/needsAgreement</sub>")
+    return "\n".join(lines)
 
 
 def _signed_text(login: str, how: str = "", company: str = "") -> str:
     extra = f" ({how})" if how else ""
     firm = f" on behalf of **{company}**" if company else ""
-    return (f"{MARK} signed={login} -->\n✅ **Contributor Agreement accepted** by @{login}{firm}{extra}. "
-            "Thank you - the automatic checks go on.\n\n<sub>Template: txabot/agreementSigned</sub>")
+    return (f"{MARK} signed={login} -->\n✅ **Contributor Agreement & Checklist accepted** by @{login}{firm}{extra}. "
+            "Thank you - the automatic 16 checks go on.\n\n<sub>Template: txabot/agreementSigned</sub>")
 
 
 def find(gh: GitHub, repo: str, number: int) -> dict | None:
@@ -50,6 +89,18 @@ def find(gh: GitHub, repo: str, number: int) -> dict | None:
 
 def _is_signed_comment(comment: dict | None, login: str) -> bool:
     return bool(comment) and f"signed={login} -->" in comment["body"].split("\n", 1)[0]
+
+
+def _extract_agreed(comment: dict | None, login: str) -> tuple[bool, str]:
+    if not comment:
+        return False, ""
+    header = comment["body"].split("\n", 1)[0]
+    if f"signed={login}" in header:
+        return True, ""
+    m = re.search(rf'agreed={re.escape(login)}(?:\s+company="([^"]+)")?', header)
+    if m:
+        return True, m.group(1) or ""
+    return False, ""
 
 
 def is_signed(gh: GitHub, repo: str, pr: dict) -> bool:
@@ -65,61 +116,99 @@ def _returning(gh: GitHub, repo: str, login: str) -> bool:
         return False
 
 
-def _set_status(gh: GitHub, repo: str, pr: dict, signed: bool) -> None:
+def _set_status(gh: GitHub, repo: str, pr: dict, signed: bool, desc: str = "") -> None:
     """``txa/agreement`` shows the step in the merge box; while it is open the required status is held too."""
     sha = pr["head"]["sha"]
+    default_desc = "Contributor Agreement accepted" if signed else f"Check PR checklist & comment {PHRASE}"
     gh.post(f"repos/{repo}/statuses/{sha}", json={
         "state": "success" if signed else "pending", "context": CONTEXT,
-        "description": "Contributor Agreement accepted" if signed else f"Comment {PHRASE} to accept"})
+        "description": desc or default_desc})
     if not signed:
         gh.post(f"repos/{repo}/statuses/{sha}", json={
-            "state": "pending", "context": STATUS_CONTEXT, "description": "Waiting for the contributor to accept the agreement"})
+            "state": "pending", "context": STATUS_CONTEXT,
+            "description": "Waiting for author to complete checklist & accept agreement"})
 
 
 def process(gh: GitHub, repo: str, number: int, comment_id: int | None = None) -> int:
-    """Ask for the agreement (PR opened) or accept it (the author commented)."""
+    """Process checklist and agreement verification for a pull request."""
     pr = gh.get(f"repos/{repo}/pulls/{number}")
     if pr["state"] != "open":
         return 0
     author = pr["user"]["login"]
+    title = (pr.get("title") or "").strip().lower()
+    body = pr.get("body") or ""
+    is_new_pkg = title.startswith("new package") or "new package:" in body.lower()
+
     current = {label["name"] for label in pr.get("labels", [])}
     bot = find(gh, repo, number)
-    signed = _is_signed_comment(bot, author)
-    if signed:
-        print(f"agreement: PR #{number} already accepted - nothing to do")  # any other comment must not restart the checks
+    if _is_signed_comment(bot, author):
+        print(f"agreement: PR #{number} already accepted - nothing to do")
         return 0
+
     how, company = "", ""
-    if not signed and pr.get("author_association") in EXEMPT:
-        signed, how = True, "maintainer, exempt"
-    if not signed and _returning(gh, repo, author):
-        signed, how = True, "agreed on an earlier pull request"
-    if not signed and comment_id:
+    comment_agreed = False
+    if comment_id:
         try:
             comment = gh.get(f"repos/{repo}/issues/comments/{comment_id}")
         except GitHubError:
             comment = None
-        match = _PHRASE_RE.match(comment["body"]) if comment and comment["user"]["login"] == author else None
-        if match:
-            gh.delete(f"repos/{repo}/issues/comments/{comment_id}", ok=(404,))
-            signed, company = True, " ".join((match.group(1) or "").split())
+        if comment and comment.get("user", {}).get("login") == author:
+            match = _PHRASE_RE.match(comment.get("body", ""))
+            if match:
+                gh.delete(f"repos/{repo}/issues/comments/{comment_id}", ok=(404,))
+                comment_agreed = True
+                company = " ".join((match.group(1) or "").split())
+
+    prior_agreed, prior_company = _extract_agreed(bot, author)
+    if comment_agreed:
+        has_agreed = True
+    elif prior_agreed:
+        has_agreed = True
+        if not company:
+            company = prior_company
+    else:
+        has_agreed = False
+
+    # New packages ALWAYS require explicit agreement comment from the author.
+    # For existing package updates, previous agreements or maintainer status can be recognized.
+    if not is_new_pkg and not has_agreed:
+        if pr.get("author_association") in EXEMPT:
+            has_agreed, how = True, "maintainer, exempt"
+        elif _returning(gh, repo, author):
+            has_agreed, how = True, "agreed on an earlier pull request"
+
+    # Verify checklist checkboxes in PR body
+    pending = pending_checklist_items(body)
+    checklist_done = (len(pending) == 0)
+
+    signed = checklist_done and has_agreed
+
     from txa.ci.gate import set_labels  # late: gate imports this module
 
     if signed:
+        signed_body = _signed_text(author, how, company)
         if bot and "signed=" not in bot["body"].split("\n", 1)[0]:
-            gh.patch(f"repos/{repo}/issues/comments/{bot['id']}", json={"body": _signed_text(author, how, company)})
+            gh.patch(f"repos/{repo}/issues/comments/{bot['id']}", json={"body": signed_body})
         elif not bot:
-            gh.post(f"repos/{repo}/issues/{number}/comments", json={"body": _signed_text(author, how, company)})
+            gh.post(f"repos/{repo}/issues/{number}/comments", json={"body": signed_body})
         set_labels(gh, repo, number, current, add=set(), remove={LABEL})
         _set_status(gh, repo, pr, True)
         _rerun_gate(gh, repo, pr)
-        print(f"agreement: PR #{number} accepted by {author}")
+        print(f"agreement: PR #{number} accepted by {author} (checklist complete and agreed)")
         return 0
-    if not bot:
-        gh.post(f"repos/{repo}/issues/{number}/comments", json={"body": _text(author)})
+
+    # Still waiting for checklist and/or agreement
+    header = f"{MARK} pending author={author}{f' agreed={author}' if has_agreed else ''}{f' company=\"{company}\"' if company else ''} -->"
+    action_body = f"{header}\n" + _needs_action_text(author, pending, not has_agreed, is_new_pkg)
+    if bot:
+        gh.patch(f"repos/{repo}/issues/comments/{bot['id']}", json={"body": action_body})
+    else:
+        gh.post(f"repos/{repo}/issues/{number}/comments", json={"body": action_body})
+
     stale = {LABELS[key][0] for key in ("validating", "verified", "fix", "review", "approved", "confirm")}
-    set_labels(gh, repo, number, current, add={LABEL}, remove=stale)  # nothing but "needs agreement" until it is signed
-    _set_status(gh, repo, pr, False)
-    print(f"agreement: PR #{number} waiting for {author}")
+    set_labels(gh, repo, number, current, add={LABEL}, remove=stale)
+    _set_status(gh, repo, pr, False, "Checklist or agreement pending")
+    print(f"agreement: PR #{number} waiting for {author} (pending={len(pending)}, agreed={has_agreed})")
     return 0
 
 

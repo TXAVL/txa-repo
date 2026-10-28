@@ -655,8 +655,10 @@ def _cmd_new_single(args) -> int:
     console.say(f"\n✓ pull request #{result.number} opened. Pull request can be found here: "
                 f"{console.paint(result.url, 'cyan', 'bold')}")
     _open_pull_request(result.url, args)
-    print(console.paint(f"  branch {result.head_repo}@{result.branch} · the TXA bot starts its 16 checks now; "
-                        f"tick the checklist in the description to confirm", "gray"))
+    if is_vi:
+        print(console.paint(f"  nhánh {result.head_repo}@{result.branch} · hãy tích đầy đủ các ô checklist và bình luận '@txa-repo agree' trên PR để bot bắt đầu chạy 16 bước kiểm tra.", "gray"))
+    else:
+        print(console.paint(f"  branch {result.head_repo}@{result.branch} · please tick the checklist in the PR description and comment '@txa-repo agree' for the TXA bot to start verification.", "gray"))
     return 0
 
 
@@ -679,17 +681,17 @@ def _find_pr(gh: GitHub, upstream: str, draft: Draft) -> str | None:
 
 
 def _checklist(repo: str) -> list[str]:
-    """The checklist of the pull request description, ticked by txacreate (it analysed and validated the cards)."""
+    """The checklist of the pull request description (empty boxes for the author to tick on GitHub)."""
     return [
         "## ✅ Checklist", "",
-        f"- [x] Signed the [Contributor Agreement](https://github.com/{repo}#readme) (the bot asks you to confirm with `@txa-repo agree`)",
-        "- [x] Linked to an issue (if applicable)", "  - Resolves #[Issue Number]", "",
+        f"- [ ] Signed the [Contributor Agreement](https://github.com/{repo}#readme) (the bot asks you to confirm with `@txa-repo agree`)",
+        "- [ ] Linked to an issue (if applicable)", "  - Resolves #[Issue Number]", "",
         "## 📦 Manifest Checklist", "",
-        f"- [x] Checked that there aren't other open [pull requests](https://github.com/{repo}/pulls) for the same manifest update/change",
-        "- [x] This PR only modifies one (1) manifest",
-        "- [x] Validated manifest locally with `txacreate validate <path>`",
-        "- [x] Tested manifest locally with `txapm install --manifest <path>`",
-        f"- [x] Manifest conforms to the [v1 schema](https://github.com/{repo}/tree/main/tools/src/txa/schemas)", "",
+        f"- [ ] Checked that there aren't other open [pull requests](https://github.com/{repo}/pulls) for the same manifest update/change",
+        "- [ ] This PR only modifies one (1) manifest",
+        "- [ ] Validated manifest locally with `txacreate validate <path>`",
+        "- [ ] Tested manifest locally with `txapm install --manifest <path>`",
+        f"- [ ] Manifest conforms to the [v1 schema](https://github.com/{repo}/blob/main/docs/manifest-schema.md)", "",
         "> **Note:** `<path>` is the directory containing the manifest you're submitting.",
     ]
 
