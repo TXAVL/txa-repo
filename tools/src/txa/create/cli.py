@@ -39,7 +39,7 @@ def _die(message: str) -> int:
 # --------------------------------------------------------------------------- auth
 
 
-SCOPES = "public_repo user:email"
+SCOPES = "public_repo user:email workflow"
 
 
 def _verified(token: str) -> tuple[GitHub, dict, str | None]:
