@@ -39,7 +39,7 @@ def print_banner(tool_name: str, subtitle: str) -> None:
         from txa import __version__
         from txa.core import config
     except Exception:
-        __version__ = "1.2.0"
+        __version__ = "1.3.0"
         config = None
 
     # Only show banner if stdout is a real terminal and no arguments were passed
