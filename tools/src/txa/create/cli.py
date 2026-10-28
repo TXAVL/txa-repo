@@ -22,6 +22,7 @@ from txa.ci import steps
 from txa.ci.context import init_local
 from txa.ci.report import build_report, quick_check, render_console, run_live
 from txa.core import config, console, credentials, engines, licenses, net, semver, winos
+from txa.core.i18n import is_vi
 from txa.core.github import GitHub, GitHubError, device_flow
 from txa.core.manifest import ManifestError, split_id
 from txa.create import ghmeta, wizard
@@ -658,7 +659,7 @@ def _cmd_new_single(args) -> int:
     console.say(f"\n✓ pull request #{result.number} opened. Pull request can be found here: "
                 f"{console.paint(result.url, 'cyan', 'bold')}")
     _open_pull_request(result.url, args)
-    if is_vi:
+    if is_vi():
         print(console.paint(f"  nhánh {result.head_repo}@{result.branch} · hãy tích đầy đủ các ô checklist và bình luận '@txa-repo agree' trên PR để bot bắt đầu chạy 16 bước kiểm tra.", "gray"))
     else:
         print(console.paint(f"  branch {result.head_repo}@{result.branch} · please tick the checklist in the PR description and comment '@txa-repo agree' for the TXA bot to start verification.", "gray"))
