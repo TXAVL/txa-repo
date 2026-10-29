@@ -13,7 +13,7 @@ targets:
     source:
       url: https://dl.pstmn.io/download/version/12.34.2/windows_64
       sha256: 5D4F5287C808EA581ABF26E01985E4E52A922156A4C1E92CBC52358F630C1282
-      size: 1
+      size: 216942048
     switches:
       silent: /S
       progress: /S

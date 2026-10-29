@@ -35,7 +35,8 @@ class RedirectLoop(NetError):
 
 def session() -> requests.Session:
     s = requests.Session()
-    s.headers.update({"User-Agent": USER_AGENT, "Accept": "*/*"})
+    # identity: installers are hashed byte for byte, and some CDNs (dl.pstmn.io) answer an empty 200 when gzip is offered
+    s.headers.update({"User-Agent": USER_AGENT, "Accept": "*/*", "Accept-Encoding": "identity"})
     return s
 
 
