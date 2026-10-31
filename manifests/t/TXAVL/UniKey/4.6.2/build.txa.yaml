@@ -12,8 +12,8 @@ targets:
     engine: exe
     source:
       url: https://github.com/TXAVL/WINSETUP/releases/download/v1.5.4/Unikey_-_TXA.exe
-      sha256: 0C66D959291D685B95FC1814233E86087CFBD6919EC5AE5C8CC0493E0EDA9C48
-      size: 1225842
+      sha256: 47EBC9AB5F68F872234483917BD215CE9277912C325D2CF6E51A37B34EE77233
+      size: 1251187
     switches:
       silent: -s
       progress: -s
