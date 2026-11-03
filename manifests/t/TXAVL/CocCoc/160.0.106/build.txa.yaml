@@ -12,15 +12,15 @@ targets:
     engine: exe
     source:
       url: https://files2.coccoc.com/browser/x64/coccoc_en_machine.exe
-      sha256: 412F4E5E625BB198D712D689E6E703691444D6D355C54A41535C8A2421120069
-      size: 14671272
+      sha256: 9297F35ADBBDC4DE38978E4AB44F1208FF6B61BC2019ADFD5505BCB5E9CAE721
+      size: 14683560
     switches:
       silent: C:/Program Files/Git/silent /install
   - arch: x86
     engine: exe
     source:
       url: https://files2.coccoc.com/browser/coccoc_vi_machine.exe
-      sha256: 3FC86F2A82BB2538AA152EAED649DF85AA05082F043DE7252BD8D48EE0BBC34C
-      size: 14671272
+      sha256: E20A78B38EF51945B1B0EFA6F25C74340DFEAF5A4640B02F5FF431CEB3306CFF
+      size: 14683560
     switches:
       silent: C:/Program Files/Git/silent /install
