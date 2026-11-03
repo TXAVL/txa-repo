@@ -24,7 +24,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from txa import __version__
-from txa.core import config, console, net, semver, winos
+from txa.core import config, console, net, retention, semver, winos
 from txa.pm import installer, uninstall
 from txa.pm.installer import InstallError
 from txa.pm.source import LocalRelease, NotFound, Source, SourceError, Sources, check_url
@@ -244,6 +244,11 @@ def cmd_install(args) -> int:
     if waiting:
         return _refuse_pending(*waiting)
     src, package_id = _pick(args, args.package)
+    if getattr(args, "choose", False) and not args.version:
+        chosen = _choose_version(src, package_id)
+        if chosen is None:
+            return 1
+        args.version = chosen
     return _install(src, package_id, args.version, args)
 
 
@@ -569,6 +574,44 @@ def _show_waiting(source: Source, entry: dict) -> None:
     console.say("! it cannot be installed until a Contributor approves the pull request")
 
 
+def _version_rows(src: Source, package_id: str) -> list[dict]:
+    """Every version kept in the repository, newest first, with the CPUs/languages it ships and whether it is installed."""
+    versions = sorted(src.versions(package_id), key=lambda v: semver.parse(v) if semver.is_valid(v) else (0, 0, 0), reverse=True)
+    installed = (installer.installed().get(package_id) or {}).get("version")
+    rows = []
+    for index, version in enumerate(versions):
+        try:
+            _, cards = src.release(package_id, version)
+            targets = cards["build"]["targets"]
+            ships = ", ".join(dict.fromkeys(t["arch"] + (f" {t['locale']}" if t.get("locale") else "") for t in targets))
+        except Exception:  # noqa: BLE001 - a broken old release must not hide the others
+            ships = "?"
+        rows.append({"version": version, "latest": index == 0, "installed": version == installed, "ships": ships})
+    return rows
+
+
+def _print_versions(src: Source, package_id: str) -> None:
+    rows = _version_rows(src, package_id)
+    print(console.head(f"{package_id} - {len(rows)} version(s) in the repository (the newest {retention.KEEP} are kept)"))
+    for row in rows:
+        marks = " ".join(m for m, on in (("latest", row["latest"]), ("installed", row["installed"])) if on)
+        print(f"  {C(row['version'], 14, 'green', 'bold')} {C(row['ships'], 28, 'yellow')} {P(marks, 'cyan')}")
+    console.say(f"install one with {P('txapm install ' + package_id + ' --version <version>', 'bold')} or pick from a list with {P('--choose', 'bold')}")
+
+
+def _choose_version(src: Source, package_id: str) -> str | None:
+    rows = _version_rows(src, package_id)
+    if len(rows) == 1:
+        return rows[0]["version"]
+    if not console._raw_available():
+        _print_versions(src, package_id)
+        _die("--choose needs an interactive terminal; pass --version <version> instead")
+        return None
+    options = [console.Option(r["version"], r["version"], " ".join(m for m, on in (("latest", r["latest"]), ("installed", r["installed"])) if on)
+                              or r["ships"]) for r in rows]
+    return console.choose(f"Which version of {package_id} do you want to install?", "version", options).value
+
+
 def cmd_show(args) -> int:
     try:
         src, package_id = _pick(args, args.package)
@@ -581,7 +624,7 @@ def cmd_show(args) -> int:
         return 0
     build, about = cards["build"], _about(cards, package_id)
     if args.versions:
-        print("\n".join(P(v, "green") for v in src.versions(package_id)))
+        _print_versions(src, package_id)
         return 0
     minimum = winos.parse_build(build["platform"]["min_build"])
     print(f"{P(about['name'], 'bold', 'cyan')} {P(version, 'green', 'bold')}  {P('(' + package_id + ')', 'gray')}"
@@ -594,7 +637,7 @@ def cmd_show(args) -> int:
         print(f"  {console.label('homepage')}{P(about['homepage'], 'cyan')}")
     print(f"  {console.label('windows')}{build['platform']['min_build']}+ ({winos.describe(minimum)}) · scope {build.get('scope', 'machine')}")
     for target in build["targets"]:
-        arch_tag = P("[" + target["arch"] + "]", "yellow", "bold")
+        arch_tag = P("[" + target["arch"] + (" " + target["locale"] if target.get("locale") else "") + "]", "yellow", "bold")
         engine_tag = P(target["engine"].ljust(5), "magenta")
         print(f"  {arch_tag} {engine_tag} {P(target['source']['url'], 'cyan')}")
         print(f"        {P('sha256', 'gray')} {target['source']['sha256']}")
@@ -941,6 +984,7 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("package", nargs="?", help="package id (TXAVL.HelloTool) or alias")
     p.add_argument("--manifest", metavar="FOLDER", help="install from a local manifest folder (to test it before submitting)")
     p.add_argument("--version", dest="version", help="install this X.Y.Z instead of the newest")
+    p.add_argument("--choose", action="store_true", help="pick the version from the list of versions in the repository")
     p.add_argument("--download-only", action="store_true", help="stop after downloading and verifying")
     _install_options(p)
     p.set_defaults(func=cmd_install)

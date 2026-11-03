@@ -72,7 +72,7 @@ def index_document(packages: dict[str, dict[str, dict]]) -> dict:
             "summary": about["summary"],
             "summaries": summaries,
             "tags": latest["core"].get("tags", []),
-            "arches": [t["arch"] for t in latest["build"]["targets"]],
+            "arches": list(dict.fromkeys(t["arch"] for t in latest["build"]["targets"])),
         })
     generated = datetime.now(timezone.utc).isoformat(timespec="seconds")
     return {"api": "txa.v1", "generated": generated, "count": len(index), "packages": index}

@@ -12,7 +12,7 @@ from typing import Any
 
 import yaml
 
-from txa.core import config, licenses
+from txa.core import config, licenses, retention
 
 ENGINE_MAP = {
     "inno": "inno",
@@ -916,9 +916,7 @@ def sync_txavl_packages(
                 )
                 save_draft_manifests(draft, root, dry_run=False)
                 if not keep_old:
-                    for old_d in ver_dirs:
-                        if old_d.name != new_ver:
-                            shutil.rmtree(old_d, ignore_errors=True)
+                    retention.prune_package(ver_dirs[0].parent)  # newest 10 stay, the oldest go
             updated.append(f"{pkg_id} ({current_ver} -> {new_ver})")
             continue
 
@@ -971,9 +969,7 @@ def sync_txavl_packages(
         console.say(f"  {console.paint('[UP]', 'green', 'bold')}   {pkg_id}: {current_ver} -> {new_ver} (from {wg_id})")
         save_draft_manifests(draft, root, dry_run=dry_run)
         if not dry_run and not keep_old:
-            for old_d in ver_dirs:
-                if old_d.name != new_ver:
-                    shutil.rmtree(old_d, ignore_errors=True)
+            retention.prune_package(ver_dirs[0].parent)  # newest 10 stay, the oldest go
         updated.append(f"{pkg_id} ({current_ver} -> {new_ver})")
 
     return {"updated": updated, "up_to_date": up_to_date, "skipped": skipped, "failed": failed}

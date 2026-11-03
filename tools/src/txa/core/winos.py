@@ -60,6 +60,25 @@ def current() -> tuple[int, int, int] | None:
     return ver.major, ver.minor, ver.build
 
 
+def ui_language() -> str:
+    """Two-letter display language of this PC ("vi", "en", ...); TXA_UI_LANG overrides it."""
+    forced = os.environ.get("TXA_UI_LANG", "").strip().lower()
+    if forced:
+        return forced.split("-")[0]
+    if sys.platform == "win32":
+        try:
+            import ctypes
+            import locale
+
+            langid = ctypes.windll.kernel32.GetUserDefaultUILanguage()
+            name = locale.windows_locale.get(langid, "")
+            if name:
+                return name.split("_")[0].lower()
+        except (AttributeError, OSError):
+            pass
+    return "en"
+
+
 def native_arch() -> str:
     """Real CPU architecture, even when this process runs under emulation."""
     if sys.platform == "win32":

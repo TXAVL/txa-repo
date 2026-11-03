@@ -30,17 +30,35 @@ class InstallError(Exception):
     pass
 
 
-def pick_target(build: dict, arch: str | None = None) -> dict:
-    targets = {t["arch"]: t for t in build.get("targets", [])}
+def _by_language(candidates: list[dict], language: str) -> dict:
+    """Among installers of one CPU, the one built for this display language, else the one without a language."""
+    for target in candidates:
+        if (target.get("locale") or "").split("-")[0].lower() == language:
+            return target
+    for target in candidates:
+        if not target.get("locale"):
+            return target
+    for target in candidates:
+        if (target.get("locale") or "").lower().startswith("en"):
+            return target
+    return candidates[0]
+
+
+def pick_target(build: dict, arch: str | None = None, language: str | None = None) -> dict:
+    """The installer for this CPU (``arch`` forces one) and, when a CPU has several, for the PC's display language."""
+    groups: dict[str, list[dict]] = {}
+    for target in build.get("targets", []):
+        groups.setdefault(target["arch"], []).append(target)
+    language = (language or winos.ui_language()).split("-")[0].lower()
     if arch:
-        if arch not in targets:
-            raise InstallError(f"no {arch} installer (available: {', '.join(targets)})")
-        return targets[arch]
+        if arch not in groups:
+            raise InstallError(f"no {arch} installer (available: {', '.join(groups)})")
+        return _by_language(groups[arch], language)
     native = winos.native_arch()
     for candidate in winos.arch_preference(native):
-        if candidate in targets:
-            return targets[candidate]
-    raise InstallError(f"no installer runs on {native} (available: {', '.join(targets)})")
+        if candidate in groups:
+            return _by_language(groups[candidate], language)
+    raise InstallError(f"no installer runs on {native} (available: {', '.join(groups)})")
 
 
 def check_os(build: dict) -> None:

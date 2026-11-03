@@ -9,18 +9,42 @@ platform:
 scope: machine
 targets:
   - arch: x64
+    locale: en-US
     engine: exe
     source:
       url: https://files2.coccoc.com/browser/x64/coccoc_en_machine.exe
       sha256: 9297F35ADBBDC4DE38978E4AB44F1208FF6B61BC2019ADFD5505BCB5E9CAE721
       size: 14683560
     switches:
-      silent: C:/Program Files/Git/silent /install
+      silent: /silent /install
+      progress: /silent /install
+  - arch: x64
+    locale: vi-VN
+    engine: exe
+    source:
+      url: https://files2.coccoc.com/browser/x64/coccoc_vi_machine.exe
+      sha256: 52DE45B76F0BEB9AF76E494CCECF0F85860E25D9E3F65AE5C0B5C9C792328586
+      size: 14683560
+    switches:
+      silent: /silent /install
+      progress: /silent /install
   - arch: x86
+    locale: en-US
+    engine: exe
+    source:
+      url: https://files2.coccoc.com/browser/coccoc_en_machine.exe
+      sha256: 78FBB2513C5B4F04829060EE14F02313AEB7083F9BA8669131E06702AE65CDA4
+      size: 14683560
+    switches:
+      silent: /silent /install
+      progress: /silent /install
+  - arch: x86
+    locale: vi-VN
     engine: exe
     source:
       url: https://files2.coccoc.com/browser/coccoc_vi_machine.exe
       sha256: E20A78B38EF51945B1B0EFA6F25C74340DFEAF5A4640B02F5FF431CEB3306CFF
       size: 14683560
     switches:
-      silent: C:/Program Files/Git/silent /install
+      silent: /silent /install
+      progress: /silent /install

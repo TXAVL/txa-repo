@@ -56,9 +56,10 @@ txapm --version
 |---|---|
 | Tìm phần mềm | `txapm search notepad` |
 | Xem thông tin một gói | `txapm show TXAVL.HelloTool` |
-| Xem mọi phiên bản | `txapm show TXAVL.HelloTool --versions` |
+| Xem kho đang có những phiên bản nào | `txapm show TXAVL.HelloTool --versions` (kèm CPU/ngôn ngữ, đánh dấu bản mới nhất và bản đã cài) |
 | Cài bản mới nhất | `txapm install TXAVL.HelloTool` |
 | Cài một phiên bản cụ thể | `txapm install TXAVL.HelloTool --version 1.4.2` |
+| Chọn phiên bản từ danh sách trong kho | `txapm install TXAVL.HelloTool --choose` |
 | Cài nhưng vẫn xem tiến trình | `txapm install TXAVL.HelloTool --progress` |
 | Cài với giao diện gốc của bộ cài | `txapm install TXAVL.HelloTool --interactive` |
 | Chỉ tải về, không cài | `txapm install TXAVL.HelloTool --download-only` |
@@ -131,6 +132,15 @@ phát hành; TXA không lưu lại bộ cài, và luôn đối chiếu SHA-256 t
 
 `npm` không có bộ cài riêng, nó đi kèm Node.js: `txapm install npm` sẽ cài Node.js (có sẵn `node`, `npm`, `npx`).
 Cần đổi giữa nhiều bản Node.js thì dùng thêm `txapm install nvm`.
+
+### Kho giữ bao nhiêu phiên bản?
+
+Mỗi gói giữ **10 phiên bản mới nhất** (bản mới nhất trừ đi 9 bản). Thêm một bản mới thì bản cũ nhất bị xoá
+trong cùng Pull Request (hoặc lần tự cập nhật). Cài bản cũ hơn bất kỳ lúc nào miễn bản đó còn trong kho:
+`txapm install <gói> --version <bản>`.
+
+Một số gói (ví dụ Cốc Cốc) có bộ cài riêng cho từng **ngôn ngữ**: `txapm` tự chọn bản đúng với ngôn ngữ hiển thị
+của Windows (trong manifest: `locale: vi-VN` / `en-US` trên từng target; ngôn ngữ khác dùng bản tiếng Anh).
 
 ### Khi cài, TXA làm gì?
 

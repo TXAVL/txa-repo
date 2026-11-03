@@ -4,7 +4,9 @@ from __future__ import annotations
 import time
 from dataclasses import dataclass
 
+from txa.core import retention
 from txa.core.github import GitHub, GitHubError
+from txa.core.manifest import package_dir
 
 
 @dataclass
@@ -42,6 +44,21 @@ def _free_branch(gh: GitHub, repo: str, name: str) -> str:
     return candidate
 
 
+def stale_paths(gh: GitHub, repo: str, base_tree: str, package_id: str, version: str) -> list[str]:
+    """Files of the oldest releases that must go so that, with ``version`` added, only the newest KEEP remain."""
+    prefix = package_dir(package_id).rstrip("/") + "/"
+    try:
+        listing = gh.get(f"repos/{repo}/git/trees/{base_tree}", params={"recursive": "1"})
+    except GitHubError:
+        return []
+    by_version: dict[str, list[str]] = {}
+    for entry in listing.get("tree", []):
+        if entry.get("type") == "blob" and entry["path"].startswith(prefix):
+            by_version.setdefault(entry["path"][len(prefix):].split("/")[0], []).append(entry["path"])
+    by_version.setdefault(version, [])
+    return [path for stale in retention.stale_versions(list(by_version), protect=version) for path in by_version[stale]]
+
+
 def submit(gh: GitHub, upstream: str, login: str, package_id: str, version: str, files: dict[str, str],
            title: str, body: str, direct: bool = False, log=print) -> Submission:
     """`files` maps repo-relative paths to file contents."""
@@ -67,10 +84,12 @@ def submit(gh: GitHub, upstream: str, login: str, package_id: str, version: str,
 
     base_sha = _wait_for_branch(gh, head_repo, base_branch, 30)
     base_tree = gh.get(f"repos/{head_repo}/git/commits/{base_sha}")["tree"]["sha"]
-    tree = gh.post(f"repos/{head_repo}/git/trees", json={
-        "base_tree": base_tree,
-        "tree": [{"path": path, "mode": "100644", "type": "blob", "content": text} for path, text in sorted(files.items())],
-    })
+    entries = [{"path": path, "mode": "100644", "type": "blob", "content": text} for path, text in sorted(files.items())]
+    dropped = stale_paths(gh, head_repo, base_tree, package_id, version)
+    entries += [{"path": path, "mode": "100644", "type": "blob", "sha": None} for path in dropped]
+    if dropped:
+        log(f"→ the repository keeps the newest {retention.KEEP} versions - removing the oldest ({len(dropped)} file(s))")
+    tree = gh.post(f"repos/{head_repo}/git/trees", json={"base_tree": base_tree, "tree": entries})
     commit = gh.post(f"repos/{head_repo}/git/commits", json={
         "message": f"{title}\n\nSubmitted with txacreate.",
         "tree": tree["sha"],

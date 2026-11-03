@@ -175,6 +175,19 @@ def main(argv: list[str] | None = None) -> int:
         if first in ("scan", "installed", "ls") and len(args_list) == 1:
             do_scan(_resolve_repo_root(None))
             return 0
+        if first == "prune":
+            from txa.core import retention
+
+            ap = console.SmartArgumentParser(prog="txacli prune", description="Keep only the newest versions of every package")
+            ap.add_argument("-r", "--repo", default=None, help="Repository root containing manifests/ (default: current repo)")
+            ap.add_argument("--keep", type=int, default=retention.KEEP, help=f"versions to keep per package (default {retention.KEEP})")
+            ap.add_argument("--dry-run", action="store_true", help="only list what would be removed")
+            parsed = ap.parse_args(args_list[1:])
+            report = retention.prune_repo(_resolve_repo_root(parsed.repo), parsed.keep, parsed.dry_run)
+            for package, versions in report.items():
+                console.say(f"  {package}: {'would remove' if parsed.dry_run else 'removed'} {', '.join(versions)}")
+            console.say(f"\n✓ {len(report)} package(s) had more than {parsed.keep} versions.")
+            return 0
         if first in ("sync", "update-all", "auto-update"):
             ap = console.SmartArgumentParser(prog="txacli sync", description="Auto-update all managed TXAVL packages in repo")
             ap.add_argument("package", nargs="?", default=None, help="Optional single package to check (e.g. Chrome)")

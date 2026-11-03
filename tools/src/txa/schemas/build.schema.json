@@ -31,7 +31,7 @@
     "targets": {
       "type": "array",
       "minItems": 1,
-      "maxItems": 3,
+      "maxItems": 8,
       "items": { "$ref": "#/$defs/target" }
     }
   },
@@ -44,6 +44,11 @@
       "required": ["arch", "engine", "source"],
       "properties": {
         "arch": { "enum": ["x64", "x86", "arm64"] },
+        "locale": {
+          "type": "string",
+          "pattern": "^[a-z]{2,3}(-[A-Za-z0-9]{2,8}){0,2}$",
+          "description": "Optional: this installer is for machines whose display language starts with this tag (vi, en...). Give one without a locale as the fallback."
+        },
         "engine": { "enum": ["inno", "nsis", "msi", "wix", "exe", "portable"] },
         "source": {
           "type": "object",

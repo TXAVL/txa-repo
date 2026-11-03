@@ -113,8 +113,14 @@ def _targets_or_skip(ctx: Context, target: dict, out: Outcome) -> list[dict]:
     return bundle.targets()
 
 
-def _artifact_file(ctx: Context, target: dict, arch: str) -> Path | None:
-    file = ctx.artifact(target, arch).get("file")
+def _slot(item: dict) -> str:
+    """Key/label of one installer: the CPU, plus the language when one CPU has several (x64-vi)."""
+    locale = (item.get("locale") or "").split("-")[0]
+    return f"{item['arch']}-{locale}" if locale else item["arch"]
+
+
+def _artifact_file(ctx: Context, target: dict, slot: str) -> Path | None:
+    file = ctx.artifact(target, slot).get("file")
     return Path(file) if file and Path(file).exists() else None
 
 
@@ -225,9 +231,9 @@ def structure(ctx: Context, target: dict, out: Outcome) -> None:
         for problem in schema_errors(kind, card):
             out.fail(f"{name}: {problem}")
     build = bundle.build or {}
-    arches = [t.get("arch") for t in build.get("targets") or [] if isinstance(t, dict)]
-    for arch in sorted({a for a in arches if arches.count(a) > 1}):
-        out.fail(f"{BUILD_FILE}: architecture '{arch}' is declared more than once")
+    arches = [(t.get("arch"), t.get("locale")) for t in build.get("targets") or [] if isinstance(t, dict)]
+    for arch, locale in sorted({a for a in arches if arches.count(a) > 1}, key=str):
+        out.fail(f"{BUILD_FILE}: architecture '{arch}'{f' / locale {locale}' if locale else ''} is declared more than once")
     if not checked:
         out.fail("no TXA cards found in this directory")
     elif out.status in ("PASS", "SKIP"):
@@ -241,8 +247,12 @@ def structure(ctx: Context, target: dict, out: Outcome) -> None:
 def naming(ctx: Context, target: dict, out: Outcome) -> None:
     bundle = ctx.bundle(target)
     parts = target["path"].split("/")
-    if ctx.mode == "ci" and len(ctx.targets) > 1:
-        out.fail(f"this pull request touches {len(ctx.targets)} releases - submit exactly one release per PR")
+    if ctx.mode == "ci":
+        added = [t for t in ctx.targets if t.get("mode") != "removal"]
+        packages = {"/".join(t["path"].split("/")[:4]) for t in ctx.targets}
+        # one new release of one package; dropping that package's oldest versions (the keep-10 rule) rides along
+        if len(added) > 1 or len(packages) > 1:
+            out.fail(f"this pull request touches {len(ctx.targets)} releases - submit exactly one release per PR")
     if len(parts) != 5 or parts[0] != "manifests":
         out.fail(f"'{target['path']}' does not follow manifests/<shard>/<Namespace>/<AppName>/<X.Y.Z>/")
     if bundle.subdirs:
@@ -412,21 +422,22 @@ def protocol(ctx: Context, target: dict, out: Outcome) -> None:
     s = net.session()
     for item in _targets_or_skip(ctx, target, out):
         arch, source = item["arch"], item["source"]
-        art = ctx.artifact(target, arch)
+        slot = _slot(item)
+        art = ctx.artifact(target, slot)
         art["mirrors"] = {}
         for role, url in [("primary", source["url"]), *(("mirror", m) for m in source.get("mirrors", []))]:
             if _SIGNED_QUERY.search(url):
-                out.warn(f"[{arch}] {url}: looks like a signed/expiring link - it will stop working")
+                out.warn(f"[{slot}] {url}: looks like a signed/expiring link - it will stop working")
             try:
                 result = net.probe(s, url, int(limits["max_redirects"]), float(limits["http_timeout_s"]))
             except net.RedirectLoop as exc:
-                out.fail(f"[{arch}] redirect loop: {exc}")
+                out.fail(f"[{slot}] redirect loop: {exc}")
                 continue
             except net.UnsafeURL as exc:
-                out.fail(f"[{arch}] insecure hop: {exc}")
+                out.fail(f"[{slot}] insecure hop: {exc}")
                 continue
             except Exception as exc:  # DNS, TLS, timeouts - all mean "unreachable"
-                out.fail(f"[{arch}] {role} unreachable: {type(exc).__name__}: {exc}")
+                out.fail(f"[{slot}] {role} unreachable: {type(exc).__name__}: {exc}")
                 continue
             record = {
                 "final_url": result.final_url, "status": result.status, "length": result.length,
@@ -439,9 +450,9 @@ def protocol(ctx: Context, target: dict, out: Outcome) -> None:
                 art["mirrors"][url] = record
             chain = len(result.hops) - 1
             if result.status not in (200, 206):
-                out.fail(f"[{arch}] {role} answered HTTP {result.status} after {chain} redirect(s)")
+                out.fail(f"[{slot}] {role} answered HTTP {result.status} after {chain} redirect(s)")
             else:
-                out.ok(f"[{arch}] {role}: HTTPS end-to-end, {chain} redirect(s), HTTP {result.status} in {result.elapsed_ms} ms")
+                out.ok(f"[{slot}] {role}: HTTPS end-to-end, {chain} redirect(s), HTTP {result.status} in {result.elapsed_ms} ms")
 
 
 # =========================================================================== 07
@@ -454,35 +465,36 @@ def payload_headers(ctx: Context, target: dict, out: Outcome) -> None:
     max_bytes = int(ctx.policy["limits"]["max_payload_mb"]) * 1024 * 1024
     for item in _targets_or_skip(ctx, target, out):
         arch = item["arch"]
-        probe = ctx.artifact(target, arch).get("probe")
+        slot = _slot(item)
+        probe = ctx.artifact(target, slot).get("probe")
         if not probe:
-            out.skip(f"[{arch}] no probe result (see STEP 06)")
+            out.skip(f"[{slot}] no probe result (see STEP 06)")
             continue
         headers, length = probe["headers"], probe["length"]
         if length is None:
-            out.warn(f"[{arch}] server sends no Content-Length - size limit enforced while streaming instead")
+            out.warn(f"[{slot}] server sends no Content-Length - size limit enforced while streaming instead")
         elif length > max_bytes:
-            out.fail(f"[{arch}] payload is {length / 1048576:.1f} MiB, limit is {max_bytes // 1048576} MiB")
+            out.fail(f"[{slot}] payload is {length / 1048576:.1f} MiB, limit is {max_bytes // 1048576} MiB")
         declared = item["source"].get("size")
         if declared and length and declared != length:
-            out.fail(f"[{arch}] source.size says {declared} bytes, server says {length}")
+            out.fail(f"[{slot}] source.size says {declared} bytes, server says {length}")
         ctype = headers.get("content-type", "").split(";", 1)[0].strip().lower()
         if ctype in _WEB_TYPES:
-            out.fail(f"[{arch}] Content-Type '{ctype}' - the URL serves a web page, not an installer")
+            out.fail(f"[{slot}] Content-Type '{ctype}' - the URL serves a web page, not an installer")
         elif not ctype:
-            out.warn(f"[{arch}] no Content-Type header")
+            out.warn(f"[{slot}] no Content-Type header")
         wanted = {"msi": ".msi", "portable": ".zip"}.get(item["engine"], ".exe")
         names = [probe["final_url"].split("?", 1)[0].rsplit("/", 1)[-1]]
         disposition = headers.get("content-disposition", "")
         if "filename=" in disposition:
             names.insert(0, disposition.split("filename=", 1)[1].split(";", 1)[0].strip().strip('"'))
         if not any(n.lower().endswith(wanted) for n in names):
-            out.warn(f"[{arch}] file name '{names[0]}' does not end with {wanted} for engine '{item['engine']}'")
+            out.warn(f"[{slot}] file name '{names[0]}' does not end with {wanted} for engine '{item['engine']}'")
         cdn = net.cdn_fingerprint(headers) or "unknown"
         server = headers.get("server", "n/a")
         resumable = "yes" if headers.get("accept-ranges", "").lower() == "bytes" or probe["method"].startswith("GET") else "no"
         size = f"{length / 1048576:.2f} MiB" if length else "unknown size"
-        out.ok(f"[{arch}] {size}, type {ctype or 'n/a'}, server '{server}', CDN {cdn}, resumable {resumable}, "
+        out.ok(f"[{slot}] {size}, type {ctype or 'n/a'}, server '{server}', CDN {cdn}, resumable {resumable}, "
                f"last-modified {headers.get('last-modified', 'n/a')}")
 
 
@@ -499,10 +511,11 @@ def availability(ctx: Context, target: dict, out: Outcome) -> None:
 
     for item in _targets_or_skip(ctx, target, out):
         arch = item["arch"]
-        art = ctx.artifact(target, arch)
+        slot = _slot(item)
+        art = ctx.artifact(target, slot)
         probe = art.get("probe")
         if not probe:
-            out.skip(f"[{arch}] no probe result (see STEP 06)")
+            out.skip(f"[{slot}] no probe result (see STEP 06)")
             continue
         url = probe["final_url"]
         host = urlsplit(url).hostname or ""
@@ -529,30 +542,30 @@ def availability(ctx: Context, target: dict, out: Outcome) -> None:
                 except Exception:
                     pass
             if ok == 3:
-                out.warn(f"[{arch}] geo DNS unavailable - {host} answered 3/3 probes from the runner only")
+                out.warn(f"[{slot}] geo DNS unavailable - {host} answered 3/3 probes from the runner only")
             else:
-                out.fail(f"[{arch}] {host} answered only {ok}/3 probes from the runner")
+                out.fail(f"[{slot}] {host} answered only {ok}/3 probes from the runner")
         else:
             good = [e for e in edges if e.ok]
             unique = {e.address for e in good}
             summary = ", ".join(f"{e.region}:{e.status or 'x'}" + (f"/{e.elapsed_ms}ms" if e.elapsed_ms else "") for e in edges)
             anycast = " (anycast edge)" if len(unique) == 1 and len(good) > 1 else ""
             if len(good) >= need:
-                out.ok(f"[{arch}] {host}: {len(good)}/{len(edges)} regions healthy{anycast} - {summary}")
+                out.ok(f"[{slot}] {host}: {len(good)}/{len(edges)} regions healthy{anycast} - {summary}")
             elif good:
-                out.warn(f"[{arch}] {host}: only {len(good)}/{len(edges)} regions healthy (want {need}) - {summary}")
+                out.warn(f"[{slot}] {host}: only {len(good)}/{len(edges)} regions healthy (want {need}) - {summary}")
             else:
-                out.fail(f"[{arch}] {host}: no region could reach the CDN - {summary}")
+                out.fail(f"[{slot}] {host}: no region could reach the CDN - {summary}")
             for edge in edges:
                 if edge.error and not edge.ok:
-                    out.info(f"[{arch}] {edge.region} @ {edge.address or '-'}: {edge.error}")
+                    out.info(f"[{slot}] {edge.region} @ {edge.address or '-'}: {edge.error}")
         for mirror, record in (art.get("mirrors") or {}).items():
             if record["status"] not in (200, 206):
-                out.fail(f"[{arch}] mirror {mirror} answered HTTP {record['status']}")
+                out.fail(f"[{slot}] mirror {mirror} answered HTTP {record['status']}")
             elif record["length"] and probe["length"] and record["length"] != probe["length"]:
-                out.fail(f"[{arch}] mirror {mirror} serves {record['length']} bytes, primary serves {probe['length']}")
+                out.fail(f"[{slot}] mirror {mirror} serves {record['length']} bytes, primary serves {probe['length']}")
             else:
-                out.ok(f"[{arch}] mirror {urlsplit(mirror).hostname} in sync with primary")
+                out.ok(f"[{slot}] mirror {urlsplit(mirror).hostname} in sync with primary")
 
 
 # =========================================================================== 09
@@ -566,38 +579,39 @@ def download(ctx: Context, target: dict, out: Outcome) -> None:
     s = net.session()
     for item in _targets_or_skip(ctx, target, out):
         arch = item["arch"]
-        art = ctx.artifact(target, arch)
-        if arch not in supplied and ctx.offline:
-            out.skip(f"[{arch}] offline mode and no local payload")
+        slot = _slot(item)
+        art = ctx.artifact(target, slot)
+        if slot not in supplied and arch not in supplied and ctx.offline:
+            out.skip(f"[{slot}] offline mode and no local payload")
             continue
-        if arch in supplied:
-            path = Path(supplied[arch])
+        if slot in supplied or arch in supplied:
+            path = Path(supplied.get(slot) or supplied[arch])
             art.update({"file": str(path), "bytes": path.stat().st_size, "stream_sha256": None})
-            out.ok(f"[{arch}] using local payload {path.name} ({path.stat().st_size} bytes)")
+            out.ok(f"[{slot}] using local payload {path.name} ({path.stat().st_size} bytes)")
         else:
             try:
-                result = net.download(s, item["source"]["url"], ctx.payload_dir(target, arch), max_bytes,
+                result = net.download(s, item["source"]["url"], ctx.payload_dir(target, slot), max_bytes,
                                       int(limits["max_redirects"]), float(limits["http_timeout_s"]) * 2)
             except Exception as exc:
-                out.fail(f"[{arch}] download failed: {type(exc).__name__}: {exc}")
+                out.fail(f"[{slot}] download failed: {type(exc).__name__}: {exc}")
                 continue
             art.update({"file": str(result.path), "bytes": result.bytes, "stream_sha256": result.sha256})
             if result.expected is not None and result.bytes != result.expected:
-                out.fail(f"[{arch}] truncated stream: {result.bytes}/{result.expected} bytes")
+                out.fail(f"[{slot}] truncated stream: {result.bytes}/{result.expected} bytes")
                 continue
             probe_len = (art.get("probe") or {}).get("length")
             if probe_len and probe_len != result.bytes:
-                out.fail(f"[{arch}] probe announced {probe_len} bytes but {result.bytes} arrived")
+                out.fail(f"[{slot}] probe announced {probe_len} bytes but {result.bytes} arrived")
                 continue
             extra = f", resumed after {result.attempts - 1} interruption(s)" if result.resumed else \
                 f", {result.attempts} attempt(s)" if result.attempts > 1 else ""
-            out.ok(f"[{arch}] {result.path.name}: {result.bytes} bytes received intact{extra}")
+            out.ok(f"[{slot}] {result.path.name}: {result.bytes} bytes received intact{extra}")
         with open(art["file"], "rb") as fh:
             head = fh.read(16)
         is_zip = head[:4] == b"PK\x03\x04"
         if head[:2] != b"MZ" and head[:8] != engines.CFB_MAGIC and not (is_zip and item["engine"] == "portable"):
             sniff = head[:15].decode("ascii", "replace")
-            out.fail(f"[{arch}] payload is not a Windows installer or portable ZIP (starts with {sniff!r})")
+            out.fail(f"[{slot}] payload is not a Windows installer or portable ZIP (starts with {sniff!r})")
 
 
 # =========================================================================== 10
@@ -625,31 +639,32 @@ def authenticode(ctx: Context, target: dict, out: Outcome) -> None:
     require = bool(ctx.policy["signature"].get("require"))
     for item in _targets_or_skip(ctx, target, out):
         arch = item["arch"]
-        file = _artifact_file(ctx, target, arch)
+        slot = _slot(item)
+        file = _artifact_file(ctx, target, slot)
         if not file:
-            out.skip(f"[{arch}] no payload (see STEP 09)")
+            out.skip(f"[{slot}] no payload (see STEP 09)")
             continue
         if item["engine"] == "portable":
-            out.skip(f"[{arch}] portable ZIP - an archive cannot carry an Authenticode signature")
+            out.skip(f"[{slot}] portable ZIP - an archive cannot carry an Authenticode signature")
             continue
         sig = signing.verify(file)
-        ctx.artifact(target, arch)["signature"] = {
+        ctx.artifact(target, slot)["signature"] = {
             "status": sig.status, "signer": sig.signer_cn, "issuer": sig.issuer,
             "thumbprint": sig.thumbprint, "timestamped": sig.timestamped, "engine": sig.engine,
         }
         if sig.status == "valid":
             stamp = "timestamped" if sig.timestamped else "NOT timestamped"
-            out.ok(f"[{arch}] valid signature by '{sig.signer_cn}' ({stamp}, verified via {sig.engine})")
+            out.ok(f"[{slot}] valid signature by '{sig.signer_cn}' ({stamp}, verified via {sig.engine})")
             if publisher and sig.signer_cn and not _resembles(publisher, sig.signer_cn):
-                out.warn(f"[{arch}] signer '{sig.signer_cn}' does not resemble publisher '{publisher}'")
+                out.warn(f"[{slot}] signer '{sig.signer_cn}' does not resemble publisher '{publisher}'")
             if not sig.timestamped:
-                out.warn(f"[{arch}] signature is not timestamped - it becomes invalid when the certificate expires")
+                out.warn(f"[{slot}] signature is not timestamped - it becomes invalid when the certificate expires")
         elif sig.status == "unsigned":
-            (out.fail if require else out.warn)(f"[{arch}] installer is not Authenticode-signed")
+            (out.fail if require else out.warn)(f"[{slot}] installer is not Authenticode-signed")
         elif sig.status in ("invalid", "untrusted"):
-            out.fail(f"[{arch}] signature {sig.status}: {sig.detail}")
+            out.fail(f"[{slot}] signature {sig.status}: {sig.detail}")
         else:
-            out.warn(f"[{arch}] signature could not be verified here: {sig.detail}")
+            out.warn(f"[{slot}] signature could not be verified here: {sig.detail}")
 
 
 # =========================================================================== 11
@@ -659,23 +674,24 @@ def authenticode(ctx: Context, target: dict, out: Outcome) -> None:
 def checksum(ctx: Context, target: dict, out: Outcome) -> None:
     for item in _targets_or_skip(ctx, target, out):
         arch = item["arch"]
-        file = _artifact_file(ctx, target, arch)
+        slot = _slot(item)
+        file = _artifact_file(ctx, target, slot)
         if not file:
-            out.skip(f"[{arch}] no payload (see STEP 09)")
+            out.skip(f"[{slot}] no payload (see STEP 09)")
             continue
-        art = ctx.artifact(target, arch)
+        art = ctx.artifact(target, slot)
         disk = net.sha256_file(file)
         art["sha256"] = disk
         stream = art.get("stream_sha256")
         if stream and stream != disk:
-            out.fail(f"[{arch}] streamed hash {stream} differs from on-disk hash {disk} - payload changed on disk")
+            out.fail(f"[{slot}] streamed hash {stream} differs from on-disk hash {disk} - payload changed on disk")
             continue
         declared = str(item["source"]["sha256"]).upper()
         if hmac.compare_digest(declared, disk):
             passes = "2 independent passes" if stream else "1 pass"
-            out.ok(f"[{arch}] SHA-256 {disk} matches the manifest ({passes}, {file.stat().st_size} bytes)")
+            out.ok(f"[{slot}] SHA-256 {disk} matches the manifest ({passes}, {file.stat().st_size} bytes)")
         else:
-            out.fail(f"[{arch}] SHA-256 mismatch - manifest {declared}, actual {disk}")
+            out.fail(f"[{slot}] SHA-256 mismatch - manifest {declared}, actual {disk}")
 
 
 # =========================================================================== 12
@@ -684,24 +700,25 @@ def checksum(ctx: Context, target: dict, out: Outcome) -> None:
 def _check_portable(item: dict, file: Path, found: engines.Inspection, out: Outcome) -> None:
     """Portable ZIP: safe to unpack, declared strip/PATH folders hold programs, CPU matches."""
     arch = item["arch"]
+    slot = _slot(item)
     if found.format != "zip":
-        out.fail(f"[{arch}] engine 'portable' declared but the payload is {found.label}")
+        out.fail(f"[{slot}] engine 'portable' declared but the payload is {found.label}")
         return
     if item["engine"] != "portable":
-        out.fail(f"[{arch}] the payload is a ZIP archive - declare engine: portable")
+        out.fail(f"[{slot}] the payload is a ZIP archive - declare engine: portable")
         return
     spec = item["portable"]
     strip, folders = int(spec.get("strip", 0)), spec["path"]
     try:
         by_folder = portable.exes(file, strip)
     except portable.ZipProblem as exc:
-        out.fail(f"[{arch}] unsafe archive: {exc}")
+        out.fail(f"[{slot}] unsafe archive: {exc}")
         return
     ok = True
     for folder in folders:
         if folder not in by_folder:
             hint = f" (found programs in: {', '.join(by_folder)})" if by_folder else " (the archive has no .exe)"
-            out.fail(f"[{arch}] PATH folder '{folder}' has no .exe after strip={strip}{hint}")
+            out.fail(f"[{slot}] PATH folder '{folder}' has no .exe after strip={strip}{hint}")
             ok = False
     if not ok:
         return
@@ -713,7 +730,7 @@ def _check_portable(item: dict, file: Path, found: engines.Inspection, out: Outc
         try:
             machine = pe.read_pe(sample, with_version=False).machine if sample else None
         except pe.PEError as exc:
-            out.fail(f"[{arch}] {entry.parts[-1]}: {exc}")
+            out.fail(f"[{slot}] {entry.parts[-1]}: {exc}")
             return
         finally:
             if sample:
@@ -722,20 +739,21 @@ def _check_portable(item: dict, file: Path, found: engines.Inspection, out: Outc
     layout = found.layout
     summary = f"{layout.files} files, {layout.unpacked / 1048576:.0f} MiB unpacked, PATH {', '.join(folders)} → {programs}"
     if machine == arch:
-        out.ok(f"[{arch}] portable ZIP, native {machine} programs; {summary}")
+        out.ok(f"[{slot}] portable ZIP, native {machine} programs; {summary}")
     elif machine == "x86" and arch in ("x64", "arm64"):
-        out.warn(f"[{arch}] portable ZIP holds 32-bit programs; {summary}")
+        out.warn(f"[{slot}] portable ZIP holds 32-bit programs; {summary}")
     else:
-        out.fail(f"[{arch}] programs in '{folders[0]}' are {machine}, which cannot be declared as {arch}")
+        out.fail(f"[{slot}] programs in '{folders[0]}' are {machine}, which cannot be declared as {arch}")
 
 
 @step(12)
 def binary(ctx: Context, target: dict, out: Outcome) -> None:
     for item in _targets_or_skip(ctx, target, out):
         arch, engine = item["arch"], item["engine"]
-        file = _artifact_file(ctx, target, arch)
+        slot = _slot(item)
+        file = _artifact_file(ctx, target, slot)
         if not file:
-            out.skip(f"[{arch}] no payload (see STEP 09)")
+            out.skip(f"[{slot}] no payload (see STEP 09)")
             continue
         found = engines.inspect(file)
         record = {"format": found.format, "engine": found.engine, "label": found.label,
@@ -743,44 +761,44 @@ def binary(ctx: Context, target: dict, out: Outcome) -> None:
         if found.pe:
             record.update({"os_version": list(found.pe.os_version), "subsystem_version": list(found.pe.subsystem_version),
                            "product_version": found.product_version, "company": found.company})
-        ctx.artifact(target, arch)["inspection"] = record
+        ctx.artifact(target, slot)["inspection"] = record
         for note in found.notes:
-            out.info(f"[{arch}] {note}")
+            out.info(f"[{slot}] {note}")
         if found.format == "unknown":
-            out.fail(f"[{arch}] unsupported payload format ({found.label})")
+            out.fail(f"[{slot}] unsupported payload format ({found.label})")
             continue
         if engine == "portable" or found.format == "zip":
             _check_portable(item, file, found, out)
             continue
         if engine == "msi" and found.format != "msi":
-            out.fail(f"[{arch}] engine 'msi' declared but the payload is a {found.label}")
+            out.fail(f"[{slot}] engine 'msi' declared but the payload is a {found.label}")
             continue
         if engine != "msi" and found.format == "msi":
-            out.fail(f"[{arch}] payload is a Windows Installer package - declare engine: msi")
+            out.fail(f"[{slot}] payload is a Windows Installer package - declare engine: msi")
             continue
         if engine != "msi":
             if found.engine == engine:
                 pass
             elif engine == "exe":
                 if found.engine != "exe":
-                    out.warn(f"[{arch}] detected {found.label} - declare engine: {found.engine} to get verified default switches")
+                    out.warn(f"[{slot}] detected {found.label} - declare engine: {found.engine} to get verified default switches")
             else:
-                out.fail(f"[{arch}] engine '{engine}' declared but {found.label} detected")
+                out.fail(f"[{slot}] engine '{engine}' declared but {found.label} detected")
                 continue
         if found.format == "msi":
             if found.payload_arch and found.payload_arch != arch:
-                out.fail(f"[{arch}] MSI template targets {found.payload_arch}, manifest says {arch}")
+                out.fail(f"[{slot}] MSI template targets {found.payload_arch}, manifest says {arch}")
                 continue
-            out.ok(f"[{arch}] {found.label}, template '{found.msi.get('template')}'")
+            out.ok(f"[{slot}] {found.label}, template '{found.msi.get('template')}'")
             continue
         machine = found.machine
         if machine == arch:
-            out.ok(f"[{arch}] native {machine} PE, engine {found.label}")
+            out.ok(f"[{slot}] native {machine} PE, engine {found.label}")
         elif machine == "x86" and arch in ("x64", "arm64"):
-            note = f"[{arch}] 32-bit {found.label} bootstrapper installing {arch} payload"
+            note = f"[{slot}] 32-bit {found.label} bootstrapper installing {arch} payload"
             (out.warn if engine == "exe" else out.ok)(note + ("" if engine != "exe" else " - confirm manually"))
         else:
-            out.fail(f"[{arch}] PE machine is {machine}, which cannot be declared as {arch}")
+            out.fail(f"[{slot}] PE machine is {machine}, which cannot be declared as {arch}")
 
 
 # =========================================================================== 13
@@ -808,14 +826,15 @@ def os_compat(ctx: Context, target: dict, out: Outcome) -> None:
         out.fail(f"min_build {text} predates Windows 7 - not supported by TXA")
     for item in items:
         arch = item["arch"]
+        slot = _slot(item)
         if arch == "arm64" and declared < winos.ARM64_FLOOR:
             out.fail(f"[arm64] arm64 desktop apps need {winos.fmt(winos.ARM64_FLOOR)} or newer, min_build is {text}")
-        inspection = ctx.artifact(target, arch).get("inspection") or {}
+        inspection = ctx.artifact(target, slot).get("inspection") or {}
         needs = max(tuple(inspection.get("os_version") or (0, 0)), tuple(inspection.get("subsystem_version") or (0, 0)))
         if needs > declared[:2]:
-            out.fail(f"[{arch}] binary header requires Windows NT {needs[0]}.{needs[1]}, but min_build says {text}")
+            out.fail(f"[{slot}] binary header requires Windows NT {needs[0]}.{needs[1]}, but min_build says {text}")
         elif inspection.get("format") == "pe":
-            out.ok(f"[{arch}] PE header needs NT {needs[0]}.{needs[1]} ≤ declared {declared[0]}.{declared[1]}")
+            out.ok(f"[{slot}] PE header needs NT {needs[0]}.{needs[1]} ≤ declared {declared[0]}.{declared[1]}")
     where = "below" if declared < floor else "at/above"
     out.ok(f"min_build {text} = {winos.describe(declared)} ({where} TXA floor {winos.fmt(floor)})")
 
@@ -827,8 +846,9 @@ def os_compat(ctx: Context, target: dict, out: Outcome) -> None:
 def switches(ctx: Context, target: dict, out: Outcome) -> None:
     for item in _targets_or_skip(ctx, target, out):
         arch, engine = item["arch"], item["engine"]
+        slot = _slot(item)
         if engine == "portable":
-            out.ok(f"[{arch}] portable: txapm unpacks the archive and edits PATH - nothing is executed, no switches")
+            out.ok(f"[{slot}] portable: txapm unpacks the archive and edits PATH - nothing is executed, no switches")
             continue
         effective = engines.effective_switches(item)
         errors, warnings = engines.check_switches(engine, effective)
@@ -838,9 +858,9 @@ def switches(ctx: Context, target: dict, out: Outcome) -> None:
         if codes and 0 not in codes:
             warnings.append("success_codes does not include 0")
         for error in errors:
-            out.fail(f"[{arch}] {error}")
+            out.fail(f"[{slot}] {error}")
         for warning in warnings:
-            out.warn(f"[{arch}] {warning}")
+            out.warn(f"[{slot}] {warning}")
         if not errors:
             source = "declared" if item.get("switches") else "TXA defaults"
-            out.ok(f"[{arch}] {engine}: silent '{effective['silent']}', progress '{effective['progress']}' ({source})")
+            out.ok(f"[{slot}] {engine}: silent '{effective['silent']}', progress '{effective['progress']}' ({source})")
