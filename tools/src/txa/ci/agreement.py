@@ -174,6 +174,8 @@ def process(gh: GitHub, repo: str, number: int, comment_id: int | None = None) -
     if not is_new_pkg and not has_agreed:
         if pr.get("author_association") in EXEMPT:
             has_agreed, how = True, "maintainer, exempt"
+        elif pr["user"].get("type") == "Bot":
+            has_agreed, how = True, "automation"  # the scheduled auto-update opens its pull requests as the bot
         elif _returning(gh, repo, author):
             has_agreed, how = True, "agreed on an earlier pull request"
 

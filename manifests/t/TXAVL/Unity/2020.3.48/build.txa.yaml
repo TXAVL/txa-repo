@@ -13,7 +13,7 @@ targets:
     source:
       url: https://download.unity3d.com/download_unity/b805b124c6b7/Windows64EditorInstaller/UnitySetup64-2020.3.48f1.exe
       sha256: 4B9652C2BCED5E3B796FA186C5F8660882D2D900BFC7630963ED32329C1D3FF0
-      size: 1
+      size: 2812613280
     switches:
       silent: /S
       progress: /S

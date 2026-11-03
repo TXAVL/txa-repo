@@ -13,7 +13,7 @@ targets:
     source:
       url: https://static3.cdn.ubi.com/orbit/launcher_installer/UbisoftConnectInstaller.exe
       sha256: 95D8BD6197A2A3E1F5A2297E65125E1C9F2091CA7967FD3EBC33A7C939CA396B
-      size: 1
+      size: 262918936
     switches:
       silent: /S
       progress: /S

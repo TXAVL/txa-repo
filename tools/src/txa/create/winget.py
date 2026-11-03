@@ -661,7 +661,7 @@ def convert_winget_to_draft(data: dict[str, Any], namespace: str = "TXAVL", over
             arch=arch,
             engine=engine,
             sha256=sha,
-            size=1,
+            size=_real_size(url),
             payload=Path(""),
             switches=switches,
             portable=portable_dict,
@@ -715,11 +715,22 @@ def save_draft_manifests(draft, root_dir, dry_run: bool = False):
     return target_dir
 
 
+def _real_size(url: str) -> int:
+    """The installer's real byte size (the validator compares it with what the server reports); 1 only if the server hides it."""
+    try:
+        length = net.probe(net.session(), url).length
+    except Exception:  # noqa: BLE001 - an unreachable server must not stop the sync
+        length = None
+    return length or 1
+
+
 # Hand-written / non-WinGet packages that must NEVER be overwritten by automatic WinGet sync
 _HANDWRITTEN_APPS = {
     "CanhCutTeamLauncher",
     "TXAWinSetup",
     "Warframe",
+    "MSYS2",   # the only "MSYS2" id upstream belongs to an emulator build, not the MSYS2 project
+    "UniKey",  # repackaged with install/uninstall scripts
 }
 
 # Deterministic mapping from TXAVL AppName -> exact WinGet PackageIdentifier
@@ -881,7 +892,7 @@ def sync_txavl_packages(
                         arch=arch,
                         engine="inno",
                         sha256=dl.sha256,
-                        size=1,
+                        size=dl.bytes or _real_size(url),
                         payload=Path(""),
                         switches=dict(DEFAULT_SWITCHES["inno"]),
                         portable={},

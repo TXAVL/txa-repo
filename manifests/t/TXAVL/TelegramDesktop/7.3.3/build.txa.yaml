@@ -13,7 +13,7 @@ targets:
     source:
       url: https://github.com/telegramdesktop/tdesktop/releases/download/v7.3.3/td-setup-win-x64-7.3.3.exe
       sha256: 865CD80080EF1948BD818000C05FE81CABBBD0688A91C2CF8978F9CC73FD5A06
-      size: 1
+      size: 63102944
     switches:
       silent: /VERYSILENT /SUPPRESSMSGBOXES /NORESTART /SP-
       progress: /SILENT /SUPPRESSMSGBOXES /NORESTART /SP-
@@ -22,7 +22,7 @@ targets:
     source:
       url: https://github.com/telegramdesktop/tdesktop/releases/download/v7.3.3/td-setup-win-arm-7.3.3.exe
       sha256: 49032F25F6F86F1339CB2A8D19D1A00B005DBC78EE86F6679F47B3477C472A92
-      size: 1
+      size: 57003552
     switches:
       silent: /VERYSILENT /SUPPRESSMSGBOXES /NORESTART /SP-
       progress: /SILENT /SUPPRESSMSGBOXES /NORESTART /SP-
@@ -31,7 +31,7 @@ targets:
     source:
       url: https://github.com/telegramdesktop/tdesktop/releases/download/v7.3.3/td-setup-win-x86-7.3.3.exe
       sha256: ED157DBE8683D5FEA22E48DAA6F54DAF4D45F12005BC1E5844010B15E182D0E7
-      size: 1
+      size: 57053096
     switches:
       silent: /VERYSILENT /SUPPRESSMSGBOXES /NORESTART /SP-
       progress: /SILENT /SUPPRESSMSGBOXES /NORESTART /SP-

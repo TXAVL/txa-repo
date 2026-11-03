@@ -13,7 +13,7 @@ targets:
     source:
       url: https://downloads.claude.ai/releases/win32/x64/2.42304.2/Claude-af65c0e384c1657459441aac3083c6e622789afe.exe
       sha256: 9EFF78C6FD1FDE2035806401BD3933578842D9A377B76DACFDB7B14571A002B0
-      size: 1
+      size: 262896288
     switches:
       silent: /S
       progress: /S
@@ -22,7 +22,7 @@ targets:
     source:
       url: https://downloads.claude.ai/releases/win32/arm64/2.42304.2/Claude-af65c0e384c1657459441aac3083c6e622789afe.exe
       sha256: 1F5D78AF009EE9018D441E2D2D117C997780F308D1054A24DD20D370D0EDB73E
-      size: 1
+      size: 257626272
     switches:
       silent: /S
       progress: /S

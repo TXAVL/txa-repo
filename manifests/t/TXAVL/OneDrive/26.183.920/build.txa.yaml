@@ -13,7 +13,7 @@ targets:
     source:
       url: https://oneclient.sfx.ms/Win/Installers/26.183.0920.0005/amd64/OneDriveSetup.exe
       sha256: 2BA7C8C6735294AD2398C37147924288B91CD7B22AC980664D990A08F347D3C3
-      size: 1
+      size: 134643088
     switches:
       silent: /S
       progress: /S
@@ -22,7 +22,7 @@ targets:
     source:
       url: https://oneclient.sfx.ms/Win/Installers/26.183.0920.0005/arm64/OneDriveSetup.exe
       sha256: DE4A896484873DE52AEFCF77CB33E046A95EA87CD0FAC1F08DFE0EF2C808DC3E
-      size: 1
+      size: 129856872
     switches:
       silent: /S
       progress: /S
@@ -31,7 +31,7 @@ targets:
     source:
       url: https://oneclient.sfx.ms/Win/Installers/26.183.0920.0005/OneDriveSetup.exe
       sha256: 2195187B95FD4C45EA093675477C2C0421BDFA4EDBFC8F9B8F92CE46CD14D3E7
-      size: 1
+      size: 126981480
     switches:
       silent: /S
       progress: /S

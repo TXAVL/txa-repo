@@ -13,7 +13,7 @@ targets:
     source:
       url: https://gamedownloads.rockstargames.com/public/installer/Rockstar-Games-Launcher.exe
       sha256: 321886457B7E4AB727A27671C17A815684A3943579EEDF7E2248A3B9F0973746
-      size: 1
+      size: 112853112
     switches:
       silent: /S
       progress: /S

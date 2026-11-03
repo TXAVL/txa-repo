@@ -13,7 +13,7 @@ targets:
     source:
       url: https://download.canhcutteam.com/Launcher/CanhCutTeam_Setup.msi
       sha256: CA35572BA413113BA72E4F1EBE71D7DA2BEF7192CF788085AC6DADCF2CBC7DA6
-      size: 1
+      size: 72069632
     switches:
       silent: /qn /norestart
       progress: /qb! /norestart

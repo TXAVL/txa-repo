@@ -13,7 +13,7 @@ targets:
     source:
       url: https://download.microsoft.com/download/9d8b4560-78de-40b0-91f9-d0a48dda818b/2317f3da-b666-45ac-baa4-72da1586d33c/windowsdesktop-runtime-8.0.33-win-x64.exe
       sha256: 4DE14DE0B327E801D7A691CB1AFC8A00DB5313A698EF53B979FC6F84FCE631DE
-      size: 1
+      size: 58398672
     switches:
       silent: /quiet /norestart
       progress: /passive /norestart
@@ -22,7 +22,7 @@ targets:
     source:
       url: https://download.microsoft.com/download/9d8b4560-78de-40b0-91f9-d0a48dda818b/ce78f5f8-bc7b-4a55-a2c3-862cccd8d9bd/windowsdesktop-runtime-8.0.33-win-arm64.exe
       sha256: 452C065E4D030C2F54D757461BD83E787C51378F2529F938FEB30DDA197307DF
-      size: 1
+      size: 53967552
     switches:
       silent: /quiet /norestart
       progress: /passive /norestart
@@ -31,7 +31,7 @@ targets:
     source:
       url: https://download.microsoft.com/download/9d8b4560-78de-40b0-91f9-d0a48dda818b/3efa31c6-6415-4349-ada5-1d18d0a2444c/windowsdesktop-runtime-8.0.33-win-x86.exe
       sha256: C53526F89D73C8026AC5217AD08069D17547E8D8AA33ECDC898130030A47A14F
-      size: 1
+      size: 53711792
     switches:
       silent: /quiet /norestart
       progress: /passive /norestart

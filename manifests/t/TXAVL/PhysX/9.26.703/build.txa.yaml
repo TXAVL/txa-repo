@@ -13,7 +13,7 @@ targets:
     source:
       url: https://us.download.nvidia.com/Windows/9.26.0703/PhysX_9.26.0703_SystemSoftware.exe
       sha256: 84B606D047B350B050B55E10993039C9FB0D3F8A2D01D3519872E80C1DA109F8
-      size: 1
+      size: 34979112
     switches:
       silent: /S
       progress: /S

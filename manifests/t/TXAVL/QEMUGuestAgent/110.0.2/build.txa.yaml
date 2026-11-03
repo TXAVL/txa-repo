@@ -13,7 +13,7 @@ targets:
     source:
       url: https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/archive-qemu-ga/qemu-ga-win-110.0.2-1.el10/qemu-ga-x86_64.msi
       sha256: C50EA2E7C04730A1097AB6C112138645BE4DA26015518329DAEBE8D3630E0790
-      size: 1
+      size: 11793408
     switches:
       silent: /qn /norestart
       progress: /qb! /norestart
@@ -22,7 +22,7 @@ targets:
     source:
       url: https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/archive-qemu-ga/qemu-ga-win-110.0.2-1.el10/qemu-ga-i386.msi
       sha256: FC37607D0063E6D4BECA827D554DFA3F59417412098B3049E6BB44AC273F0820
-      size: 1
+      size: 11624960
     switches:
       silent: /qn /norestart
       progress: /qb! /norestart

@@ -13,7 +13,7 @@ targets:
     source:
       url: https://public-cdn.cloud.unity3d.com/hub/prod/3.22.5/UnityHubSetup-3.22.5-x64.exe
       sha256: C0C2040C09DA024E19CFE1713B8154C624AB1FF77F21C871C95E3A09EB2C8CCD
-      size: 1
+      size: 193082648
     switches:
       silent: /S
       progress: /S
@@ -22,7 +22,7 @@ targets:
     source:
       url: https://public-cdn.cloud.unity3d.com/hub/prod/3.22.5/UnityHubSetup-3.22.5-arm64.exe
       sha256: C7296132D7A905FDA9332E17C6A1B3DB7BCCF563489904E33C56721EC8B62900
-      size: 1
+      size: 183602720
     switches:
       silent: /S
       progress: /S

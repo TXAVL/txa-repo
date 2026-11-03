@@ -13,7 +13,7 @@ targets:
     source:
       url: https://download.microsoft.com/download/9a5569d2-a134-42cb-940f-d7225433a20c/MicrosoftEdgeEnterpriseX64.msi
       sha256: F7BC427C4D26AEFE12BD492A24959CC6CA328AEA2851614637D7133CAE329071
-      size: 1
+      size: 215318528
     switches:
       silent: /qn /norestart
       progress: /qb! /norestart
@@ -22,7 +22,7 @@ targets:
     source:
       url: https://download.microsoft.com/download/9a5569d2-a134-42cb-940f-d7225433a20c/MicrosoftEdgeEnterpriseARM64.msi
       sha256: FBC24254C81CE7A0C1FB776EE6D1F58FECE30FFEDEE6F3613637117B51247918
-      size: 1
+      size: 218644480
     switches:
       silent: /qn /norestart
       progress: /qb! /norestart
@@ -31,7 +31,7 @@ targets:
     source:
       url: https://download.microsoft.com/download/9a5569d2-a134-42cb-940f-d7225433a20c/MicrosoftEdgeEnterpriseX86.msi
       sha256: 07D84F7FA262AB981E4DB3D1CE99380521397298B631FAE295FE8A86CA8013FC
-      size: 1
+      size: 190894080
     switches:
       silent: /qn /norestart
       progress: /qb! /norestart

@@ -13,7 +13,7 @@ targets:
     source:
       url: https://github.com/JanDeDobbeleer/oh-my-posh/releases/download/v31.9.1/install-x64.msix
       sha256: E789FAD6B961532DA431C58983666749E12019EA2328F5ECE151FA9433E6FD92
-      size: 1
+      size: 6157893
     switches:
       silent: /S
       progress: /S
@@ -22,7 +22,7 @@ targets:
     source:
       url: https://github.com/JanDeDobbeleer/oh-my-posh/releases/download/v31.9.1/install-arm64.msix
       sha256: 038526B67A623404F173B87126C1713557AE508439969877CBED0BF77342B7DD
-      size: 1
+      size: 5499244
     switches:
       silent: /S
       progress: /S

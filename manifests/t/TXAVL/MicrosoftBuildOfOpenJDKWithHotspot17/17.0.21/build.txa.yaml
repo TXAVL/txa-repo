@@ -13,7 +13,7 @@ targets:
     source:
       url: https://aka.ms/download-jdk/microsoft-jdk-17.0.21.0.2-windows-x64.msi#winget
       sha256: 303FF40A72A88FAB605B8E846968B369C52DE6F17AB262AFE50F4AFCF1C6D3D4
-      size: 1
+      size: 168456192
     switches:
       silent: /qn /norestart
       progress: /qb! /norestart
@@ -22,7 +22,7 @@ targets:
     source:
       url: https://aka.ms/download-jdk/microsoft-jdk-17.0.21.0.2-windows-aarch64.msi#winget
       sha256: 71643FBA8211EF4106176BDD68CC2614843F0B6D0EB294533058BD91A3002AC6
-      size: 1
+      size: 164593664
     switches:
       silent: /qn /norestart
       progress: /qb! /norestart

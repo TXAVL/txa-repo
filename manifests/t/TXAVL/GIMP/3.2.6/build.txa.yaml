@@ -13,7 +13,7 @@ targets:
     source:
       url: https://download.gimp.org/gimp/v3.2/windows/gimp-3.2.6-setup.exe
       sha256: 9337CCCBC01D4098EE7A3DAB215B3AFBE6ECE99C5287C92441D6F12CF541EBCA
-      size: 1
+      size: 190358080
     switches:
       silent: /VERYSILENT /SUPPRESSMSGBOXES /NORESTART /SP-
       progress: /SILENT /SUPPRESSMSGBOXES /NORESTART /SP-

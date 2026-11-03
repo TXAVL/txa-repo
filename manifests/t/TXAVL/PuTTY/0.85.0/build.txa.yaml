@@ -13,7 +13,7 @@ targets:
     source:
       url: https://the.earth.li/~sgtatham/putty/0.85/w64/putty-64bit-0.85-installer.msi
       sha256: 2213EBACF962B709411D654A40087508A694756BC4E41C5A1C24AD86596B2511
-      size: 1
+      size: 3846144
     switches:
       silent: /qn /norestart
       progress: /qb! /norestart
@@ -22,7 +22,7 @@ targets:
     source:
       url: https://the.earth.li/~sgtatham/putty/0.85/wa64/putty-arm64-0.85-installer.msi
       sha256: F26059B6F6CFA7BADD59A1F133AF4338AD3EC68E8B0AEB0EC1DFD7D63E1C66D4
-      size: 1
+      size: 3303936
     switches:
       silent: /qn /norestart
       progress: /qb! /norestart
@@ -31,7 +31,7 @@ targets:
     source:
       url: https://the.earth.li/~sgtatham/putty/0.85/w32/putty-0.85-installer.msi
       sha256: CBC48AF94F6462FA3C1859F4185A1FFDA360C3C760DEF9AD5B1E0EC1430B2E09
-      size: 1
+      size: 3512832
     switches:
       silent: /qn /norestart
       progress: /qb! /norestart

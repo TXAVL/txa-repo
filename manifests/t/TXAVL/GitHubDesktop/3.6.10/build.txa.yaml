@@ -13,7 +13,7 @@ targets:
     source:
       url: https://desktop.githubusercontent.com/releases/3.6.10-ffeefe5d/GitHubDesktopSetup-x64.exe
       sha256: 36CAE76228A32CFABCF2BF3E17E6BB3F4E294B70692CA88A163595E6603DD835
-      size: 1
+      size: 269355808
     switches:
       silent: /S
       progress: /S
@@ -22,7 +22,7 @@ targets:
     source:
       url: https://desktop.githubusercontent.com/releases/3.6.10-ffeefe5d/GitHubDesktopSetup-arm64.exe
       sha256: 1F83A4C4623B9E7CD4634FEE4BE47684D7CE67C66B7FCA36293EAC6F74BD4EAA
-      size: 1
+      size: 268076832
     switches:
       silent: /S
       progress: /S

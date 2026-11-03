@@ -13,7 +13,7 @@ targets:
     source:
       url: https://cdn.gxx.garenanow.com/gxx/pc/installer/Garena-v2.0.exe
       sha256: 2DA45C2783C2B9A0B30515603E54487E121542CDA852502376FB4152E0C73F95
-      size: 1
+      size: 73106216
     switches:
       silent: /S
       progress: /S

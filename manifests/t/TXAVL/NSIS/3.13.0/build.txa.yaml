@@ -13,7 +13,7 @@ targets:
     source:
       url: https://sourceforge.net/projects/nsis/files/NSIS%203/3.13/nsis-3.13-setup.exe/download
       sha256: DB9A1038BBC0E53FEF24F423FD609979BD578E942F1BE1198DB186D1C42652A3
-      size: 1
+      size: 1567985
     switches:
       silent: /S
       progress: /S

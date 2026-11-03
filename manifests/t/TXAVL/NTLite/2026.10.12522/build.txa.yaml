@@ -13,7 +13,7 @@ targets:
     source:
       url: https://downloads.ntlite.com/files/packages/2026.10.12522/NTLite_setup_x64.exe
       sha256: 579E61E0CFFDD69272173E3D23F1E55A215015697E210F22E57442BFB377B94D
-      size: 1
+      size: 28192512
     switches:
       silent: /VERYSILENT /SUPPRESSMSGBOXES /NORESTART /SP-
       progress: /SILENT /SUPPRESSMSGBOXES /NORESTART /SP-
@@ -22,7 +22,7 @@ targets:
     source:
       url: https://downloads.ntlite.com/files/packages/2026.10.12522/NTLite_setup_x86_legacy.exe
       sha256: 9E0999B1EEAE484DEC1A2CEF20D79576EBE4E5EB7911E518845BA06EA5C0F50A
-      size: 1
+      size: 24241272
     switches:
       silent: /VERYSILENT /SUPPRESSMSGBOXES /NORESTART /SP-
       progress: /SILENT /SUPPRESSMSGBOXES /NORESTART /SP-

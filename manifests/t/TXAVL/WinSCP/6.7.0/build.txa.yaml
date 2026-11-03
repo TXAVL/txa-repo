@@ -13,7 +13,7 @@ targets:
     source:
       url: https://sourceforge.net/projects/winscp/files/WinSCP/6.7/WinSCP-6.7-Setup.exe/download
       sha256: C8E603088B608B6620CA8E06846486CFED48969B76B111F05A83A386A829207C
-      size: 1
+      size: 13150616
     switches:
       silent: /VERYSILENT /SUPPRESSMSGBOXES /NORESTART /SP-
       progress: /SILENT /SUPPRESSMSGBOXES /NORESTART /SP-

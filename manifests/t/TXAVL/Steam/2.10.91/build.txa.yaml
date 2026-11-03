@@ -13,7 +13,7 @@ targets:
     source:
       url: https://cdn.akamai.steamstatic.com/client/installer/SteamSetup.exe
       sha256: 7D3654531C32D941B8CAE81C4137FC542172BFA9635F169CB392F245A0A12BCB
-      size: 1
+      size: 2380800
     switches:
       silent: /S
       progress: /S

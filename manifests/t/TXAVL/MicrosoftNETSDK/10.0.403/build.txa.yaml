@@ -13,7 +13,7 @@ targets:
     source:
       url: https://download.microsoft.com/download/4a85064e-5a0f-43c9-85ea-a5a9d78047c5/7a651622-ad57-4db0-8c1e-12771c93f513/dotnet-sdk-10.0.403-win-x64.exe
       sha256: C71A1710BF3B931318E24A58C8414C1B4CC5D4FCAC4510C07965C64083846332
-      size: 1
+      size: 215399928
     switches:
       silent: /quiet /norestart
       progress: /passive /norestart
@@ -22,7 +22,7 @@ targets:
     source:
       url: https://download.microsoft.com/download/4a85064e-5a0f-43c9-85ea-a5a9d78047c5/69586988-741e-45cd-b271-fa9f5852f5b6/dotnet-sdk-10.0.403-win-arm64.exe
       sha256: 2DE453311AC3C0B3557FB86BA2258507E38555D11D5937CFBE318FDBBCF861CC
-      size: 1
+      size: 203654816
     switches:
       silent: /quiet /norestart
       progress: /passive /norestart
@@ -31,7 +31,7 @@ targets:
     source:
       url: https://download.microsoft.com/download/4a85064e-5a0f-43c9-85ea-a5a9d78047c5/3f3b41cb-2de0-4c76-9fa3-419d054225c4/dotnet-sdk-10.0.403-win-x86.exe
       sha256: 1EFABF262ADCD8DC33CD8D8AE8AEA8D90A1AFA7F13C9E5E25570F6849DBE9E53
-      size: 1
+      size: 203127872
     switches:
       silent: /quiet /norestart
       progress: /passive /norestart

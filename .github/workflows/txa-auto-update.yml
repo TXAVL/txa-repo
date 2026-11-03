@@ -28,10 +28,21 @@ jobs:
   sync:
     name: Auto-update TXAVL manifests
     runs-on: windows-latest
+    env:
+      APP_ID: ${{ secrets.TXA_APP_ID }}
     steps:
+      - name: Bot identity (GitHub App - must be allowed to bypass the main branch rule)
+        id: app
+        if: env.APP_ID != ''
+        uses: actions/create-github-app-token@v2
+        with:
+          app-id: ${{ secrets.TXA_APP_ID }}
+          private-key: ${{ secrets.TXA_APP_PRIVATE_KEY }}
+
       - uses: actions/checkout@v7
         with:
           fetch-depth: 0
+          token: ${{ steps.app.outputs.token || github.token }}
 
       - uses: actions/setup-python@v7
         with:
@@ -55,12 +66,12 @@ jobs:
             txacli sync --namespace TXAVL
           }
 
-      - name: Commit & push updated manifests
+      - name: Open a pull request with the updated manifests
         shell: pwsh
         env:
-          GH_TOKEN: ${{ github.token }}
+          GH_TOKEN: ${{ steps.app.outputs.token || github.token }}
         run: |
-          git config user.name "txa-bot[bot]"
+          git config user.name "txa-repo-bot[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add manifests/t/TXAVL
           $status = git status --porcelain manifests/t/TXAVL
@@ -68,7 +79,16 @@ jobs:
             Write-Host "All TXAVL packages are already at the latest version."
             exit 0
           }
+          # main is protected (pull request + txa/verified): updates go through the same review as any package
+          $branch = "txa-auto-update"
+          git checkout -B $branch
           git commit -m "chore(manifests): auto-update TXAVL packages to latest upstream versions"
-          git push origin HEAD:main
-          gh workflow run txa-publish-api.yml
-
+          git push --force origin "HEAD:refs/heads/$branch"
+          if ($LASTEXITCODE -ne 0) { Write-Host "::error::could not push $branch"; exit 1 }
+          $open = gh pr list --head $branch --state open --json number --jq '.[0].number'
+          if ($open) {
+            Write-Host "Pull request #$open already open - updated its branch."
+          } else {
+            gh pr create --base main --head $branch --title "Auto-update: TXAVL packages to the latest upstream versions" --body "Created by the scheduled TXA Auto-Update. Every changed release goes through the 16 bot checks; a code owner approves, then it merges."
+            if ($LASTEXITCODE -ne 0) { Write-Host "::error::could not open the pull request"; exit 1 }
+          }
