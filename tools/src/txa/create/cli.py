@@ -21,7 +21,7 @@ from txa import __version__
 from txa.ci import steps
 from txa.ci.context import init_local
 from txa.ci.report import build_report, quick_check, render_console, run_live
-from txa.core import config, console, credentials, engines, licenses, net, semver, winos
+from txa.core import config, console, credentials, engines, licenses, net, semver, updatecheck, winos
 from txa.core.i18n import is_vi
 from txa.core.github import GitHub, GitHubError, device_flow
 from txa.core.manifest import ManifestError, split_id
@@ -884,6 +884,7 @@ def _release_options(p: argparse.ArgumentParser) -> None:
 
 def main(argv: list[str] | None = None) -> int:
     console.setup()
+    updatecheck.register()
     parser = console.SmartArgumentParser(
         prog="txacreate",
         description="Publish installers to the TXA repository",

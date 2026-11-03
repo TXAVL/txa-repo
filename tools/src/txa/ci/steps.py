@@ -9,7 +9,7 @@ from pathlib import Path
 from typing import Callable
 
 from txa.ci.context import Context
-from txa.core import engines, net, pe, portable, semver, signing, winos
+from txa.core import engines, net, pe, portable, retention, semver, signing, winos
 from txa.core.licenses import NEEDS_URL, SPDX
 from txa.core.manifest import (
     ABOUT_RE, BUILD_FILE, CORE_FILE, ID_RE, LANG_RE, ManifestError, about_file, kind_of, parse_card, ref_of,
@@ -354,7 +354,15 @@ def versioning(ctx: Context, target: dict, out: Outcome) -> None:
     elif not newest:
         out.ok(f"first release {version}")
     elif semver.parse(version) <= semver.parse(newest):
-        out.fail(f"{version} must be greater than the newest published version {newest}")
+        others = [v for v in existing if v != version]
+        newer = sum(1 for v in others if semver.parse(v) > semver.parse(version))
+        if version in existing and ctx.mode == "ci":
+            out.fail(f"{version} is already published - edit it as an update or pick a new version")
+        elif newer < retention.KEEP:
+            # the repository keeps the newest KEEP versions, so an older release that still fits is fine
+            out.ok(f"older release {version} (newest is {newest}; {newer} newer version(s), the newest {retention.KEEP} are kept)")
+        else:
+            out.fail(f"{version} is older than the {retention.KEEP} newest versions (newest {newest}) and would be dropped at once")
     else:
         old, new = semver.parse(newest), semver.parse(version)
         bump = "major" if new[0] > old[0] else "minor" if new[1] > old[1] else "patch"

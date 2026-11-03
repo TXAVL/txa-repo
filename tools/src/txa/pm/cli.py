@@ -24,7 +24,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from txa import __version__
-from txa.core import config, console, net, retention, semver, winos
+from txa.core import config, console, net, retention, semver, updatecheck, winos
 from txa.pm import installer, uninstall
 from txa.pm.installer import InstallError
 from txa.pm.source import LocalRelease, NotFound, Source, SourceError, Sources, check_url
@@ -953,6 +953,7 @@ def _install_options(p: argparse.ArgumentParser) -> None:
 
 def main(argv: list[str] | None = None) -> int:
     console.setup()
+    updatecheck.register()
     parser = console.SmartArgumentParser(
         prog="txapm",
         description="TXA package manager",

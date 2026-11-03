@@ -18,7 +18,7 @@ import sys
 from pathlib import Path
 
 from txa import __version__
-from txa.core import config, console
+from txa.core import config, console, updatecheck
 from txa.core.manifest import find_repo_root
 from txa.create import winget as wg
 
@@ -165,6 +165,7 @@ def do_import(args) -> int:
 
 def main(argv: list[str] | None = None) -> int:
     console.setup()
+    updatecheck.register()
     args_list = list(sys.argv[1:] if argv is None else argv)
 
     # Support explicit subcommands cleanly while keeping flag-based invocation 100% compatible
