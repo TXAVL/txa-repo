@@ -1,0 +1,5 @@
+---
+// Inline bilingual text: both languages are in the HTML, CSS shows the active one (html[lang]).
+const { vi, en } = Astro.props;
+---
+<span data-l="vi">{vi !== undefined ? vi : <slot name="vi" />}</span><span data-l="en">{en !== undefined ? en : <slot name="en" />}</span>

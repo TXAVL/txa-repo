@@ -1,0 +1,118 @@
+---
+import "../styles/global.css";
+import T from "../components/T.astro";
+
+interface Props { title: string; description: string; active?: "home" | "docs" }
+const { title, description, active = "home" } = Astro.props;
+const base = import.meta.env.BASE_URL.replace(/\/?$/, "/");
+---
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <meta name="color-scheme" content="light dark" />
+    <link rel="icon" href={`data:image/svg+xml,${encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><rect width="32" height="32" rx="8" fill="#0a7a5f"/><path d="M9 10h14M16 10v13" stroke="#fff" stroke-width="3.2" stroke-linecap="round"/></svg>')}`} />
+    <!-- set the language before first paint so English visitors never see a flash of Vietnamese -->
+    <script is:inline>
+      (function () {
+        var s = localStorage.getItem("txa_lang");
+        var l = s === "vi" || s === "en" ? s : (navigator.language || "").toLowerCase().indexOf("vi") === 0 ? "vi" : "en";
+        document.documentElement.lang = l;
+      })();
+    </script>
+  </head>
+  <body>
+    <div class="wrap">
+      <header class="top">
+        <a class="brand" href={base} aria-label="TXA">
+          <span class="brand__mark">TXA<i>.</i></span>
+          <span class="brand__name"><T vi="Kho gói phần mềm" en="Package index" /></span>
+        </a>
+        <nav class="top__nav" aria-label="Menu">
+          <a href={`${base}#goi`} aria-current={active === "home" ? "page" : undefined}><T vi="Danh sách gói" en="Packages" /></a>
+          <a href={`${base}docs/`} aria-current={active === "docs" ? "page" : undefined}><T vi="Tài liệu" en="Docs" /></a>
+          <a href="https://github.com/TXAVL/txa-repo">GitHub</a>
+          <div class="seg" role="group" aria-label="Ngôn ngữ / Language">
+            <button type="button" data-lang="vi" aria-label="Tiếng Việt" title="Tiếng Việt"><span class="flag" aria-hidden="true">🇻🇳</span><span class="code" aria-hidden="true">VI</span></button>
+            <button type="button" data-lang="en" aria-label="English" title="English"><span class="flag" aria-hidden="true">🇬🇧</span><span class="code" aria-hidden="true">EN</span></button>
+          </div>
+        </nav>
+      </header>
+
+      <slot />
+    </div>
+
+    <footer class="foot">
+      <div class="wrap">
+        <div class="foot__links">
+          <a href={`${base}docs/`}><T vi="Tài liệu" en="Docs" /></a>
+          <a href={`${base}api/txa/v1/index.json`}>index.json</a>
+          <a href={`${base}api/txa/v1/pending.json`}>pending.json</a>
+          <a href="https://github.com/TXAVL/txa-repo">GitHub</a>
+          <a href="https://pypi.org/project/txa/">PyPI</a>
+          <span><T vi="Mọi dữ liệu trên trang này sinh tự động từ kho manifest." en="Everything on this site is generated from the manifest repository." /></span>
+          <small class="foot__credit"><T vi="Biểu tượng từ Simple Icons (CC0), từ trang của nhà phát hành và từ kho TXAVL. Tên và logo thuộc chủ sở hữu, chỉ dùng để nhận diện phần mềm." en="Icons from Simple Icons (CC0), each publisher's site and the TXAVL repositories. Names and logos belong to their owners and are used only to identify the software." /></small>
+        </div>
+        <p class="foot__word" aria-hidden="true">TXA</p>
+      </div>
+    </footer>
+  </body>
+</html>
+
+<script>
+  const root = document.documentElement;
+  const lang = () => (root.lang === "en" ? "en" : "vi");
+
+  // flags where the system can draw them (Windows cannot: it shows letters, so VI / EN stay there)
+  function flagsSupported(): boolean {
+    try {
+      const c = document.createElement("canvas");
+      c.width = 40; c.height = 24;
+      const g = c.getContext("2d", { willReadFrequently: true })!;
+      g.textBaseline = "top";
+      g.font = "20px 'Apple Color Emoji','Noto Color Emoji','Segoe UI Emoji',sans-serif";
+      g.fillText("\u{1F1FB}\u{1F1F3}", 0, 0);
+      const d = g.getImageData(0, 0, 40, 24).data;
+      for (let i = 0; i < d.length; i += 4) {
+        if (d[i + 3] > 200 && (Math.abs(d[i] - d[i + 1]) > 40 || Math.abs(d[i + 1] - d[i + 2]) > 40)) return true;
+      }
+    } catch { /* keep the letters */ }
+    return false;
+  }
+  if (flagsSupported()) root.dataset.flags = "";
+
+  // language switch
+  function paintLang() {
+    document.querySelectorAll<HTMLButtonElement>(".seg button").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.lang === lang())));
+  }
+  document.querySelectorAll<HTMLButtonElement>(".seg button").forEach((b) =>
+    b.addEventListener("click", () => {
+      root.lang = b.dataset.lang!;
+      localStorage.setItem("txa_lang", root.lang);
+      paintLang();
+      document.dispatchEvent(new CustomEvent("txa:lang", { detail: lang() }));
+    }),
+  );
+  paintLang();
+
+  // copy buttons
+  async function copy(text: string) {
+    try { await navigator.clipboard.writeText(text); return; } catch { /* fall back */ }
+    const ta = document.createElement("textarea");
+    ta.value = text; ta.style.position = "fixed"; ta.style.opacity = "0";
+    document.body.append(ta); ta.select();
+    try { document.execCommand("copy"); } finally { ta.remove(); }
+  }
+  (window as any).txaCopy = async (btn: HTMLElement, text: string) => {
+    await copy(text);
+    btn.setAttribute("data-done", "");
+    window.setTimeout(() => btn.removeAttribute("data-done"), 1600);
+  };
+  document.addEventListener("click", (e) => {
+    const btn = (e.target as Element).closest<HTMLElement>("[data-copy]");
+    if (btn) (window as any).txaCopy(btn, btn.dataset.copy!);
+  });
+</script>

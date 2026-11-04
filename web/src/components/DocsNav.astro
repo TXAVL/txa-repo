@@ -1,0 +1,24 @@
+---
+import T from "./T.astro";
+import { groups } from "../lib/docs-nav";
+
+interface Props { details: { slug: string; short: [string, string] }[]; current?: string }
+const { details, current } = Astro.props;
+const base = import.meta.env.BASE_URL.replace(/\/?$/, "/");
+// on the main docs page the sections are anchors; on a detail page they lead back to it
+const sec = (id: string) => (current ? `${base}docs/#${id}` : `#${id}`);
+---
+<nav class="docs__nav" aria-label="Docs">
+  {groups.map((g) => (
+    <div class="docs__group">
+      <p class="docs__label"><T vi={g.vi} en={g.en} /></p>
+      {g.items.map(([id, vi, en]) => (<a href={sec(id)}><T vi={vi} en={en} /></a>))}
+    </div>
+  ))}
+  <div class="docs__group">
+    <p class="docs__label"><T vi="Tài liệu chi tiết" en="Detailed reference" /></p>
+    {details.map((d) => (
+      <a href={`${base}docs/${d.slug}/`} aria-current={current === d.slug ? "page" : undefined}><T vi={d.short[0]} en={d.short[1]} /></a>
+    ))}
+  </div>
+</nav>

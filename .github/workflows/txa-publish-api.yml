@@ -10,7 +10,7 @@ name: TXA Publish API
 on:
   push:
     branches: [main]
-    paths: ["manifests/**", "policy.txa.yaml", "tools/src/txa/ci/api.py", "tools/src/txa/core/i18n.py"]
+    paths: ["manifests/**", "policy.txa.yaml", "tools/src/txa/ci/api.py", "tools/src/txa/core/i18n.py", "web/**", "docs/**"]
   # the "waiting for review" list follows the pull requests: refresh it when the bot finishes or a PR is closed.
   # (workflow_run, not pull_request_target: a PR event would stick a "deployed to github-pages" box on the PR page)
   workflow_run:
@@ -49,6 +49,22 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           GITHUB_REPOSITORY: ${{ github.repository }}
         run: txaci build-api --root . --out site --pending
+
+      # The index page is an Astro site (web/). It reads site/api/txa/v1/*.json written above and
+      # replaces the plain index.html that build-api leaves as a fallback.
+      - uses: actions/setup-node@v7
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+
+      - name: Build the index page (Astro)
+        working-directory: web
+        run: |
+          npm ci
+          npm run icons   # fetches an icon for any package that has none yet; failures keep the monogram
+          npm run build
+          cp -r dist/. ../site/
 
       - uses: actions/configure-pages@v6
 

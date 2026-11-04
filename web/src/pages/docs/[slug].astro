@@ -1,0 +1,39 @@
+---
+import Base from "../../layouts/Base.astro";
+import T from "../../components/T.astro";
+import DocsNav from "../../components/DocsNav.astro";
+import { loadDocs } from "../../lib/docs";
+
+export async function getStaticPaths() {
+  const pages = await loadDocs();
+  return pages.map((page, i) => ({ params: { slug: page.slug }, props: { page, pages, i } }));
+}
+const { page, pages, i } = Astro.props;
+const base = import.meta.env.BASE_URL.replace(/\/?$/, "/");
+const prev = pages[i - 1];
+const next = pages[i + 1];
+---
+<Base title={`${page.title.vi} · ${page.title.en} · Docs · TXA`} description={page.title.en} active="docs">
+  <div class="docs">
+    <DocsNav details={pages.map((d) => ({ slug: d.slug, short: d.short }))} current={page.slug} />
+    <main class="doc">
+      <header class="doc__head">
+        <h1 class="rise doc__title--long"><T vi={page.title.vi} en={page.title.en} /></h1>
+        <p class="lead rise" style="--i:1">
+          <T vi="Trang này đọc trực tiếp từ thư mục docs của kho nên luôn khớp với bản trên GitHub." en="This page is read straight from the repository's docs folder, so it always matches what is on GitHub." />
+          <a class="link" data-l="vi" href={page.source.vi}>Sửa trên GitHub</a><a class="link" data-l="en" href={page.source.en ?? page.source.vi}>Edit on GitHub</a>
+        </p>
+      </header>
+      <div class="sheet md">
+        <div data-l="vi" set:html={page.html.vi} />
+        {page.html.en
+          ? <div data-l="en" set:html={page.html.en} />
+          : <div data-l="en"><div class="callout"><p>This page has no English translation yet, so the original is shown. A translation goes in <code>docs/{page.slug}.en.md</code>.</p></div><Fragment set:html={page.html.vi} /></div>}
+        <nav class="pn" aria-label="Prev / next">
+          {prev ? (<a class="pn__prev" href={`${base}docs/${prev.slug}/`}><small><T vi="Trước" en="Previous" /></small>{prev.short[0]}</a>) : <span />}
+          {next ? (<a class="pn__next" href={`${base}docs/${next.slug}/`}><small><T vi="Tiếp theo" en="Next" /></small>{next.short[0]}</a>) : <span />}
+        </nav>
+      </div>
+    </main>
+  </div>
+</Base>

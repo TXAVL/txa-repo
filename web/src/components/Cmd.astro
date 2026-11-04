@@ -1,0 +1,8 @@
+---
+// A copyable command: the whole chip is a button; "Copy" turns into "Copied" through CSS ([data-done]).
+const { text, note } = Astro.props;
+---
+<button class="chip" type="button" data-copy={text} aria-label={`Copy: ${text}`}>
+  <code>{text}</code>
+  <span class="chip__act"><span class="on-idle"><span data-l="vi">Chép</span><span data-l="en">Copy</span></span><span class="on-done"><span data-l="vi">Đã chép</span><span data-l="en">Copied</span></span></span>
+</button>

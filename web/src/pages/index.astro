@@ -1,0 +1,309 @@
+---
+import Base from "../layouts/Base.astro";
+import T from "../components/T.astro";
+import Cmd from "../components/Cmd.astro";
+import { loadIndex, loadPending, categorize, hueOf, CATEGORIES } from "../lib/data";
+import icons from "../lib/icons.json";
+
+const base = import.meta.env.BASE_URL.replace(/\/?$/, "/");
+const api = `${base}api/txa/v1`;
+const index = await loadIndex();
+const pending = await loadPending();
+const pkgs = index.packages;
+
+const counts = Object.fromEntries(CATEGORIES.map((c) => [c.id, 0]));
+const rows = pkgs.map((p, n) => {
+  const cat = categorize(p);
+  counts[cat]++;
+  const alias = p.alias || p.id;
+  const vi = p.summaries["vi-VN"] || p.summary;
+  const en = p.summaries["en-US"] || p.summary;
+  return {
+    p, n, cat, alias, vi, en,
+    cmd: `txapm install ${alias}`,
+    icon: (icons as Record<string, string>)[p.id.split(".").pop()!] ?? null,
+    hue: hueOf(p.id),
+    arch: p.arches.map((a) => (a === "arm64" ? "ARM64" : a)).join(" · "),
+    search: [p.id, alias, ...(p.aliases || []), p.name, p.publisher, vi, en, ...p.tags].join(" "),
+  };
+});
+const sample = rows.find((r) => r.alias === "vlc") ?? rows[0];
+const ONELINER = "irm https://raw.githubusercontent.com/TXAVL/txa-repo/main/install.ps1 | iex";
+const aliases = rows.map((r) => r.alias);
+
+const versionsTotal = pkgs.reduce((n, p) => n + p.versions.length, 0);
+const arm = pkgs.filter((p) => p.arches.includes("arm64")).length;
+const x64 = pkgs.filter((p) => p.arches.includes("x64")).length;
+const publishers = new Set(pkgs.map((p) => p.publisher)).size;
+
+const stages = [
+  { n: "Resolve", vi: "Lấy thông tin gói từ kho đã được kiểm định, chọn đúng bộ cài cho máy bạn (ARM64, x64 hoặc x86) và kiểm tra phiên bản Windows tối thiểu.", en: "Reads the package from the vetted repository, picks the installer that fits your PC (ARM64, x64 or x86) and checks the minimum Windows version." },
+  { n: "Download", vi: "Tải bộ cài từ chính trang của nhà phát hành. TXA không lưu lại bộ cài nào.", en: "Downloads the installer from the publisher's own site. TXA never hosts an installer." },
+  { n: "Verify", vi: "So mã SHA-256. Sai một byte là xoá file và dừng.", en: "Compares the SHA-256. One wrong byte and the file is deleted and the install stops." },
+  { n: "Install", vi: "Cài im lặng, không cần bấm Next. Gói cài cho cả máy sẽ xin quyền admin một lần.", en: "Installs silently, no clicking Next. Machine-wide packages ask for admin rights once." },
+  { n: "Record", vi: "Ghi vào danh sách đã cài để nâng cấp, gỡ, sao lưu sau này.", en: "Records it in your installed list for later upgrade, uninstall and export." },
+];
+const checks = [
+  ["Mã hoá file, không BOM", "File encoding, no BOM"], ["Cấu trúc YAML", "YAML structure"], ["Tên và mã gói", "Name and package id"],
+  ["Phiên bản và đường nâng cấp", "Version and upgrade path"], ["Giấy phép và ngôn ngữ", "License and locales"], ["HTTPS, không lặp chuyển hướng", "HTTPS, no redirect loops"],
+  ["Dung lượng khớp máy chủ", "Size matches the server"], ["CDN ở nhiều khu vực", "CDN reachable in several regions"], ["Tải và đọc toàn bộ file", "Full download and read"],
+  ["Chữ ký số Authenticode", "Authenticode signature"], ["SHA-256 khớp", "SHA-256 match"], ["Kiến trúc CPU, loại bộ cài", "CPU architecture, installer type"],
+  ["Phiên bản Windows tối thiểu", "Minimum Windows version"], ["Tham số cài im lặng", "Silent install switches"],
+];
+const cheats = [
+  ["Nâng cấp tất cả phần mềm đã cài", "Upgrade everything you installed", "txapm upgrade --all"],
+  ["Xem gói nào có bản mới", "See which packages have a newer version", "txapm list --upgrade-available"],
+  ["Cài một phiên bản cụ thể", "Install one specific version", "txapm install python --version 3.14.10"],
+  ["Giữ nguyên một gói, không cho nâng cấp", "Pin a package so it never upgrades", "txapm pin add python"],
+  ["Sao lưu danh sách gói", "Back up your package list", "txapm export pkgs.json"],
+  ["Cài lại cả bộ trên máy mới", "Reinstall the whole set on a new PC", "txapm import pkgs.json"],
+  ["Gỡ cài đặt", "Uninstall", "txapm uninstall vlc"],
+  ["Kiểm tra sức khoẻ hệ thống", "Check the health of your setup", "txapm doctor"],
+];
+const faqs = [
+  { qvi: "Gõ txapm báo “not recognized”?", qen: "txapm says “not recognized”?", avi: "Mở cửa sổ terminal mới để PATH được nạp lại.", aen: "Open a new terminal window so PATH is reloaded." },
+  { qvi: "Cài báo “SHA-256 mismatch”?", qen: "Install fails with “SHA-256 mismatch”?", avi: "File trên máy chủ nhà phát hành đã thay đổi so với lúc duyệt. TXA đã xoá file đó để bảo vệ bạn. Hãy báo ở Issues trên GitHub.", aen: "The file on the publisher's server changed since it was reviewed. TXA deleted it to protect you. Please report it in GitHub Issues." },
+  { qvi: "Cài báo mã thoát 1618 hay 3010?", qen: "Exit code 1618 or 3010?", avi: "1618: Windows đang cài phần mềm khác, đợi xong rồi chạy lại. 3010: cài thành công, chỉ cần khởi động lại máy.", aen: "1618: Windows is installing something else, wait and run again. 3010: installed fine, just restart the PC." },
+  { qvi: "TXA có lưu bộ cài của tôi không?", qen: "Does TXA store the installers?", avi: "Không. Mỗi gói chỉ trỏ tới link tải chính thức của nhà phát hành và luôn đối chiếu SHA-256 trước khi chạy.", aen: "No. Each package only points to the publisher's official download and is always checked against its SHA-256 before it runs." },
+];
+---
+
+<Base title="Kho gói phần mềm TXA · TXA Package Index" description="Cài phần mềm Windows bằng một dòng lệnh. Kho gói TXA: tải từ trang chính thức, kiểm tra chữ ký số và SHA-256, cài im lặng." active="home">
+  <main>
+    <section class="hero" aria-labelledby="h1">
+      <div>
+        <h1 id="h1" class="rise" style="--i:1"><T vi="Cài phần mềm Windows bằng một dòng lệnh" en="Install Windows software with one command" /></h1>
+        <p class="lede rise" style="--i:2">
+          <T vi="TXA tải bộ cài từ trang chính thức của nhà phát hành, kiểm tra chữ ký số và SHA-256, rồi cài im lặng. Không phải bấm Next." en="TXA downloads the installer from the publisher's official site, verifies the digital signature and SHA-256, then installs silently. No clicking Next." />
+        </p>
+
+        <form class="cmd rise" style="--i:3" id="cmd" role="search" autocomplete="off">
+          <label class="sr-only" for="q"><T vi="Tìm phần mềm theo tên, mã gói hoặc mô tả" en="Search software by name, package id or description" /></label>
+          <span class="cmd__prompt" aria-hidden="true">txapm install</span>
+          <input id="q" name="q" type="search" spellcheck="false" autocapitalize="off" placeholder={aliases[0]} data-aliases={JSON.stringify(aliases)} />
+          <button class="btn" type="submit" id="cmd-copy"><span class="on-idle"><T vi="Chép lệnh" en="Copy command" /></span><span class="on-done"><T vi="Đã chép" en="Copied" /></span></button>
+        </form>
+        <p class="cmd__hint rise" style="--i:4" id="hint" aria-live="polite"></p>
+
+        <p class="meta rise" style="--i:5">
+          <span><b id="total">{pkgs.length}</b> <T vi="gói phần mềm" en="packages" /></span>
+          <span><T vi="Cập nhật" en="Updated" /> <time id="generated" datetime={index.generated}>{index.generated}</time></span>
+          <a href={`${api}/index.json`}>index.json</a>
+          <a href={`${api}/pending.json`}>pending.json</a>
+        </p>
+      </div>
+
+      <aside class="steps rise" style="--i:3" aria-labelledby="steps-h">
+        <h2 id="steps-h"><T vi="Bắt đầu trong ba bước" en="Get started in three steps" /></h2>
+        <ol>
+          <li>
+            <span><T vi="Cài TXA bằng PowerShell" en="Install TXA from PowerShell" /></span>
+            <Cmd text={ONELINER} />
+            <small><T vi="Không cần quyền admin. Mở terminal mới sau khi cài xong." en="No admin rights needed. Open a new terminal when it finishes." /></small>
+          </li>
+          <li>
+            <span><T vi="Tìm phần mềm" en="Find the software" /></span>
+            <Cmd text="txapm search notepad" />
+          </li>
+          <li>
+            <span><T vi="Cài đặt, hoàn toàn im lặng" en="Install it, completely silent" /></span>
+            <Cmd text={sample.cmd} />
+          </li>
+        </ol>
+      </aside>
+    </section>
+
+    <!-- real figures from the index, set as type -->
+    <section class="facts" aria-label="TXA">
+      <p><b>{pkgs.length}</b><span><T vi="gói phần mềm, mỗi gói trỏ tới link tải chính thức" en="packages, each pointing to the official download" /></span></p>
+      <p><b>{versionsTotal}</b><span><T vi="phiên bản đang giữ trong kho, tối đa 10 bản mới nhất mỗi gói" en="versions kept in the repository, up to the newest 10 per package" /></span></p>
+      <p><b>{arm}<small>/{x64}</small></b><span><T vi="gói có bản ARM64 trên tổng số gói có bản x64" en="packages with an ARM64 build out of those with x64" /></span></p>
+      <p><b>{publishers}</b><span><T vi="nhà phát hành khác nhau" en="different publishers" /></span></p>
+    </section>
+
+    <section class="catalog" id="goi" aria-labelledby="goi-h">
+      <div class="catalog__head">
+        <h2 class="title" id="goi-h"><T vi="Tất cả gói phần mềm" en="All packages" /></h2>
+        <p class="count" id="count" aria-live="polite"></p>
+      </div>
+
+      <ul class="filters" aria-label="Filter">
+        <li><button type="button" data-cat="all" aria-pressed="true"><T vi="Tất cả" en="All" /><em>{pkgs.length}</em></button></li>
+        {CATEGORIES.filter((c) => counts[c.id] > 0).map((c) => (
+          <li><button type="button" data-cat={c.id} aria-pressed="false"><T vi={c.vi} en={c.en} /><em>{counts[c.id]}</em></button></li>
+        ))}
+      </ul>
+
+      <ul class="list" id="list">
+        {rows.map((r) => (
+          <li class="pkg" data-cat={r.cat} data-alias={r.alias} data-search={r.search} style={`--h:${r.hue};--n:${r.n}`}>
+            {r.icon
+              ? <span class="tile tile--icon" aria-hidden="true"><img src={`${base}icons/${r.icon}`} alt="" width="36" height="36" loading="lazy" decoding="async" /></span>
+              : <span class="tile" aria-hidden="true">{r.p.name.charAt(0).toUpperCase()}</span>}
+            <div>
+              <h3 class="pkg__name">{r.p.name}</h3>
+              <a class="pkg__id" href={`${api}/packages/${r.p.id}.json`} title="JSON">{r.p.id}</a>
+            </div>
+            <p class="pkg__sum"><T vi={r.vi} en={r.en} /></p>
+            <div class="pkg__ver">{r.p.latest}<small>{r.arch}</small></div>
+            <Cmd text={r.cmd} />
+          </li>
+        ))}
+      </ul>
+
+      <div class="empty" id="empty" hidden>
+        <strong><T vi="Không có gói nào khớp." en="No package matches." /></strong>
+        <T vi="Thử tên khác, hoặc " en="Try another name, or " /><a href="https://github.com/TXAVL/txa-repo"><T vi="đề xuất gói mới trên GitHub" en="suggest a new package on GitHub" /></a>.
+      </div>
+    </section>
+
+    <section class="how" aria-labelledby="how-h">
+      <div>
+        <h2 class="title" id="how-h"><T vi="Mỗi lần cài, TXA làm đúng năm việc" en="Every install is the same five steps" /></h2>
+        <p class="lead"><T vi="Màn hình báo từng bước kèm thanh tiến trình có tốc độ và thời gian còn lại. Bản dưới đây là ví dụ minh hoạ định dạng." en="The terminal reports each step with a progress bar showing speed and time left. What follows is an illustration of the format." /></p>
+        <pre class="term" aria-label="Terminal"><code><span class="t-dim">&gt;</span> txapm install {sample.alias}
+<span class="t-ok">[1/5]</span> Resolve   {sample.p.id} {sample.p.latest}
+<span class="t-ok">[2/5]</span> Download  <span data-l="vi">từ trang của nhà phát hành</span><span data-l="en">from the publisher's site</span>
+<span class="t-ok">[3/5]</span> Verify    SHA-256 <span data-l="vi">khớp</span><span data-l="en">match</span>
+<span class="t-ok">[4/5]</span> Install   <span data-l="vi">cài im lặng</span><span data-l="en">silent install</span>
+<span class="t-ok">[5/5]</span> Record    <span data-l="vi">đã ghi vào danh sách</span><span data-l="en">saved to your list</span></code></pre>
+      </div>
+      <ol class="stages">
+        {stages.map((s) => (
+          <li><h3>{s.n}</h3><p><T vi={s.vi} en={s.en} /></p></li>
+        ))}
+      </ol>
+    </section>
+
+    <section class="vet" aria-labelledby="vet-h">
+      <div>
+        <h2 class="title" id="vet-h"><T vi="Mỗi bản phát hành đều qua kiểm định" en="Every release is vetted before it is published" /></h2>
+        <p class="lead"><T vi="Gói gửi lên kho chạy 14 bước kiểm tra tự động trên Windows thật, rồi một moderator duyệt. Các bản do bot tự cập nhật chạy lại đúng bộ kiểm tra đó trước khi vào kho." en="A package sent to the repository runs 14 automatic checks on a real Windows runner, then a moderator reviews it. Releases the bot updates by itself run the same checks before they are published." /></p>
+        <p class="lead"><a class="link" href={`${base}docs/#dong-gop`}><T vi="Cách gửi phần mềm của bạn" en="How to submit your software" /></a></p>
+      </div>
+      <ul class="checks">
+        {checks.map((c) => (<li><T vi={c[0]} en={c[1]} /></li>))}
+      </ul>
+    </section>
+
+    <section class="cheats" aria-labelledby="cheat-h">
+      <h2 class="title" id="cheat-h"><T vi="Lệnh hay dùng sau khi cài" en="Commands you will keep using" /></h2>
+      <ul class="rowlist">
+        {cheats.map((c) => (
+          <li><span><T vi={c[0]} en={c[1]} /></span><Cmd text={c[2]} /></li>
+        ))}
+      </ul>
+      <p class="more"><a class="link" href={`${base}docs/#txapm`}><T vi="Xem toàn bộ lệnh trong tài liệu" en="See every command in the docs" /></a></p>
+    </section>
+
+    <section class="faq" aria-labelledby="faq-h">
+      <h2 class="title" id="faq-h"><T vi="Câu hỏi thường gặp" en="Frequently asked questions" /></h2>
+      <div>
+        {faqs.map((f) => (
+          <details>
+            <summary><T vi={f.qvi} en={f.qen} /></summary>
+            <p><T vi={f.avi} en={f.aen} /></p>
+          </details>
+        ))}
+      </div>
+    </section>
+
+    <section class="pending" id="cho-duyet" aria-labelledby="pending-h">
+      <div>
+        <h2 class="title" id="pending-h"><T vi="Đang chờ duyệt" en="Waiting for review" /></h2>
+        <p class="note"><T vi="Các bản đã gửi và qua kiểm tra tự động, đang chờ người duyệt bấm merge." en="Releases that were submitted and passed the automatic checks, waiting for a reviewer to merge." /></p>
+      </div>
+      {pending.packages.length > 0 ? (
+        <ul>
+          {pending.packages.map((e) => (
+            <li>
+              <span><strong>{e.name || e.id}</strong> <code>{e.version}</code></span>
+              {e.url && <a href={e.url}><T vi="Xem yêu cầu" en="View pull request" /></a>}
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p class="none"><T vi="Hiện không có bản nào đang chờ duyệt." en="Nothing is waiting for review right now." /></p>
+      )}
+    </section>
+  </main>
+</Base>
+
+<script>
+  type Lang = "vi" | "en";
+  const D: Record<Lang, Record<string, string>> = {
+    vi: { idle: "Gõ tên phần mềm, trang sẽ lọc ngay và ghép sẵn lệnh cài. Nhấn / để quay lại ô này.", one: "Nhấn Enter để chép:", many: "Enter chép lệnh của gói đầu tiên:", all: "{n} gói", some: "{n} / {t} gói", label: "Tìm phần mềm theo tên, mã gói hoặc mô tả", locale: "vi-VN" },
+    en: { idle: "Type a software name: the list filters at once and the install command is assembled for you. Press / to come back here.", one: "Press Enter to copy:", many: "Enter copies the command of the first match:", all: "{n} packages", some: "{n} of {t} packages", label: "Search software by name, package id or description", locale: "en-GB" },
+  };
+  const root = document.documentElement;
+  const lang = (): Lang => (root.lang === "en" ? "en" : "vi");
+  const $ = <E extends Element>(s: string) => document.querySelector<E>(s)!;
+  const $$ = <E extends Element>(s: string) => [...document.querySelectorAll<E>(s)];
+  const fold = (s: string) => s.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/đ/g, "d");
+  const fmt = (s: string, v: Record<string, number>) => s.replace(/\{(\w+)\}/g, (_, k) => String(v[k]));
+
+  const input = $<HTMLInputElement>("#q");
+  const hint = $("#hint");
+  const countEl = $("#count");
+  const empty = $("#empty");
+  const items = $$<HTMLElement>(".pkg");
+  items.forEach((el) => (el.dataset.hay = fold(el.dataset.search || "")));
+  const total = items.length;
+  let cat = "all";
+
+  const firstMatch = () => items.find((el) => !el.hidden);
+  function apply() {
+    const words = fold(input.value).trim().split(/\s+/).filter(Boolean);
+    let shown = 0;
+    for (const el of items) {
+      const ok = (cat === "all" || el.dataset.cat === cat) && words.every((w) => el.dataset.hay!.includes(w));
+      el.hidden = !ok;
+      if (ok) shown++;
+    }
+    const t = D[lang()];
+    countEl.textContent = fmt(shown === total ? t.all : t.some, { n: shown, t: total });
+    empty.hidden = shown !== 0;
+    const first = firstMatch();
+    hint.textContent = !input.value.trim() || !first ? t.idle : `${shown === 1 ? t.one : t.many} txapm install ${first.dataset.alias}`;
+  }
+  input.addEventListener("input", apply);
+  $("#cmd").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const first = firstMatch();
+    const typed = input.value.trim();
+    const target = typed && first ? first.dataset.alias : typed || input.placeholder;
+    await (window as any).txaCopy($("#cmd-copy"), `txapm install ${target}`);
+  });
+  $$<HTMLButtonElement>(".filters button").forEach((b) =>
+    b.addEventListener("click", () => {
+      cat = b.dataset.cat!;
+      $$(".filters button").forEach((x) => x.setAttribute("aria-pressed", String(x === b)));
+      apply();
+    }),
+  );
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "/" && !/^(INPUT|TEXTAREA)$/.test((e.target as Element).tagName)) { e.preventDefault(); input.focus(); input.select(); }
+  });
+
+  // the placeholder cycles through real package names
+  const aliases: string[] = JSON.parse(input.dataset.aliases || "[]");
+  if (!matchMedia("(prefers-reduced-motion: reduce)").matches && aliases.length > 1) {
+    let i = 0;
+    window.setInterval(() => {
+      if (document.activeElement === input || input.value) return;
+      i = (i + 1) % aliases.length;
+      input.placeholder = aliases[(i * 7) % aliases.length];
+    }, 2400);
+  }
+
+  const when = $<HTMLTimeElement>("#generated");
+  function paint() {
+    const t = D[lang()];
+    input.setAttribute("aria-label", t.label);
+    const d = new Date(when.dateTime);
+    if (!Number.isNaN(d.getTime())) when.textContent = new Intl.DateTimeFormat(t.locale, { dateStyle: "medium", timeStyle: "short", timeZone: "UTC" }).format(d) + " UTC";
+    apply();
+  }
+  document.addEventListener("txa:lang", paint);
+  paint();
+</script>

@@ -11,3 +11,4 @@ site/
 tools/src/txa/_build.py
 # local test suite: kept on the maintainer's machine, never pushed
 tools/tests/
+.claude/

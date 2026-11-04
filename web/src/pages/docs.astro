@@ -1,0 +1,316 @@
+---
+import Base from "../layouts/Base.astro";
+import T from "../components/T.astro";
+import Cmd from "../components/Cmd.astro";
+import DocsNav from "../components/DocsNav.astro";
+import { order } from "../lib/docs-nav";
+import { loadDocs } from "../lib/docs";
+
+const base = import.meta.env.BASE_URL.replace(/\/?$/, "/");
+const ONELINER = "irm https://raw.githubusercontent.com/TXAVL/txa-repo/main/install.ps1 | iex";
+const gh = "https://github.com/TXAVL/txa-repo";
+const details = await loadDocs();
+
+const pn = (id: string) => {
+  const i = order.findIndex((o) => o[0] === id);
+  return { prev: order[i - 1], next: order[i + 1] };
+};
+
+// [command, vi, en]
+const find = [
+  ["txapm search notepad", "Tìm phần mềm", "Search for software"],
+  ["txapm show TXAVL.VLC", "Xem thông tin một gói", "Show a package"],
+  ["txapm show TXAVL.VLC --versions", "Xem các phiên bản có trong kho (kèm CPU, ngôn ngữ)", "List the versions in the repository (with CPU and language)"],
+  ["txapm install vlc", "Cài bản mới nhất (gõ tên ngắn hoặc mã đầy đủ TXAVL.VLC)", "Install the newest version (short name or full id TXAVL.VLC)"],
+  ["txapm install vlc --version 3.0.24", "Cài một phiên bản cụ thể", "Install one specific version"],
+  ["txapm install vlc --choose", "Chọn phiên bản từ danh sách trong kho", "Pick the version from the repository list"],
+  ["txapm install vlc --progress", "Cài nhưng vẫn xem tiến trình của bộ cài", "Install and still show the installer's progress"],
+  ["txapm install vlc --interactive", "Cài bằng giao diện gốc của bộ cài", "Install with the installer's own interface"],
+  ["txapm install vlc --download-only", "Chỉ tải về, không cài", "Download only, do not install"],
+  ["txapm install --manifest <thư-mục>", "Thử một manifest trên máy trước khi gửi", "Try a manifest on your PC before submitting it"],
+];
+const manage = [
+  ["txapm list", "Xem gói đã cài", "List installed packages"],
+  ["txapm list --upgrade-available", "Xem gói có bản mới", "List packages with a newer version"],
+  ["txapm list --all", "Xem mọi phần mềm trên máy, đánh dấu cái nào có trong TXA", "List all software on the PC and mark what TXA knows"],
+  ["txapm upgrade vlc", "Nâng cấp một gói", "Upgrade one package"],
+  ["txapm upgrade --all", "Nâng cấp tất cả", "Upgrade everything"],
+  ["txapm uninstall vlc", "Gỡ cài đặt", "Uninstall"],
+  ["txapm pin add vlc", "Giữ nguyên phiên bản, upgrade --all sẽ không đụng tới", "Keep a version; upgrade --all leaves it alone"],
+  ["txapm pin list", "Xem các gói đang giữ (pin remove để bỏ)", "List pinned packages (pin remove to release)"],
+  ["txapm export pkgs.json", "Sao lưu danh sách gói", "Back up your package list"],
+  ["txapm import pkgs.json", "Cài lại cả bộ trên máy mới", "Reinstall the whole set on a new PC"],
+  ["txapm download vlc -d D:\\setup", "Tải bộ cài và manifest về một thư mục", "Save the installer and manifest into a folder"],
+];
+const extra = [
+  ["txapm wg search <từ-khoá>", "Tìm trên WinGet ngay trong txapm", "Search WinGet from inside txapm"],
+  ["txapm wg install <id>", "Cài trực tiếp một gói từ WinGet", "Install a WinGet package directly"],
+  ["txapm doctor", "Kiểm tra sức khoẻ hệ thống, kho nguồn, WinGet và cache", "Check the health of your setup, sources, WinGet and cache"],
+  ["txapm clean", "Dọn bộ cài tải tạm và file log (thêm --all để dọn hết)", "Remove temporary installers and logs (--all removes everything)"],
+  ["txapm log", "Xem danh sách hoặc nội dung log cài đặt (thêm tên gói)", "List install logs, or read one (add a package name)"],
+  ["txapm which vlc", "Xem vị trí cài, PATH và nguồn của một gói", "Show install location, PATH and source of a package"],
+  ["txapm --info", "Thông tin cài đặt, đường dẫn, tài khoản", "Install info, paths, account"],
+];
+const sources = [
+  ["txapm source", "Xem các kho", "List sources"],
+  ["txapm source add congty https://pkgs.congty.vn/api/txa/v1", "Thêm kho HTTPS", "Add an HTTPS source"],
+  ["txapm source add noibo \\\\server\\share\\txa", "Thêm kho là thư mục (ổ mạng, máy cá nhân)", "Add a folder as a source (network share, local)"],
+  ["txapm source add congty <url> --token-env CONGTY_TOKEN", "Kho riêng tư cần token", "Private source that needs a token"],
+  ["txapm source add congty <url> --allow-lan", "Cho phép tải bộ cài từ máy chủ LAN", "Allow installers from a LAN server"],
+  ["txapm source disable txa", "Tắt một kho (enable để bật lại, remove để xoá)", "Disable a source (enable to turn it on, remove to delete)"],
+  ["txapm search app -s congty", "Chỉ tìm hoặc cài từ một kho (-s)", "Search or install from one source only (-s)"],
+  ["txapm source reset", "Về mặc định (chỉ kho txa)", "Back to the default (only the txa source)"],
+];
+const labels = [
+  ["txa:needs-agreement", "Bạn chưa chấp nhận Contributor Agreement: comment @txa-repo agree", "You have not accepted the Contributor Agreement: comment @txa-repo agree"],
+  ["txa:needs-confirmation", "Checklist trong mô tả PR chưa tick đủ", "The checklist in the PR description is not fully ticked"],
+  ["txa:validating", "Bot đang chạy các bước kiểm tra", "The bot is running the checks"],
+  ["txa:verified-build", "Qua hết kiểm tra tự động", "Passed every automatic check"],
+  ["txa:awaiting-review", "Chờ moderator duyệt", "Waiting for a moderator"],
+  ["txa:approved", "Moderator đã duyệt, sẽ tự gộp", "Approved, will merge by itself"],
+  ["txa:published", "Đã gộp: gói đã nằm trong kho", "Merged: the package is in the repository"],
+  ["txa:fix-required", "Có lỗi: đọc comment của bot, sửa rồi push lại", "Something failed: read the bot's comment, fix and push again"],
+];
+---
+
+<Base title="Tài liệu · Docs · TXA Package Index" description="Tài liệu TXA: cài đặt, lệnh txapm, kho nguồn riêng, đóng góp gói bằng txacreate, cấu trúc manifest và API txa.v1." active="docs">
+  <div class="docs">
+    <DocsNav details={details.map((d) => ({ slug: d.slug, short: d.short }))} />
+
+    <main class="doc">
+      <header class="doc__head">
+        <h1 class="rise"><T vi="Tài liệu TXA" en="TXA documentation" /></h1>
+        <p class="lead rise" style="--i:1"><T vi="Từ dòng lệnh cài đầu tiên tới việc gửi gói của chính bạn lên kho." en="From the first install command to submitting your own package." /></p>
+        <form class="cmd cmd--docs rise" style="--i:2" role="search" onsubmit="return false">
+          <label class="sr-only" for="dq"><T vi="Tìm lệnh trong tài liệu" en="Find a command in the docs" /></label>
+          <span class="cmd__prompt" aria-hidden="true">txapm</span>
+          <input id="dq" type="search" spellcheck="false" autocapitalize="off" autocomplete="off" placeholder="upgrade" />
+          <span class="cmd__count" id="dq-count" aria-live="polite"></span>
+        </form>
+        <p class="cmd__hint rise" style="--i:3"><T vi="Gõ một từ như upgrade, pin hay source để lọc mọi lệnh trong trang." en="Type a word like upgrade, pin or source to filter every command on this page." /></p>
+      </header>
+      <div class="sheet">
+      <section id="bat-dau">
+        <h2><T vi="Bắt đầu" en="Get started" /></h2>
+        <p><T vi="Yêu cầu: Windows 10 (1809) trở lên, x64 hoặc ARM64." en="Requirements: Windows 10 (1809) or later, x64 or ARM64." /></p>
+        <h3><T vi="Cách 1: PowerShell, không cần Python" en="Option 1: PowerShell, no Python needed" /></h3>
+        <p><T vi="Mở PowerShell (không cần quyền admin) và chạy:" en="Open PowerShell (no admin rights needed) and run:" /></p>
+        <Cmd text={ONELINER} />
+        <p><T vi="Script tải bản mới nhất, kiểm tra SHA-256, cài vào %LOCALAPPDATA%\TXA và tự thêm vào PATH. Nó hỏi ngôn ngữ trước khi cài; bỏ qua câu hỏi bằng -Lang vi hoặc -Lang en. Mở terminal mới là dùng được." en="The script downloads the latest release, verifies its SHA-256, installs to %LOCALAPPDATA%\TXA and adds it to PATH. It asks for a language first; skip the question with -Lang vi or -Lang en. Open a new terminal and you are ready." /></p>
+        <h3><T vi="Cách 2: pipx" en="Option 2: pipx" /></h3>
+        <p><T vi="Nếu đã có Python 3.10 trở lên:" en="If you already have Python 3.10 or newer:" /></p>
+        <Cmd text="pipx install txa" />
+        <p><T vi="Chưa có pipx thì chạy python -m pip install --user pipx rồi python -m pipx ensurepath, sau đó mở terminal mới." en="No pipx yet? Run python -m pip install --user pipx, then python -m pipx ensurepath, and open a new terminal." /></p>
+        <p><T vi="Kiểm tra:" en="Check:" /></p>
+        <Cmd text="txapm --version" />
+        <nav class="pn" aria-label="Prev / next">
+          {pn("bat-dau").prev ? (<a class="pn__prev" href={`#${pn("bat-dau").prev[0]}`}><small><T vi="Trước" en="Previous" /></small><T vi={pn("bat-dau").prev[1]} en={pn("bat-dau").prev[2]} /></a>) : <span />}
+          {pn("bat-dau").next ? (<a class="pn__next" href={`#${pn("bat-dau").next[0]}`}><small><T vi="Tiếp theo" en="Next" /></small><T vi={pn("bat-dau").next[1]} en={pn("bat-dau").next[2]} /></a>) : <span />}
+        </nav>
+      </section>
+
+      <section id="txapm">
+        <h2><T vi="Dùng txapm" en="Using txapm" /></h2>
+        <p><T vi="Gói nào có tên ngắn (alias) thì gõ tên ngắn cũng được: txapm install vlc. Một số lệnh có tên viết tắt: add = install, rm = uninstall, ls = list, find = search." en="Packages with a short name (alias) accept it: txapm install vlc. Some commands have short forms: add = install, rm = uninstall, ls = list, find = search." /></p>
+        <h3><T vi="Tìm và cài" en="Find and install" /></h3>
+        <ul class="rowlist">{find.map((c) => (<li><span><T vi={c[1]} en={c[2]} /></span><Cmd text={c[0]} /></li>))}</ul>
+        <h3><T vi="Quản lý phần mềm đã cài" en="Manage what is installed" /></h3>
+        <ul class="rowlist">{manage.map((c) => (<li><span><T vi={c[1]} en={c[2]} /></span><Cmd text={c[0]} /></li>))}</ul>
+        <h3><T vi="Công cụ thêm" en="More tools" /></h3>
+        <ul class="rowlist">{extra.map((c) => (<li><span><T vi={c[1]} en={c[2]} /></span><Cmd text={c[0]} /></li>))}</ul>
+        <div class="callout"><p><T vi="npm không có bộ cài riêng, nó đi kèm Node.js: txapm install npm sẽ cài Node.js (có sẵn node, npm, npx). Cần đổi giữa nhiều bản Node.js thì dùng thêm txapm install nvm." en="npm has no installer of its own, it ships with Node.js: txapm install npm installs Node.js (with node, npm and npx). To switch between Node.js versions, also install nvm." /></p></div>
+        <nav class="pn" aria-label="Prev / next">
+          {pn("txapm").prev ? (<a class="pn__prev" href={`#${pn("txapm").prev[0]}`}><small><T vi="Trước" en="Previous" /></small><T vi={pn("txapm").prev[1]} en={pn("txapm").prev[2]} /></a>) : <span />}
+          {pn("txapm").next ? (<a class="pn__next" href={`#${pn("txapm").next[0]}`}><small><T vi="Tiếp theo" en="Next" /></small><T vi={pn("txapm").next[1]} en={pn("txapm").next[2]} /></a>) : <span />}
+        </nav>
+      </section>
+
+      <section id="cai-dat-lam-gi">
+        <h2><T vi="Khi cài, TXA làm gì" en="What an install does" /></h2>
+        <p><T vi="Mỗi lần cài, màn hình báo từng bước [1/5] tới [5/5] kèm thanh tiến trình có tốc độ và thời gian còn lại." en="Each install reports steps [1/5] to [5/5] with a progress bar showing speed and time left." /></p>
+        <div class="tbl">
+          <div><b>Resolve</b><span><T vi="Lấy thông tin gói từ kho txa-repo (đã được kiểm định và có người duyệt), chọn bộ cài đúng cho máy (ARM64, rồi x64, rồi x86) và kiểm tra phiên bản Windows tối thiểu." en="Reads the package from the txa-repo repository (vetted and reviewed), chooses the installer for your PC (ARM64, then x64, then x86) and checks the minimum Windows version." /></span></div>
+          <div><b>Download</b><span><T vi="Tải về %TEMP%\txa." en="Downloads to %TEMP%\txa." /></span></div>
+          <div><b>Verify</b><span><T vi="So mã SHA-256. Sai một byte là xoá file và dừng." en="Compares the SHA-256. One wrong byte and the file is deleted and the install stops." /></span></div>
+          <div><b>Install</b><span><T vi="Cài im lặng. Gói cài cho cả máy hiện hộp thoại UAC xin quyền admin. Log nằm ở %LOCALAPPDATA%\TXA\logs." en="Installs silently. Machine-wide packages show a UAC prompt for admin rights. Logs are in %LOCALAPPDATA%\TXA\logs." /></span></div>
+          <div><b>Record</b><span><T vi="Ghi vào danh sách đã cài để upgrade, uninstall, export dùng." en="Saved to your installed list for upgrade, uninstall and export." /></span></div>
+        </div>
+        <p><T vi="Gói portable (như FFmpeg) không có bộ cài: TXA giải nén vào %LOCALAPPDATA%\TXA\apps\<Id>\<phiên-bản>, thêm thư mục chương trình vào PATH của riêng bạn (không cần quyền admin) rồi nhắc mở terminal mới. upgrade thay bản cũ, uninstall xoá thư mục và gỡ khỏi PATH." en="Portable packages (like FFmpeg) have no installer: TXA unpacks them to %LOCALAPPDATA%\TXA\apps\<Id>\<version>, adds the program folder to your own PATH (no admin needed) and reminds you to open a new terminal. upgrade replaces the old copy, uninstall removes the folder and the PATH entry." /></p>
+        <nav class="pn" aria-label="Prev / next">
+          {pn("cai-dat-lam-gi").prev ? (<a class="pn__prev" href={`#${pn("cai-dat-lam-gi").prev[0]}`}><small><T vi="Trước" en="Previous" /></small><T vi={pn("cai-dat-lam-gi").prev[1]} en={pn("cai-dat-lam-gi").prev[2]} /></a>) : <span />}
+          {pn("cai-dat-lam-gi").next ? (<a class="pn__next" href={`#${pn("cai-dat-lam-gi").next[0]}`}><small><T vi="Tiếp theo" en="Next" /></small><T vi={pn("cai-dat-lam-gi").next[1]} en={pn("cai-dat-lam-gi").next[2]} /></a>) : <span />}
+        </nav>
+      </section>
+
+      <section id="phien-ban">
+        <h2><T vi="Phiên bản và ngôn ngữ" en="Versions and languages" /></h2>
+        <p><T vi="Mỗi gói giữ 10 phiên bản mới nhất (bản mới nhất trừ đi 9 bản). Thêm một bản mới thì bản cũ nhất bị xoá trong cùng Pull Request hoặc lần tự cập nhật. Bạn cài được bản cũ hơn bất kỳ lúc nào miễn bản đó còn trong kho:" en="Each package keeps the newest 10 versions (the latest minus 9). Adding a new one removes the oldest in the same pull request or automatic update. You can install any older version while it is still in the repository:" /></p>
+        <Cmd text="txapm install <gói> --version <bản>" />
+        <p><T vi="Một số gói (ví dụ Cốc Cốc) có bộ cài riêng cho từng ngôn ngữ. txapm tự chọn bản đúng với ngôn ngữ hiển thị của Windows (locale: vi-VN hoặc en-US trên từng target trong manifest); ngôn ngữ khác dùng bản tiếng Anh." en="Some packages (for example Coc Coc) ship a separate installer per language. txapm picks the one that matches the Windows display language (locale: vi-VN or en-US on each target in the manifest); any other language uses the English build." /></p>
+        <nav class="pn" aria-label="Prev / next">
+          {pn("phien-ban").prev ? (<a class="pn__prev" href={`#${pn("phien-ban").prev[0]}`}><small><T vi="Trước" en="Previous" /></small><T vi={pn("phien-ban").prev[1]} en={pn("phien-ban").prev[2]} /></a>) : <span />}
+          {pn("phien-ban").next ? (<a class="pn__next" href={`#${pn("phien-ban").next[0]}`}><small><T vi="Tiếp theo" en="Next" /></small><T vi={pn("phien-ban").next[1]} en={pn("phien-ban").next[2]} /></a>) : <span />}
+        </nav>
+      </section>
+
+      <section id="kho-nguon">
+        <h2><T vi="Kho nguồn riêng" en="Your own sources" /></h2>
+        <p><T vi="Ngoài kho chính txa, bạn thêm được kho riêng: phần mềm nội bộ công ty, bản build riêng của nhóm. Kho riêng chỉ cần phục vụ cùng REST API txa.v1 (hai file JSON tĩnh), hoặc đơn giản là một thư mục chứa manifests/." en="Besides the main txa source you can add your own: internal company software, a team's private builds. A source only needs to serve the same txa.v1 REST API (two static JSON files), or simply be a folder containing manifests/." /></p>
+        <ul class="rowlist">{sources.map((c) => (<li><span><T vi={c[1]} en={c[2]} /></span><Cmd text={c[0]} /></li>))}</ul>
+        <ul class="plain">
+          <li><T vi="Kho được hỏi theo thứ tự: txa trước, rồi các kho thêm sau. Cùng một Id ở nhiều kho thì TXA dừng và yêu cầu chọn bằng -s để tránh cài nhầm." en="Sources are asked in order: txa first, then the ones you added. If the same id exists in several, TXA stops and asks you to choose with -s so nothing is installed by mistake." /></li>
+          <li><T vi="Gói nhớ nó được cài từ kho nào, nên upgrade luôn lấy bản mới từ đúng kho đó." en="A package remembers which source it came from, so upgrade always reads the new version from there." /></li>
+          <li><T vi="Token không bao giờ được ghi vào file cấu hình: TXA chỉ lưu tên biến môi trường và chỉ gửi token tới đúng máy chủ của kho đó. Kho phải dùng HTTPS (trừ http://localhost để thử)." en="Tokens are never written to the config file: TXA stores only the environment variable name and sends the token only to that source's own server. Sources must use HTTPS (except http://localhost for testing)." /></li>
+        </ul>
+        <h3><T vi="Tự dựng một kho" en="Build a source yourself" /></h3>
+        <ol class="plain">
+          <li><T vi="Tạo thư mục có manifests/<chữ-cái>/<Namespace>/<AppName>/<X.Y.Z>/ (soạn nhanh bằng txacreate new <url> --dry-run --out <thư-mục>)." en="Create a folder with manifests/<letter>/<Namespace>/<AppName>/<X.Y.Z>/ (draft it fast with txacreate new <url> --dry-run --out <folder>)." /></li>
+          <li><T vi="Dùng ngay dạng thư mục: txapm source add noibo D:\kho-txa, hoặc sinh REST API tĩnh:" en="Use it as a folder at once: txapm source add noibo D:\kho-txa, or generate the static REST API:" /></li>
+        </ol>
+        <Cmd text="txaci build-api --root D:\kho-txa --out D:\kho-txa-site" />
+        <p><T vi="Đưa thư mục đó lên máy chủ HTTPS bất kỳ (IIS, nginx, GitHub Pages, S3...) rồi txapm source add congty https://<máy-chủ>/api/txa/v1. Muốn có cả bot kiểm định như kho chính thì fork repo, đổi namespace trong policy.txa.yaml và chạy scripts/setup-github.ps1." en="Put that folder on any HTTPS server (IIS, nginx, GitHub Pages, S3...) and run txapm source add congty https://<server>/api/txa/v1. For the full vetting bot like the main repository, fork it, change the namespace in policy.txa.yaml and run scripts/setup-github.ps1." /></p>
+        <nav class="pn" aria-label="Prev / next">
+          {pn("kho-nguon").prev ? (<a class="pn__prev" href={`#${pn("kho-nguon").prev[0]}`}><small><T vi="Trước" en="Previous" /></small><T vi={pn("kho-nguon").prev[1]} en={pn("kho-nguon").prev[2]} /></a>) : <span />}
+          {pn("kho-nguon").next ? (<a class="pn__next" href={`#${pn("kho-nguon").next[0]}`}><small><T vi="Tiếp theo" en="Next" /></small><T vi={pn("kho-nguon").next[1]} en={pn("kho-nguon").next[2]} /></a>) : <span />}
+        </nav>
+      </section>
+
+      <section id="dong-gop">
+        <h2><T vi="Đóng góp một gói" en="Contribute a package" /></h2>
+        <p><T vi="Ai có tài khoản GitHub cũng gửi được, không cần biết viết YAML." en="Anyone with a GitHub account can submit, no YAML skills needed." /></p>
+        <h3><T vi="1. Gửi bộ cài" en="1. Send the installer" /></h3>
+        <p><T vi="Đưa link tải .exe hoặc .msi chính thức (bắt buộc HTTPS). Không cần đăng nhập trước:" en="Give the official .exe or .msi download link (HTTPS is required). No sign-in first:" /></p>
+        <Cmd text="txacreate new https://vendor.example/app-2.1.0-x64.exe" />
+        <p><T vi="txacreate hỏi từng câu như một trình hướng dẫn, mỗi câu có ví dụ và giá trị gợi ý (Enter để nhận). Link GitHub Releases được tự điền tên, nhà phát hành, giấy phép, mô tả. Sau đó nó tạo bản xem trước 3 file YAML, kiểm tra nhanh rồi hỏi có gửi lên kho không. Có bản cho nhiều CPU thì đưa nhiều link: txacreate new <link-x64> <link-arm64>." en="txacreate walks you through it with an example and a suggested value for every question (Enter accepts). A GitHub Releases link fills in the name, publisher, license and description. It then builds a 3-file YAML preview, runs a quick check and asks whether to submit. For several CPUs give several links: txacreate new <x64-link> <arm64-link>." /></p>
+        <h3><T vi="2. Cấp quyền GitHub, chỉ ở bước cuối" en="2. Authorize GitHub, only at the last step" /></h3>
+        <p><T vi="Khi sắp fork kho và mở Pull Request, TXA hiện một mã 8 ký tự và mở trình duyệt tại github.com/login/device. Bạn nhập mã rồi bấm Authorize; lệnh tự fork, tạo branch, commit và mở Pull Request. Quyền được mã hoá và nhớ trên máy." en="Right before forking the repository and opening the pull request, TXA shows an 8-character code and opens github.com/login/device. Enter the code and press Authorize; the command forks, branches, commits and opens the pull request. The grant is encrypted and remembered on your PC." /></p>
+        <h3><T vi="3. Gói đã có, giờ có bản mới" en="3. The package exists and has a new version" /></h3>
+        <Cmd text="txacreate update TXAVL.HelloTool https://vendor.example/app-2.2.0-x64.exe" />
+        <p><T vi="Mọi thông tin cũ được giữ nguyên, chỉ thay link và phiên bản." en="All earlier information is kept, only the link and the version change." /></p>
+        <h3><T vi="Lệnh tiện ích" en="Helper commands" /></h3>
+        <div class="tbl">
+          <div><b>txacreate new &lt;link&gt; --dry-run</b><span><T vi="Chỉ tạo file vào ./txa-out để xem trước, không gửi gì." en="Only writes files to ./txa-out to preview, nothing is sent." /></span></div>
+          <div><b>txacreate hash setup.exe</b><span><T vi="Xem SHA-256, kiến trúc, loại bộ cài của một file." en="Show the SHA-256, architecture and installer type of a file." /></span></div>
+          <div><b>txacreate validate &lt;thư-mục&gt;</b><span><T vi="Chạy 14 bước kiểm tra cho thư mục gói hoặc cả kho." en="Run the 14 checks on a package folder or a whole repository." /></span></div>
+          <div><b>txacreate submit &lt;thư-mục&gt;</b><span><T vi="Gửi PR cho thư mục gói, thư mục kho gốc hoặc thư mục API." en="Open a PR for a package folder, a repository root or an API folder." /></span></div>
+          <div><b>txacreate token --store</b><span><T vi="Cấp quyền GitHub trước, không đợi tới lúc gửi (--clear để đăng xuất)." en="Authorize GitHub in advance (--clear signs out)." /></span></div>
+        </div>
+        <h3><T vi="Sau khi gửi Pull Request" en="After you open the pull request" /></h3>
+        <p><T vi="Việc đầu tiên là chấp nhận Contributor Agreement: bot comment ngay và PR chưa thể gộp, 14 bước kiểm tra chưa chạy, cho tới khi bạn trả lời đúng một comment:" en="The first thing is to accept the Contributor Agreement: the bot comments at once and the PR cannot merge, and the 14 checks do not start, until you reply with exactly one comment:" /></p>
+        <Cmd text="@txa-repo agree" />
+        <p><T vi="Chỉ comment của chính người mở PR mới có hiệu lực; thay mặt công ty thì ghi @txa-repo agree company=&quot;Tên công ty&quot;. Chỉ cần chấp nhận một lần. Mô tả PR có checklist bạn tự tick, rồi bot chạy kiểm tra và cập nhật bảng tiến trình ngay trong PR. Nhãn đi theo vòng đời của PR:" en="Only a comment from the PR author counts; on behalf of a company write @txa-repo agree company=&quot;Company name&quot;. You only accept once. The PR description holds a checklist you tick yourself, then the bot runs the checks and updates a progress table inside the PR. Labels follow the life of the PR:" /></p>
+        <div class="tbl">{labels.map((l) => (<div><b>{l[0]}</b><span><T vi={l[1]} en={l[2]} /></span></div>))}</div>
+        <p><T vi="Gói đang chờ duyệt vẫn hiện trong kho (pending.json) nhưng chưa cài được; khi moderator duyệt và PR được gộp, khoảng hai phút sau mọi người cài được gói đó." en="A package waiting for review still shows in the index (pending.json) but cannot be installed yet; once a moderator approves and the PR merges, everyone can install it about two minutes later." /></p>
+        <nav class="pn" aria-label="Prev / next">
+          {pn("dong-gop").prev ? (<a class="pn__prev" href={`#${pn("dong-gop").prev[0]}`}><small><T vi="Trước" en="Previous" /></small><T vi={pn("dong-gop").prev[1]} en={pn("dong-gop").prev[2]} /></a>) : <span />}
+          {pn("dong-gop").next ? (<a class="pn__next" href={`#${pn("dong-gop").next[0]}`}><small><T vi="Tiếp theo" en="Next" /></small><T vi={pn("dong-gop").next[1]} en={pn("dong-gop").next[2]} /></a>) : <span />}
+        </nav>
+      </section>
+
+      <section id="manifest">
+        <h2><T vi="Cấu trúc manifest" en="Manifest format" /></h2>
+        <p><T vi="Mỗi phiên bản nằm trong manifests/t/TXAVL/<AppName>/<X.Y.Z>/ và gồm ba loại file, đều có JSON Schema để trình soạn thảo gợi ý:" en="Each version lives in manifests/t/TXAVL/<AppName>/<X.Y.Z>/ and has three kinds of file, all with a JSON Schema so editors can help:" /></p>
+        <div class="tbl">
+          <div><b>core.txa.yaml</b><span><T vi="Mã gói, phiên bản, kênh, tên ngắn (alias), ngôn ngữ mặc định, tag." en="Package id, version, channel, short name (alias), default language, tags." /></span></div>
+          <div><b>build.txa.yaml</b><span><T vi="Bộ cài từng CPU: url HTTPS, sha256, dung lượng, loại bộ cài (engine), tham số cài im lặng, phiên bản Windows tối thiểu, phạm vi cài." en="The installer per CPU: HTTPS url, sha256, size, installer type (engine), silent switches, minimum Windows version, install scope." /></span></div>
+          <div><b>about.&lt;lang&gt;.txa.yaml</b><span><T vi="Tên, nhà phát hành, tóm tắt, trang chủ, giấy phép. Mỗi ngôn ngữ một file (vi-VN, en-US)." en="Name, publisher, summary, homepage, license. One file per language (vi-VN, en-US)." /></span></div>
+        </div>
+        <p><T vi="Đặc tả đầy đủ từng trường và mẫu có chú thích:" en="The full specification of every field, and annotated examples:" /> <a class="link" href={`${gh}/blob/main/docs/manifest-schema.md`}>docs/manifest-schema.md</a> · <a class="link" href={`${gh}/tree/main/examples`}>examples</a></p>
+        <nav class="pn" aria-label="Prev / next">
+          {pn("manifest").prev ? (<a class="pn__prev" href={`#${pn("manifest").prev[0]}`}><small><T vi="Trước" en="Previous" /></small><T vi={pn("manifest").prev[1]} en={pn("manifest").prev[2]} /></a>) : <span />}
+          {pn("manifest").next ? (<a class="pn__next" href={`#${pn("manifest").next[0]}`}><small><T vi="Tiếp theo" en="Next" /></small><T vi={pn("manifest").next[1]} en={pn("manifest").next[2]} /></a>) : <span />}
+        </nav>
+      </section>
+
+      <section id="api">
+        <h2><T vi="API công khai" en="Public API" /></h2>
+        <p><T vi="Trang này và txapm đều đọc cùng một REST API tĩnh, namespace txa.v1, đặt trên GitHub Pages:" en="This site and txapm read the same static REST API, namespace txa.v1, hosted on GitHub Pages:" /></p>
+        <div class="tbl">
+          <div><b>/api/txa/v1/index.json</b><span><T vi="Mọi gói: mã, alias, phiên bản mới nhất, danh sách phiên bản, tên, nhà phát hành, tóm tắt hai ngôn ngữ, tag, CPU." en="Every package: id, alias, latest version, version list, name, publisher, summaries in both languages, tags, CPUs." /></span></div>
+          <div><b>/api/txa/v1/packages/&lt;Id&gt;.json</b><span><T vi="Mọi phiên bản của một gói cùng cả ba thẻ manifest." en="Every version of one package with all three manifest cards." /></span></div>
+          <div><b>/api/txa/v1/pending.json</b><span><T vi="Các bản đã gửi, đang chờ duyệt." en="Releases that were submitted and are waiting for review." /></span></div>
+        </div>
+        <p><a class="link" href={`${base}api/txa/v1/index.json`}>index.json</a> · <a class="link" href={`${base}api/txa/v1/pending.json`}>pending.json</a></p>
+        <nav class="pn" aria-label="Prev / next">
+          {pn("api").prev ? (<a class="pn__prev" href={`#${pn("api").prev[0]}`}><small><T vi="Trước" en="Previous" /></small><T vi={pn("api").prev[1]} en={pn("api").prev[2]} /></a>) : <span />}
+          {pn("api").next ? (<a class="pn__next" href={`#${pn("api").next[0]}`}><small><T vi="Tiếp theo" en="Next" /></small><T vi={pn("api").next[1]} en={pn("api").next[2]} /></a>) : <span />}
+        </nav>
+      </section>
+
+      <section id="faq">
+        <h2><T vi="Hỏi đáp và gỡ cài đặt" en="FAQ and uninstall" /></h2>
+        <h3><T vi="Gõ txapm báo “not recognized”?" en="txapm says “not recognized”?" /></h3>
+        <p><T vi="Mở cửa sổ terminal mới để PATH được nạp lại." en="Open a new terminal window so PATH is reloaded." /></p>
+        <h3><T vi="Cài báo “SHA-256 mismatch”?" en="Install fails with “SHA-256 mismatch”?" /></h3>
+        <p><T vi="File trên máy chủ nhà phát hành đã thay đổi so với lúc duyệt. TXA đã xoá file đó để bảo vệ bạn. Hãy báo ở Issues trên GitHub." en="The file on the publisher's server changed since it was reviewed. TXA deleted it to protect you. Please report it in GitHub Issues." /></p>
+        <h3><T vi="Mã thoát 1618 và 3010?" en="Exit codes 1618 and 3010?" /></h3>
+        <p><T vi="1618: Windows đang cài phần mềm khác, đợi xong rồi chạy lại. 3010: cài thành công, chỉ cần khởi động lại máy." en="1618: Windows is installing something else, wait and run again. 3010: installed fine, just restart the PC." /></p>
+        <h3><T vi="Gỡ TXA khỏi máy" en="Remove TXA from your PC" /></h3>
+        <Cmd text="& ([scriptblock]::Create((irm https://raw.githubusercontent.com/TXAVL/txa-repo/main/install.ps1))) -Uninstall" />
+        <p><T vi="Cài bằng pipx thì gỡ bằng pipx uninstall txa." en="Installed with pipx? Remove it with pipx uninstall txa." /></p>
+        <nav class="pn" aria-label="Prev / next">
+          {pn("faq").prev ? (<a class="pn__prev" href={`#${pn("faq").prev[0]}`}><small><T vi="Trước" en="Previous" /></small><T vi={pn("faq").prev[1]} en={pn("faq").prev[2]} /></a>) : <span />}
+          {pn("faq").next ? (<a class="pn__next" href={`#${pn("faq").next[0]}`}><small><T vi="Tiếp theo" en="Next" /></small><T vi={pn("faq").next[1]} en={pn("faq").next[2]} /></a>) : <span />}
+        </nav>
+      </section>
+      </div>
+    </main>
+  </div>
+</Base>
+
+<script>
+  const root = document.documentElement;
+  const slug = (t: string) => t.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/đ/g, "d").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+  const fold = (s: string) => s.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/đ/g, "d");
+
+  // anchors on every h3 + the sub-list of the section being read, under its item in the side menu
+  const navLinks = [...document.querySelectorAll<HTMLAnchorElement>(".docs__nav a")];
+  const byId = new Map(navLinks.map((a) => [a.hash.slice(1), a]));
+  document.querySelectorAll<HTMLElement>(".doc section[id]").forEach((sec) => {
+    const heads = [...sec.querySelectorAll<HTMLElement>("h3")];
+    const sub = document.createElement("div");
+    sub.className = "docs__sub";
+    heads.forEach((h, i) => {
+      const label = h.querySelector<HTMLElement>("[data-l=vi]")?.textContent || h.textContent || "";
+      h.id = `${sec.id}-${slug(label) || i}`;
+      const a = document.createElement("a");
+      a.href = `#${h.id}`;
+      const vi = h.querySelector("[data-l=vi]")?.textContent, en = h.querySelector("[data-l=en]")?.textContent;
+      a.innerHTML = vi && en ? `<span data-l="vi">${vi}</span><span data-l="en">${en}</span>` : h.textContent!;
+      sub.append(a);
+    });
+    if (heads.length) byId.get(sec.id)?.after(sub);
+  });
+
+  const secs = [...document.querySelectorAll<HTMLElement>(".doc section[id]")];
+  function spy() {
+    const y = window.scrollY + window.innerHeight * 0.25;
+    let cur = secs[0];
+    for (const s of secs) if (s.offsetTop <= y) cur = s;
+    navLinks.forEach((a) => (a.hash.slice(1) === cur.id ? a.setAttribute("aria-current", "true") : a.removeAttribute("aria-current")));
+    document.querySelectorAll<HTMLElement>(".docs__sub").forEach((d) => (d.dataset.open = String((d.previousElementSibling as HTMLAnchorElement)?.hash.slice(1) === cur.id)));
+  }
+  addEventListener("scroll", spy, { passive: true });
+  spy();
+
+  // command filter: hides every row that does not match, keeps headings so the reader keeps their place
+  const q = document.getElementById("dq") as HTMLInputElement;
+  const count = document.getElementById("dq-count")!;
+  const rows = [...document.querySelectorAll<HTMLElement>(".doc .rowlist li, .doc .tbl > div")];
+  rows.forEach((r) => (r.dataset.hay = fold(r.textContent || "")));
+  function filter() {
+    const words = fold(q.value).trim().split(/\s+/).filter(Boolean);
+    let shown = 0;
+    rows.forEach((r) => {
+      const ok = words.every((w) => r.dataset.hay!.includes(w));
+      r.hidden = !ok;
+      if (ok) shown++;
+    });
+    count.textContent = words.length ? `${shown} / ${rows.length}` : "";
+    root.toggleAttribute("data-filtering", words.length > 0);
+  }
+  q.addEventListener("input", filter);
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "/" && !/^(INPUT|TEXTAREA)$/.test((e.target as Element).tagName)) { e.preventDefault(); q.focus(); q.select(); }
+  });
+</script>
