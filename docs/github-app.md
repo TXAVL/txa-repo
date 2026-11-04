@@ -46,3 +46,9 @@ Mở một PR mới: comment của bot phải hiện tên `txa-repo` kèm nhãn 
 kiểm tra hai secret đã có chưa (`gh secret list`) và App đã được cài vào `txa-repo`.
 
 Bonus: vì App gộp PR bằng quyền của nó, lần gộp đó tính như một push thật và tự kích hoạt `TXA Publish API`.
+
+## 5. Kho mới, nhớ người đã đồng ý ở kho khác
+
+Kho chạy bot TXA mà bạn dựng (fork) có thể **nhớ người đã đồng ý Thỏa thuận Người đóng góp ở kho khác**, giống cách `winget-pkgs` làm với CLA. Trong kho đó, tạo biến repository `TXA_AGREEMENT_REPOS` (Settings → Secrets and variables → Actions → Variables) với danh sách kho tin cậy, cách nhau bằng dấu phẩy, ví dụ `TXAVL/txa-repo`. Để trống thì bot chỉ tin `TXAVL/txa-repo` (và chính kho đó).
+
+Ai đã có PR được gộp, có comment đồng ý đúng phiên bản thỏa thuận hiện hành ở một kho trong danh sách, sẽ không bị hỏi lại; PR của họ vào thẳng bước tick checklist. Muốn bắt mọi người comment lại thì đặt `RECOGNISE_RETURNING = False` trong `tools/src/txa/ci/agreement.py`.

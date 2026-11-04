@@ -56,6 +56,9 @@ jobs:
           GH_TOKEN: ${{ steps.app.outputs.token || github.token }}
           PR_NUMBER: ${{ github.event.pull_request.number || github.event.issue.number }}
           COMMENT_ID: ${{ github.event.comment.id }}
+          # Repositories whose accepted agreements this repository trusts (comma separated owner/repo).
+          # Set the repository variable TXA_AGREEMENT_REPOS in a fork; empty means TXAVL/txa-repo.
+          TXA_AGREEMENT_REPOS: ${{ vars.TXA_AGREEMENT_REPOS }}
         run: |
           if [ -n "$COMMENT_ID" ]; then extra="--comment-id $COMMENT_ID"; else extra=""; fi
           txaci gate agreement --pr "$PR_NUMBER" $extra

@@ -10,8 +10,9 @@ const SHORT: Record<string, [string, string]> = {
   "manifest-schema": ["Đặc tả manifest", "Manifest reference"],
   "winget-import": ["Nhập từ WinGet, kho riêng", "WinGet import, own repo"],
   "github-app": ["Bot riêng cho kho", "Your own repo bot"],
+  "contributor-agreement": ["Thỏa thuận người đóng góp", "Contributor agreement"],
 };
-const ORDER = ["manifest-schema", "winget-import", "github-app"];
+const ORDER = ["manifest-schema", "winget-import", "contributor-agreement", "github-app"];
 
 export const slug = (t: string) =>
   t.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/đ/g, "d").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");

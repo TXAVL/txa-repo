@@ -400,3 +400,7 @@ input { caret-color: var(--accent); }
 
 .doc { max-width: none; }
 .doc__head .lead { max-width: 40rem; }
+
+/* docs: one section at a time (the script sets data-paged; without it everything shows) */
+[data-paged]:not([data-filtering]) .doc section[id]:not([data-active]) { display: none; }
+[data-paged] .doc section[id] { padding-top: 0; }

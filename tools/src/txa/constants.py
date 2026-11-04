@@ -27,6 +27,10 @@ GITHUB_API = "https://api.github.com"
 USER_AGENT = f"txa/{__version__} (+https://github.com/{UPSTREAM_REPO})"
 
 STATUS_CONTEXT = "txa/verified"
+AGREEMENT_URL = "https://txavl.github.io/txa-repo/docs/contributor-agreement/"
+AGREEMENT_SOURCE = "https://github.com/TXAVL/txa-repo/blob/main/docs/contributor-agreement.md"
+AGREEMENT_VERSION = "1.0"  # raise it when docs/contributor-agreement.md changes in a way people must accept again
+AGREEMENT_HOME = "TXAVL/txa-repo"  # the repository whose accepted agreements every TXA repository trusts by default
 REPORT_MARKER = "<!-- txa-bot:report -->"
 
 LABELS = {

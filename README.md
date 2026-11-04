@@ -270,16 +270,14 @@ Chủ kho muốn bot hiện tên riêng (`txa-repo[bot]`) thay vì `github-actio
 
 ### Sau khi gửi Pull Request
 
-**Việc đầu tiên sau khi tạo PR là chấp nhận Contributor Agreement (EULA).** Bot comment ngay: *"This PR cannot be merged
-until you accept the Contributor Agreement"*. Bạn trả lời đúng một comment:
+**Việc đầu tiên sau khi tạo PR là đọc và chấp nhận [Thỏa thuận Người đóng góp (Contributor Agreement)](docs/contributor-agreement.md).** Bot comment ngay và gắn nhãn `txa:needs-agreement`. Bạn trả lời đúng một comment:
 
 ```
 @txa-repo agree
 ```
 
-Bot tự **xoá comment đó**, đánh dấu bước này là đã xong (`✅ Contributor Agreement accepted`) và bỏ nhãn
-`txa:needs-agreement`. **Bot chưa chạy bước nào cho tới khi bạn chấp nhận**: 14 bước kiểm tra, bảng tiến trình và 16 check chỉ bắt đầu sau khi bạn comment `@txa-repo agree`. Chưa chấp nhận thì PR không thể gộp. Chỉ comment của chính người mở PR mới có hiệu lực. Thay mặt công ty thì ghi `@txa-repo agree company="Tên công ty"`.
-Chỉ cần chấp nhận **một lần**: người đã có PR được gộp, và maintainer của repo, được bot nhận ra tự động. Bước này hiện thành status `txa/agreement` trong khung merge.
+Bot tự **xoá comment đó**, gỡ nhãn `txa:needs-agreement` và gắn nhãn `txa:needs-confirmation` (đang chờ bạn tick checklist). **Bot chưa chạy bất cứ bước nào cho tới khi bạn vừa đồng ý vừa tick hết các ô** trong mô tả PR: 14 bước kiểm tra, bảng tiến trình và 16 check chỉ bắt đầu khi đủ hai điều kiện đó, lúc ấy nhãn chuyển sang `txa:validating`. Chưa đủ thì PR không thể gộp. Chỉ comment của chính người mở PR mới có hiệu lực. Thay mặt công ty thì ghi `@txa-repo agree company="Tên công ty"`.
+Giống `winget-pkgs`: **đồng ý một lần, bot nhớ**. Lần sau, nếu bạn đã có PR được gộp ở kho này hoặc ở một kho trong danh sách tin cậy (mặc định `TXAVL/txa-repo`) và thỏa thuận chưa đổi phiên bản, bot ghi nhận sẵn và PR vào thẳng nhãn `txa:needs-confirmation`: không phải comment lại, nhưng **vẫn phải tick hết checklist** của từng PR trước khi bot chạy. Maintainer không được miễn, cũng phải đồng ý một lần như mọi người. Khi thỏa thuận đổi phiên bản, bot sẽ hỏi lại. Bước này hiện thành status `txa/agreement` trong khung merge.
 
 Mô tả của PR có một **checklist bạn tự tick**: đã đọc hướng dẫn, không có PR trùng, chỉ sửa một manifest,
 đã chạy `txacreate validate <thư-mục>`, đã thử `txapm install --manifest <thư-mục>`, đúng schema.
@@ -287,7 +285,7 @@ Bot đăng huy hiệu sức khoẻ (Validation Pipeline / Publish Pipeline), li�
 (`01. …` → `16. …`, từng cái chuyển từ *Queued* sang xong) và giữ PR ở trạng thái chờ cho tới khi mọi ô được tick
 (nhãn `txa:needs-confirmation`). Sau khi qua kiểm tra, bot báo cần một Contributor/moderator duyệt.
 
-Ngay khi PR được mở, bot đăng một **bảng tiến trình** và tự cập nhật từng bước ngay trong PR
+Khi bạn đã đồng ý và tick hết các ô, bot đăng một **bảng tiến trình** và tự cập nhật từng bước ngay trong PR
 (⏳ chờ → 🔄 đang chạy → ✅ xong / ❌ lỗi, kèm thời gian mỗi bước):
 
 ```

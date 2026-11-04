@@ -196,9 +196,10 @@ const labels = [
           <div><b><code>txacreate token --store</code></b><span><T vi="Cấp quyền GitHub trước, không đợi tới lúc gửi (--clear để đăng xuất)." en="Authorize GitHub in advance (--clear signs out)." /></span></div>
         </div>
         <h3><T vi="Sau khi gửi Pull Request" en="After you open the pull request" /></h3>
-        <p><T vi="Việc đầu tiên là chấp nhận Contributor Agreement: bot comment ngay và PR chưa thể gộp, 14 bước kiểm tra chưa chạy, cho tới khi bạn trả lời đúng một comment:" en="The first thing is to accept the Contributor Agreement: the bot comments at once and the PR cannot merge, and the 14 checks do not start, until you reply with exactly one comment:" /></p>
+        <p><T vi="Việc đầu tiên là đọc và chấp nhận Thỏa thuận Người đóng góp. Bot comment ngay và gắn nhãn txa:needs-agreement. Bạn trả lời đúng một comment, khi đó bot xoá comment, đổi nhãn sang txa:needs-confirmation (chờ bạn tick checklist) và vẫn chưa chạy gì:" en="The first thing is to read and accept the Contributor Agreement. The bot comments at once and adds the txa:needs-agreement label. You reply with exactly one comment; the bot deletes it, switches the label to txa:needs-confirmation (waiting for you to tick the checklist) and still runs nothing:" /></p>
         <Cmd text="@txa-repo agree" />
-        <p><T vi="Chỉ comment của chính người mở PR mới có hiệu lực; thay mặt công ty thì ghi @txa-repo agree company=&quot;Tên công ty&quot;. Chỉ cần chấp nhận một lần. Mô tả PR có checklist bạn tự tick, rồi bot chạy kiểm tra và cập nhật bảng tiến trình ngay trong PR. Nhãn đi theo vòng đời của PR:" en="Only a comment from the PR author counts; on behalf of a company write @txa-repo agree company=&quot;Company name&quot;. You only accept once. The PR description holds a checklist you tick yourself, then the bot runs the checks and updates a progress table inside the PR. Labels follow the life of the PR:" /></p>
+        <p><a class="link" href={`${base}docs/contributor-agreement/`}><T vi="Đọc Thỏa thuận Người đóng góp" en="Read the Contributor Agreement" /></a></p>
+        <p><T vi="Chỉ khi bạn vừa đồng ý vừa tick hết các ô trong mô tả PR, bot mới chạy 14 bước kiểm tra, bảng tiến trình và 16 check, và nhãn chuyển sang txa:validating. Chỉ comment của chính người mở PR mới có hiệu lực; thay mặt công ty thì ghi @txa-repo agree company=&quot;Tên công ty&quot;. Giống winget-pkgs: đồng ý một lần, bot nhớ. Từ PR sau, nếu bạn đã có PR được gộp ở kho này hoặc ở kho tin cậy (mặc định TXAVL/txa-repo) và thỏa thuận chưa đổi phiên bản, bạn không phải comment lại, nhưng vẫn phải tick checklist trước khi bot chạy. Nhãn đi theo vòng đời của PR:" en="Only when you have agreed and ticked every box in the PR description does the bot run the 14 checks, the progress table and the 16 checks, and the label becomes txa:validating. Only a comment from the PR author counts; on behalf of a company write @txa-repo agree company=&quot;Company name&quot;. Like winget-pkgs: agree once, the bot remembers. From your next PR, if you already have a merged PR in this repository or in a trusted one (by default TXAVL/txa-repo) and the agreement has not changed version, you do not comment again, but you still tick the checklist before the bot runs. Labels follow the life of the PR:" /></p>
         <div class="tbl">{labels.map((l) => (<div><b><code>{l[0]}</code></b><span><T vi={l[1]} en={l[2]} /></span></div>))}</div>
         <p><T vi="Gói đang chờ duyệt vẫn hiện trong kho (pending.json) nhưng chưa cài được; khi moderator duyệt và PR được gộp, khoảng hai phút sau mọi người cài được gói đó." en="A package waiting for review still shows in the index (pending.json) but cannot be installed yet; once a moderator approves and the PR merges, everyone can install it about two minutes later." /></p>
         <nav class="pn" aria-label="Prev / next">
@@ -282,16 +283,27 @@ const labels = [
     if (heads.length) byId.get(sec.id)?.after(sub);
   });
 
+  // one section at a time: the menu, the in-page links and the Previous / Next buttons all switch the section
   const secs = [...document.querySelectorAll<HTMLElement>(".doc section[id]")];
-  function spy() {
-    const y = window.scrollY + window.innerHeight * 0.25;
-    let cur = secs[0];
-    for (const s of secs) if (s.offsetTop <= y) cur = s;
-    navLinks.forEach((a) => (a.hash.slice(1) === cur.id ? a.setAttribute("aria-current", "true") : a.removeAttribute("aria-current")));
-    document.querySelectorAll<HTMLElement>(".docs__sub").forEach((d) => (d.dataset.open = String((d.previousElementSibling as HTMLAnchorElement)?.hash.slice(1) === cur.id)));
+  const sheet = document.querySelector<HTMLElement>(".sheet")!;
+  root.dataset.paged = "";
+  function activate(id: string, anchor?: string) {
+    const sec = secs.find((x) => x.id === id) ?? secs[0];
+    secs.forEach((x) => (x === sec ? x.setAttribute("data-active", "") : x.removeAttribute("data-active")));
+    navLinks.forEach((a) => (a.hash.slice(1) === sec.id ? a.setAttribute("aria-current", "true") : a.removeAttribute("aria-current")));
+    document.querySelectorAll<HTMLElement>(".docs__sub").forEach((d) => (d.dataset.open = String((d.previousElementSibling as HTMLAnchorElement)?.hash.slice(1) === sec.id)));
+    const target = anchor ? document.getElementById(anchor) : null;
+    if (target) target.scrollIntoView();
+    else window.scrollTo({ top: Math.max(0, sheet.getBoundingClientRect().top + window.scrollY - 16) });
   }
-  addEventListener("scroll", spy, { passive: true });
-  spy();
+  function route() {
+    const h = decodeURIComponent(location.hash.slice(1));
+    const sec = secs.find((x) => x.id === h) ?? secs.find((x) => h.startsWith(x.id + "-"));
+    if (!h) { activate(secs[0].id); window.scrollTo({ top: 0 }); return; }
+    activate(sec?.id ?? secs[0].id, sec && sec.id !== h ? h : undefined);
+  }
+  addEventListener("hashchange", route);
+  route();
 
   // command filter: hides every row that does not match, keeps headings so the reader keeps their place
   const q = document.getElementById("dq") as HTMLInputElement;
@@ -308,6 +320,10 @@ const labels = [
     });
     count.textContent = words.length ? `${shown} / ${rows.length}` : "";
     root.toggleAttribute("data-filtering", words.length > 0);
+    secs.forEach((sec) => {
+      const any = !words.length || [...sec.querySelectorAll<HTMLElement>(".rowlist li, .tbl > div")].some((r) => !r.hidden);
+      sec.hidden = !any;
+    });
   }
   q.addEventListener("input", filter);
   document.addEventListener("keydown", (e) => {

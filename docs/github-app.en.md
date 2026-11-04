@@ -47,3 +47,9 @@ check that both secrets exist (`gh secret list`) and that the App is installed o
 
 Bonus: because the App merges PRs with its own permissions, that merge counts as a real push and triggers
 `TXA Publish API` by itself.
+
+## 5. A new repository remembers people who agreed in another one
+
+A repository you build (a fork) that runs the TXA bot can **remember people who already accepted the Contributor Agreement elsewhere**, the way `winget-pkgs` does with its CLA. In that repository create the repository variable `TXA_AGREEMENT_REPOS` (Settings → Secrets and variables → Actions → Variables) holding the trusted repositories, comma separated, for example `TXAVL/txa-repo`. Left empty the bot trusts only `TXAVL/txa-repo` (and the repository itself).
+
+Anyone with a merged PR and an accepted-agreement comment of the current agreement version in a listed repository is not asked again; their PR goes straight to ticking the checklist. To make everyone comment again, set `RECOGNISE_RETURNING = False` in `tools/src/txa/ci/agreement.py`.

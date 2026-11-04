@@ -688,7 +688,7 @@ def _checklist(repo: str) -> list[str]:
     """The checklist of the pull request description (empty boxes for the author to tick on GitHub)."""
     return [
         "## ✅ Checklist", "",
-        f"- [ ] Signed the [Contributor Agreement](https://github.com/{repo}#readme) (the bot asks you to confirm with `@txa-repo agree`)",
+        "- [ ] Read the [Contributor Agreement](https://txavl.github.io/txa-repo/docs/contributor-agreement/) and accepted it by commenting `@txa-repo agree` (once; the bot remembers you)",
         "- [ ] Linked to an issue (if applicable)", "  - Resolves #[Issue Number]", "",
         "## 📦 Manifest Checklist", "",
         f"- [ ] Checked that there aren't other open [pull requests](https://github.com/{repo}/pulls) for the same manifest update/change",
