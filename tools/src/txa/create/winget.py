@@ -747,7 +747,6 @@ def _real_size(url: str) -> int:
 # Hand-written / non-WinGet packages that must NEVER be overwritten by automatic WinGet sync
 _HANDWRITTEN_APPS = {
     "CanhCutTeamLauncher",
-    "TXAWinSetup",
     "Warframe",
     "MSYS2",   # the only "MSYS2" id upstream belongs to an emulator build, not the MSYS2 project
     "UniKey",  # repackaged with install/uninstall scripts
@@ -955,6 +954,28 @@ def sync_txavl_packages(
                     retention.prune_package(ver_dirs[0].parent)  # newest 10 stay, the oldest go
             updated.append(f"{pkg_id} ({current_ver} -> {new_ver})")
             continue
+
+        # Own GitHub releases (T-Drop, TXAWinSetup...): the newest release links to an installer asset of a trusted
+        # repository, so that repository's latest release is the upstream (see create/github_sync.py).
+        if app_name not in _TXAVL_WINGET_MAP:
+            from txa.create import github_sync
+
+            gh_repo = github_sync.release_repo(latest_dir)
+            if gh_repo:
+                out = github_sync.sync_release(app_dir, latest_dir, gh_repo, dry_run=dry_run, keep_old=keep_old)
+                if out.status == "updated":
+                    console.say(f"  {console.paint('[UP]', 'green', 'bold')}   {pkg_id}: {current_ver} -> {out.new_version} (from GitHub {gh_repo})")
+                    updated.append(f"{pkg_id} ({current_ver} -> {out.new_version})")
+                elif out.status == "up_to_date":
+                    console.say(f"  {console.paint('[OK]', 'gray')}   {pkg_id}@{current_ver}")
+                    up_to_date.append(pkg_id)
+                elif out.status == "failed":
+                    console.say(f"  {console.paint('[FAIL]', 'red')} {pkg_id}: {out.detail}")
+                    failed.append(pkg_id)
+                else:
+                    console.say(f"  {console.paint('[SKIP]', 'yellow')} {pkg_id}@{current_ver} ({out.detail})")
+                    skipped.append(pkg_id)
+                continue
 
         # Standard WinGet-backed TXAVL package
         wg_id = _TXAVL_WINGET_MAP.get(app_name) or resolve_to_winget_id(prev_about.get("name") or app_name)

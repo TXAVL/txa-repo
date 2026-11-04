@@ -1,5 +1,5 @@
-# TXA Auto-Update - periodically checks upstream sources (WinGet & antigravity.google)
-# and updates all managed TXAVL packages in manifests/t/TXAVL/ to their newest versions.
+# TXA Auto-Update - periodically checks upstream sources (WinGet, antigravity.google and the GitHub Releases of
+# TXAVL's own repositories, e.g. T-Drop) and updates all managed TXAVL packages in manifests/t/TXAVL/ to their newest versions.
 #
 # Hand-written packages (CanhCutTeamLauncher, TXAWinSetup, Warframe, or any manifest
 # containing `auto-update: false` / `hand-written`) and third-party contributor
