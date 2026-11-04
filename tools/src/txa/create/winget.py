@@ -795,6 +795,22 @@ _TXAVL_WINGET_MAP: dict[str, str] = {
     "VisualStudioCommunity2026": "Microsoft.VisualStudio.Community",
     "VLC": "VideoLAN.VLC",
     "WinSCP": "WinSCP.WinSCP",
+    "DockerDesktop": "Docker.DockerDesktop",
+    "CMake": "Kitware.CMake",
+    "Go": "GoLang.Go",
+    "Neovim": "Neovim.Neovim",
+    "JetBrainsToolbox": "JetBrains.Toolbox",
+    "DBeaver": "DBeaver.DBeaver.Community",
+    "Wireshark": "WiresharkFoundation.Wireshark",
+    "Bitwarden": "Bitwarden.Bitwarden",
+    "KeePassXC": "KeePassXCTeam.KeePassXC",
+    "QBittorrent": "qBittorrent.qBittorrent",
+    "SumatraPDF": "SumatraPDF.SumatraPDF",
+    "HandBrake": "HandBrake.HandBrake",
+    "Zoom": "Zoom.Zoom",
+    "Inkscape": "Inkscape.Inkscape",
+    "Blender": "BlenderFoundation.Blender",
+    "WinDirStat": "WinDirStat.WinDirStat",
 }
 
 

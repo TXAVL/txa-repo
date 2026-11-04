@@ -565,6 +565,22 @@ _SUMMARIES_VI: dict[str, str] = {
     "vlc": "Trình phát đa phương tiện mã nguồn mở miễn phí, chơi được hầu hết mọi định dạng video và âm thanh.",
     "warframe": "Tựa game bắn súng hành động góc nhìn thứ ba khoa học viễn tưởng miễn phí (Free-to-Play).",
     "winscp": "Trình quản lý và truyền tải file qua giao thức SFTP, FTP, WebDAV, S3 và SCP trên Windows.",
+    "dockerdesktop": "Xây dựng, chạy và chia sẻ ứng dụng container (Docker) ngay trên Windows.",
+    "cmake": "Bộ công cụ mã nguồn mở đa nền tảng để biên dịch, kiểm thử và đóng gói phần mềm.",
+    "go": "Ngôn ngữ lập trình Go của Google: đơn giản, nhanh, xây phần mềm đáng tin cậy.",
+    "neovim": "Trình soạn thảo văn bản dựa trên Vim, dễ mở rộng và dễ dùng hơn.",
+    "jetbrainstoolbox": "Cài đặt, cập nhật và mở mọi IDE của JetBrains từ một nơi.",
+    "dbeaver": "Công cụ quản lý nhiều loại cơ sở dữ liệu, miễn phí, dành cho lập trình viên và DBA.",
+    "wireshark": "Phần mềm phân tích giao thức mạng phổ biến nhất thế giới.",
+    "bitwarden": "Trình quản lý mật khẩu an toàn, miễn phí cho mọi thiết bị.",
+    "keepassxc": "Trình quản lý mật khẩu hiện đại, mã nguồn mở, lưu hoàn toàn trên máy bạn.",
+    "qbittorrent": "Trình tải torrent mã nguồn mở, miễn phí và không quảng cáo.",
+    "sumatrapdf": "Trình đọc PDF, ePub, Mobi, truyện tranh... nhỏ gọn và rất nhanh.",
+    "handbrake": "Phần mềm chuyển đổi video mã nguồn mở, xuất ra định dạng phát được trên mọi thiết bị.",
+    "zoom": "Ứng dụng họp video, nhắn tin và gọi điện Zoom Workplace cho máy tính.",
+    "inkscape": "Phần mềm thiết kế đồ hoạ vector mã nguồn mở, miễn phí.",
+    "blender": "Bộ phần mềm dựng hình 3D mã nguồn mở: mô hình hoá, hoạt hình, kết xuất.",
+    "windirstat": "Xem dung lượng ổ đĩa dưới dạng sơ đồ và dọn dẹp: biết cái gì đang chiếm chỗ.",
 }
 
 _SUMMARIES_EN: dict[str, str] = {
