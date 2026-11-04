@@ -89,9 +89,15 @@ jobs:
             }
             git add $dir
             git commit -q -m "chore(manifests): auto-update TXAVL.$name to the latest upstream version"
-            git pull -q --rebase origin main
-            git push -q origin HEAD:main
-            if ($LASTEXITCODE -ne 0) { Write-Host "::error::could not push TXAVL.$name to main"; $failures += $name; continue }
+            # another commit can land on main while this one is being checked: rebase and retry
+            $ok = $false
+            foreach ($try in 1..4) {
+              git pull -q --rebase origin main
+              git push -q origin HEAD:main
+              if ($LASTEXITCODE -eq 0) { $ok = $true; break }
+              Start-Sleep -Seconds (3 * $try)
+            }
+            if (-not $ok) { Write-Host "::error::could not push TXAVL.$name to main"; $failures += $name; continue }
             $pushed++
           }
           Write-Host "Published $pushed package update(s) to main."
