@@ -240,8 +240,9 @@ html[lang="en"] [data-l="vi"], html:not([lang="en"]) [data-l="en"] { display: no
 /* a label and a command on one row */
 .cheats .title { margin-bottom: 1.5rem; }
 .rowlist { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
-.rowlist li { background: var(--surface); border-radius: var(--r); padding: .7rem .8rem .7rem 1.25rem; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 420px); align-items: center; gap: 1rem; }
-.rowlist li > span { font-weight: 500; }
+.rowlist li { background: var(--surface); border-radius: var(--r); padding: .7rem .8rem .7rem 1.25rem; display: flex; flex-wrap: wrap; align-items: center; gap: .5rem 1rem; }
+.rowlist li > span { font-weight: 500; flex: 1 1 13rem; min-width: 0; }
+.rowlist li > .chip { flex: 1 1 19rem; max-width: 26rem; width: auto; }
 
 .faq { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: clamp(2rem, 5vw, 5rem); align-items: start; }
 details { background: var(--surface); border-radius: var(--r); padding: 1rem 1.25rem; }
@@ -272,7 +273,6 @@ details p { margin: .75rem 0 0; color: var(--ink-2); max-width: 40rem; }
 .doc pre { background: var(--surface); border-radius: var(--r); padding: 1.1rem 1.3rem; overflow-x: auto; font: 400 .9rem/1.7 var(--mono); margin: 1rem 0; }
 .doc pre code { background: none; padding: 0; font: inherit; }
 .doc .rowlist { margin: 1rem 0; }
-.doc .rowlist li { grid-template-columns: minmax(0, 1fr) minmax(0, 420px); }
 .callout { background: var(--accent-tint); border-radius: var(--r); padding: 1rem 1.25rem; margin: 1.25rem 0; }
 .callout p { margin: 0; }
 .tbl { display: grid; gap: 6px; margin: 1rem 0; }
@@ -287,7 +287,7 @@ details p { margin: .75rem 0 0; color: var(--ink-2); max-width: 40rem; }
   .how, .vet, .faq, .docs { grid-template-columns: 1fr; }
   .docs__nav { position: static; max-height: none; display: flex; flex-wrap: wrap; gap: 6px; }
   .docs__nav a { background: var(--surface); }
-  .rowlist li, .doc .rowlist li { grid-template-columns: 1fr; }
+  .rowlist li > .chip { max-width: none; flex-basis: 100%; }
 }
 @media (max-width: 560px) {
   .facts { grid-template-columns: 1fr 1fr; gap: 1.5rem 1rem; }
@@ -404,3 +404,6 @@ input { caret-color: var(--accent); }
 /* docs: one section at a time (the script sets data-paged; without it everything shows) */
 [data-paged]:not([data-filtering]) .doc section[id]:not([data-active]) { display: none; }
 [data-paged] .doc section[id] { padding-top: 0; }
+
+/* rows and table cells are layout, not running text: the 66ch measure is for paragraphs and list items only */
+.doc .rowlist li, .md .rowlist li, .doc .checks li { max-width: none; }
