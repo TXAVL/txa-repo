@@ -55,36 +55,44 @@ jobs:
         shell: pwsh
         run: winget source update --disable-interactivity | Out-Null
 
-      - name: Update each package in its own pull request
+      - name: Update each package and commit it straight to main
         shell: pwsh
         env:
           PKG_FILTER: ${{ inputs.package }}
           GH_TOKEN: ${{ steps.app.outputs.token || github.token }}
         run: |
-          # main is protected (pull request + txa/verified) and the bot allows one release per PR:
-          # every package that has a newer version gets its own branch and pull request.
+          # No pull request and no human review: each package with a newer version is synced, checked with the
+          # full online validator (STEP 01-14: size, SHA-256, signature, ...) and pushed straight to main.
+          # The bot (GitHub App) must be allowed to bypass the main branch rule. A release that fails the
+          # validator is dropped (nothing is pushed) and the job ends red so you get the mail.
           git config user.name "txa-repo-bot[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           $names = if ($env:PKG_FILTER) { @($env:PKG_FILTER) } else { Get-ChildItem manifests/t/TXAVL -Directory | ForEach-Object Name }
-          $opened = 0
+          $pushed = 0
+          $failures = @()
           foreach ($name in $names) {
+            $dir = "manifests/t/TXAVL/$name"
             txacli sync $name --namespace TXAVL
-            $changed = git status --porcelain "manifests/t/TXAVL/$name"
-            if (-not $changed) { continue }
-            $branch = "txa-auto-update/$name"
-            git checkout -q -B $branch
-            git add "manifests/t/TXAVL/$name"
-            git commit -q -m "chore(manifests): auto-update TXAVL.$name to the latest upstream version"
-            git push -q --force origin "HEAD:refs/heads/$branch"
-            if ($LASTEXITCODE -ne 0) { Write-Host "::error::could not push $branch"; exit 1 }
-            $open = gh pr list --head $branch --state open --json number --jq '.[0].number'
-            if ($open) {
-              Write-Host "TXAVL.${name}: pull request #$open already open - its branch was refreshed."
-            } else {
-              gh pr create --base main --head $branch --title "Auto-update: TXAVL.$name" --body "Created by the scheduled TXA Auto-Update. The 16 bot checks run on this release; a code owner approves, then it merges. The repository keeps the newest 10 versions of each package; the oldest is removed when one is added."
-              if ($LASTEXITCODE -ne 0) { Write-Host "::error::could not open the pull request for $name"; exit 1 }
-              $opened++
+            if ($LASTEXITCODE -ne 0) { $failures += $name; git checkout -q -- $dir; git clean -fdq -- $dir; continue }
+            if (-not (git status --porcelain $dir)) { continue }
+            $releases = @(git ls-files --others --exclude-standard $dir | ForEach-Object { Split-Path $_ -Parent } | Sort-Object -Unique)
+            $valid = $true
+            foreach ($release in $releases) {
+              txaci validate $release
+              if ($LASTEXITCODE -ne 0) { $valid = $false }
             }
-            git checkout -q main
+            if (-not $valid) {
+              Write-Host "::error::TXAVL.${name}: the new release failed validation - not published"
+              $failures += $name
+              git checkout -q -- $dir; git clean -fdq -- $dir
+              continue
+            }
+            git add $dir
+            git commit -q -m "chore(manifests): auto-update TXAVL.$name to the latest upstream version"
+            git pull -q --rebase origin main
+            git push -q origin HEAD:main
+            if ($LASTEXITCODE -ne 0) { Write-Host "::error::could not push TXAVL.$name to main"; $failures += $name; continue }
+            $pushed++
           }
-          Write-Host "Opened $opened new pull request(s)."
+          Write-Host "Published $pushed package update(s) to main."
+          if ($failures.Count) { Write-Host "::error::not updated: $($failures -join ', ')"; exit 1 }

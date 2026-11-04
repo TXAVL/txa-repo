@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import re
 import subprocess
+import time
 from typing import Any
 
 import yaml
@@ -716,12 +717,20 @@ def save_draft_manifests(draft, root_dir, dry_run: bool = False):
 
 
 def _real_size(url: str) -> int:
-    """The installer's real byte size (the validator compares it with what the server reports); 1 only if the server hides it."""
-    try:
-        length = net.probe(net.session(), url).length
-    except Exception:  # noqa: BLE001 - an unreachable server must not stop the sync
-        length = None
-    return length or 1
+    """The installer's real byte size (the validator compares it with what the server reports).
+
+    Retried a few times; if the size still cannot be read this raises, so the package is
+    skipped instead of being published with a made-up size (STEP 07 would reject it)."""
+    last: Exception | str = "the server reported no size"
+    for attempt in range(3):
+        try:
+            length = net.probe(net.session(), url).length
+            if length:
+                return length
+        except Exception as exc:  # noqa: BLE001 - reported below after the retries
+            last = exc
+        time.sleep(2 * (attempt + 1))
+    raise RuntimeError(f"cannot read the installer size of {url}: {last}")
 
 
 # Hand-written / non-WinGet packages that must NEVER be overwritten by automatic WinGet sync
@@ -939,7 +948,12 @@ def sync_txavl_packages(
             up_to_date.append(pkg_id)
             continue
 
-        draft = convert_winget_to_draft(data, namespace=namespace, override_id=pkg_id)
+        try:
+            draft = convert_winget_to_draft(data, namespace=namespace, override_id=pkg_id)
+        except RuntimeError as exc:  # e.g. the installer size could not be read: skip, never publish a guess
+            console.say(f"  {console.paint('[FAIL]', 'red')} {pkg_id}@{new_ver}: {exc}")
+            failed.append(pkg_id)
+            continue
         # Preserve curated metadata from the existing TXAVL manifest
         if prev_pkg.get("alias"):
             draft.alias = prev_pkg["alias"]
