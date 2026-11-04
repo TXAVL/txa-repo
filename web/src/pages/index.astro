@@ -123,7 +123,10 @@ const faqs = [
 
     <section class="catalog" id="goi" aria-labelledby="goi-h">
       <div class="catalog__head">
-        <h2 class="title" id="goi-h"><T vi="Tất cả gói phần mềm" en="All packages" /></h2>
+        <div class="catalog__title-group">
+          <h2 class="title" id="goi-h"><T vi="Tất cả gói phần mềm" en="All packages" /></h2>
+          <span class="catalog__badge">{pkgs.length}</span>
+        </div>
         <p class="count" id="count" aria-live="polite"></p>
       </div>
 
