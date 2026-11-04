@@ -13,7 +13,7 @@ targets:
     source:
       url: https://static.rust-lang.org/rustup/archive/1.29.3/x86_64-pc-windows-msvc/rustup-init.exe
       sha256: 38027D51D69A5D05493627A0634DBEA52D6CD793C8F072D2373D3F4163EEC7DB
-      size: 1
+      size: 12839424
     switches:
       silent: /S
       progress: /S
@@ -22,7 +22,7 @@ targets:
     source:
       url: https://static.rust-lang.org/rustup/archive/1.29.3/aarch64-pc-windows-msvc/rustup-init.exe
       sha256: 407E0D72F81D26A01F9D032B8317908CBB2917BA22765474B682B41390792AD9
-      size: 1
+      size: 11361792
     switches:
       silent: /S
       progress: /S
@@ -31,7 +31,7 @@ targets:
     source:
       url: https://static.rust-lang.org/rustup/archive/1.29.3/i686-pc-windows-msvc/rustup-init.exe
       sha256: FA448CC3839D6FBACB5ED1954C16F60C4D16E7E6476677A66FFFB34DC91BD201
-      size: 1
+      size: 9997824
     switches:
       silent: /S
       progress: /S
