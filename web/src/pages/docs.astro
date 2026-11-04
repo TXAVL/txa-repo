@@ -79,8 +79,8 @@ const labels = [
 
     <main class="doc">
       <header class="doc__head">
-        <h1 class="rise"><T vi="Tài liệu TXA" en="TXA documentation" /></h1>
-        <p class="lead rise" style="--i:1"><T vi="Từ dòng lệnh cài đầu tiên tới việc gửi gói của chính bạn lên kho." en="From the first install command to submitting your own package." /></p>
+        <h1 class="rise"><T vi="Cài, quản lý và đóng góp phần mềm với TXA" en="Install, manage and publish software with TXA" /></h1>
+        <p class="lead rise" style="--i:1"><T vi="Tài liệu TXA: từ dòng lệnh cài đầu tiên tới việc gửi gói của chính bạn lên kho." en="TXA documentation: from the first install command to submitting your own package." /></p>
         <form class="cmd cmd--docs rise" style="--i:2" role="search" onsubmit="return false">
           <label class="sr-only" for="dq"><T vi="Tìm lệnh trong tài liệu" en="Find a command in the docs" /></label>
           <span class="cmd__prompt" aria-hidden="true">txapm</span>
@@ -189,17 +189,17 @@ const labels = [
         <p><T vi="Mọi thông tin cũ được giữ nguyên, chỉ thay link và phiên bản." en="All earlier information is kept, only the link and the version change." /></p>
         <h3><T vi="Lệnh tiện ích" en="Helper commands" /></h3>
         <div class="tbl">
-          <div><b>txacreate new &lt;link&gt; --dry-run</b><span><T vi="Chỉ tạo file vào ./txa-out để xem trước, không gửi gì." en="Only writes files to ./txa-out to preview, nothing is sent." /></span></div>
-          <div><b>txacreate hash setup.exe</b><span><T vi="Xem SHA-256, kiến trúc, loại bộ cài của một file." en="Show the SHA-256, architecture and installer type of a file." /></span></div>
-          <div><b>txacreate validate &lt;thư-mục&gt;</b><span><T vi="Chạy 14 bước kiểm tra cho thư mục gói hoặc cả kho." en="Run the 14 checks on a package folder or a whole repository." /></span></div>
-          <div><b>txacreate submit &lt;thư-mục&gt;</b><span><T vi="Gửi PR cho thư mục gói, thư mục kho gốc hoặc thư mục API." en="Open a PR for a package folder, a repository root or an API folder." /></span></div>
-          <div><b>txacreate token --store</b><span><T vi="Cấp quyền GitHub trước, không đợi tới lúc gửi (--clear để đăng xuất)." en="Authorize GitHub in advance (--clear signs out)." /></span></div>
+          <div><b><code>txacreate new &lt;link&gt; --dry-run</code></b><span><T vi="Chỉ tạo file vào ./txa-out để xem trước, không gửi gì." en="Only writes files to ./txa-out to preview, nothing is sent." /></span></div>
+          <div><b><code>txacreate hash setup.exe</code></b><span><T vi="Xem SHA-256, kiến trúc, loại bộ cài của một file." en="Show the SHA-256, architecture and installer type of a file." /></span></div>
+          <div><b><code>txacreate validate &lt;thư-mục&gt;</code></b><span><T vi="Chạy 14 bước kiểm tra cho thư mục gói hoặc cả kho." en="Run the 14 checks on a package folder or a whole repository." /></span></div>
+          <div><b><code>txacreate submit &lt;thư-mục&gt;</code></b><span><T vi="Gửi PR cho thư mục gói, thư mục kho gốc hoặc thư mục API." en="Open a PR for a package folder, a repository root or an API folder." /></span></div>
+          <div><b><code>txacreate token --store</code></b><span><T vi="Cấp quyền GitHub trước, không đợi tới lúc gửi (--clear để đăng xuất)." en="Authorize GitHub in advance (--clear signs out)." /></span></div>
         </div>
         <h3><T vi="Sau khi gửi Pull Request" en="After you open the pull request" /></h3>
         <p><T vi="Việc đầu tiên là chấp nhận Contributor Agreement: bot comment ngay và PR chưa thể gộp, 14 bước kiểm tra chưa chạy, cho tới khi bạn trả lời đúng một comment:" en="The first thing is to accept the Contributor Agreement: the bot comments at once and the PR cannot merge, and the 14 checks do not start, until you reply with exactly one comment:" /></p>
         <Cmd text="@txa-repo agree" />
         <p><T vi="Chỉ comment của chính người mở PR mới có hiệu lực; thay mặt công ty thì ghi @txa-repo agree company=&quot;Tên công ty&quot;. Chỉ cần chấp nhận một lần. Mô tả PR có checklist bạn tự tick, rồi bot chạy kiểm tra và cập nhật bảng tiến trình ngay trong PR. Nhãn đi theo vòng đời của PR:" en="Only a comment from the PR author counts; on behalf of a company write @txa-repo agree company=&quot;Company name&quot;. You only accept once. The PR description holds a checklist you tick yourself, then the bot runs the checks and updates a progress table inside the PR. Labels follow the life of the PR:" /></p>
-        <div class="tbl">{labels.map((l) => (<div><b>{l[0]}</b><span><T vi={l[1]} en={l[2]} /></span></div>))}</div>
+        <div class="tbl">{labels.map((l) => (<div><b><code>{l[0]}</code></b><span><T vi={l[1]} en={l[2]} /></span></div>))}</div>
         <p><T vi="Gói đang chờ duyệt vẫn hiện trong kho (pending.json) nhưng chưa cài được; khi moderator duyệt và PR được gộp, khoảng hai phút sau mọi người cài được gói đó." en="A package waiting for review still shows in the index (pending.json) but cannot be installed yet; once a moderator approves and the PR merges, everyone can install it about two minutes later." /></p>
         <nav class="pn" aria-label="Prev / next">
           {pn("dong-gop").prev ? (<a class="pn__prev" href={`#${pn("dong-gop").prev[0]}`}><small><T vi="Trước" en="Previous" /></small><T vi={pn("dong-gop").prev[1]} en={pn("dong-gop").prev[2]} /></a>) : <span />}
@@ -211,9 +211,9 @@ const labels = [
         <h2><T vi="Cấu trúc manifest" en="Manifest format" /></h2>
         <p><T vi="Mỗi phiên bản nằm trong manifests/t/TXAVL/<AppName>/<X.Y.Z>/ và gồm ba loại file, đều có JSON Schema để trình soạn thảo gợi ý:" en="Each version lives in manifests/t/TXAVL/<AppName>/<X.Y.Z>/ and has three kinds of file, all with a JSON Schema so editors can help:" /></p>
         <div class="tbl">
-          <div><b>core.txa.yaml</b><span><T vi="Mã gói, phiên bản, kênh, tên ngắn (alias), ngôn ngữ mặc định, tag." en="Package id, version, channel, short name (alias), default language, tags." /></span></div>
-          <div><b>build.txa.yaml</b><span><T vi="Bộ cài từng CPU: url HTTPS, sha256, dung lượng, loại bộ cài (engine), tham số cài im lặng, phiên bản Windows tối thiểu, phạm vi cài." en="The installer per CPU: HTTPS url, sha256, size, installer type (engine), silent switches, minimum Windows version, install scope." /></span></div>
-          <div><b>about.&lt;lang&gt;.txa.yaml</b><span><T vi="Tên, nhà phát hành, tóm tắt, trang chủ, giấy phép. Mỗi ngôn ngữ một file (vi-VN, en-US)." en="Name, publisher, summary, homepage, license. One file per language (vi-VN, en-US)." /></span></div>
+          <div><b><code>core.txa.yaml</code></b><span><T vi="Mã gói, phiên bản, kênh, tên ngắn (alias), ngôn ngữ mặc định, tag." en="Package id, version, channel, short name (alias), default language, tags." /></span></div>
+          <div><b><code>build.txa.yaml</code></b><span><T vi="Bộ cài từng CPU: url HTTPS, sha256, dung lượng, loại bộ cài (engine), tham số cài im lặng, phiên bản Windows tối thiểu, phạm vi cài." en="The installer per CPU: HTTPS url, sha256, size, installer type (engine), silent switches, minimum Windows version, install scope." /></span></div>
+          <div><b><code>about.&lt;lang&gt;.txa.yaml</code></b><span><T vi="Tên, nhà phát hành, tóm tắt, trang chủ, giấy phép. Mỗi ngôn ngữ một file (vi-VN, en-US)." en="Name, publisher, summary, homepage, license. One file per language (vi-VN, en-US)." /></span></div>
         </div>
         <p><T vi="Đặc tả đầy đủ từng trường và mẫu có chú thích:" en="The full specification of every field, and annotated examples:" /> <a class="link" href={`${gh}/blob/main/docs/manifest-schema.md`}>docs/manifest-schema.md</a> · <a class="link" href={`${gh}/tree/main/examples`}>examples</a></p>
         <nav class="pn" aria-label="Prev / next">
@@ -226,9 +226,9 @@ const labels = [
         <h2><T vi="API công khai" en="Public API" /></h2>
         <p><T vi="Trang này và txapm đều đọc cùng một REST API tĩnh, namespace txa.v1, đặt trên GitHub Pages:" en="This site and txapm read the same static REST API, namespace txa.v1, hosted on GitHub Pages:" /></p>
         <div class="tbl">
-          <div><b>/api/txa/v1/index.json</b><span><T vi="Mọi gói: mã, alias, phiên bản mới nhất, danh sách phiên bản, tên, nhà phát hành, tóm tắt hai ngôn ngữ, tag, CPU." en="Every package: id, alias, latest version, version list, name, publisher, summaries in both languages, tags, CPUs." /></span></div>
-          <div><b>/api/txa/v1/packages/&lt;Id&gt;.json</b><span><T vi="Mọi phiên bản của một gói cùng cả ba thẻ manifest." en="Every version of one package with all three manifest cards." /></span></div>
-          <div><b>/api/txa/v1/pending.json</b><span><T vi="Các bản đã gửi, đang chờ duyệt." en="Releases that were submitted and are waiting for review." /></span></div>
+          <div><b><code>/api/txa/v1/index.json</code></b><span><T vi="Mọi gói: mã, alias, phiên bản mới nhất, danh sách phiên bản, tên, nhà phát hành, tóm tắt hai ngôn ngữ, tag, CPU." en="Every package: id, alias, latest version, version list, name, publisher, summaries in both languages, tags, CPUs." /></span></div>
+          <div><b><code>/api/txa/v1/packages/&lt;Id&gt;.json</code></b><span><T vi="Mọi phiên bản của một gói cùng cả ba thẻ manifest." en="Every version of one package with all three manifest cards." /></span></div>
+          <div><b><code>/api/txa/v1/pending.json</code></b><span><T vi="Các bản đã gửi, đang chờ duyệt." en="Releases that were submitted and are waiting for review." /></span></div>
         </div>
         <p><a class="link" href={`${base}api/txa/v1/index.json`}>index.json</a> · <a class="link" href={`${base}api/txa/v1/pending.json`}>pending.json</a></p>
         <nav class="pn" aria-label="Prev / next">

@@ -96,7 +96,7 @@ h1 { margin: 0; font-weight: 700; font-size: clamp(2.3rem, 4.4vw, 4.1rem); line-
 .btn:hover { filter: brightness(1.08); }
 .btn:active { transform: translateY(1px) scale(.985); }
 .cmd__hint { margin: .9rem 0 0; color: var(--ink-2); font-size: .92rem; min-height: 1.5em; }
-.cmd__hint kbd { font: 500 .8rem var(--mono); background: var(--surface-2); padding: .1rem .4rem; border-radius: 5px; }
+.cmd__hint kbd { font: 500 .82rem var(--mono); background: var(--surface-2); padding: .1rem .4rem; border-radius: 5px; }
 .meta { margin: 2rem 0 0; color: var(--ink-2); font-size: .95rem; display: flex; flex-wrap: wrap; gap: .25rem 1.25rem; }
 .meta b { color: var(--ink); font-weight: 600; }
 .meta a { text-decoration: none; color: var(--ink); font-weight: 500; text-underline-offset: 4px; }
@@ -113,7 +113,7 @@ h1 { margin: 0; font-weight: 700; font-size: clamp(2.3rem, 4.4vw, 4.1rem); line-
 /* A copyable command. */
 .chip { display: flex; align-items: center; justify-content: space-between; gap: .75rem; width: 100%; text-align: left; border: 0; background: var(--surface-2); border-radius: 10px; padding: .55rem .6rem .55rem .85rem; min-height: 44px; transition: background .15s ease; }
 .chip code { font-size: .88rem; overflow-wrap: anywhere; line-height: 1.35; }
-.chip__act { flex: none; font: 600 .8rem var(--font); color: var(--accent); padding: .2rem .55rem; border-radius: 6px; background: var(--surface); min-width: 4.2rem; text-align: center; }
+.chip__act { flex: none; font: 600 .82rem var(--font); color: var(--accent); padding: .2rem .55rem; border-radius: 6px; background: var(--surface); min-width: 4.2rem; text-align: center; }
 .chip:hover { background: var(--accent-tint); }
 .chip[data-done] .chip__act { background: var(--accent); color: var(--on-accent); }
 
@@ -138,11 +138,11 @@ h2.title { margin: 0; font-size: clamp(1.6rem, 2.6vw, 2.4rem); line-height: 1.1;
 .tile.tile--icon { background: #f3f6f5; }
 .tile--icon img { width: 34px; height: 34px; object-fit: contain; display: block; }
 .pkg__name { margin: 0; font-weight: 600; font-size: 1.05rem; line-height: 1.25; letter-spacing: -.01em; }
-.pkg__id { display: block; margin-top: .15rem; font: 400 .8rem var(--mono); color: var(--ink-2); text-decoration: none; overflow-wrap: anywhere; }
+.pkg__id { display: block; margin-top: .15rem; font: 400 .82rem var(--mono); color: var(--ink-2); text-decoration: none; overflow-wrap: anywhere; }
 a.pkg__id:hover { color: var(--accent); text-decoration: underline; text-underline-offset: 3px; }
-.pkg__sum { margin: 0; color: var(--ink-2); font-size: .95rem; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-.pkg__ver { font-family: var(--mono); font-weight: 500; font-size: .95rem; font-variant-numeric: tabular-nums; }
-.pkg__ver small { display: block; font: 400 .78rem var(--font); color: var(--ink-2); margin-top: .1rem; }
+.pkg__sum { margin: 0; color: var(--ink-2); font-size: 1rem; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.pkg__ver { font-weight: 500; font-size: 1rem; font-variant-numeric: tabular-nums; }
+.pkg__ver small { display: block; font: 400 .82rem var(--font); color: var(--ink-2); margin-top: .1rem; }
 .pkg .chip { background: var(--surface-2); }
 
 .empty { background: var(--surface); border-radius: var(--r); padding: 2rem; color: var(--ink-2); }
@@ -228,7 +228,7 @@ html[lang="en"] [data-l="vi"], html:not([lang="en"]) [data-l="en"] { display: no
 .t-ok { color: var(--accent); font-weight: 500; }
 .t-dim { color: var(--ink-2); }
 .stages { list-style: none; margin: 0; padding: 0; display: grid; gap: 1.6rem; }
-.stages h3 { margin: 0 0 .25rem; font: 600 1.1rem var(--mono); color: var(--accent); letter-spacing: -.01em; }
+.stages h3 { margin: 0 0 .25rem; font: 650 1.15rem var(--font); color: var(--accent); letter-spacing: -.01em; }
 .stages p { margin: 0; color: var(--ink-2); max-width: 32rem; }
 
 /* vetting */
@@ -277,7 +277,8 @@ details p { margin: .75rem 0 0; color: var(--ink-2); max-width: 40rem; }
 .callout p { margin: 0; }
 .tbl { display: grid; gap: 6px; margin: 1rem 0; }
 .tbl > div { background: var(--surface); border-radius: var(--r); padding: .8rem 1.1rem; display: grid; grid-template-columns: minmax(0, 12rem) minmax(0, 1fr); gap: 1rem; }
-.tbl > div > b { font: 600 .9rem var(--mono); color: var(--accent); overflow-wrap: anywhere; }
+.tbl > div > b { font: 650 .95rem var(--font); color: var(--accent); overflow-wrap: anywhere; }
+.tbl > div > b code { font: 500 .88rem var(--mono); background: none; padding: 0; }
 
 @media (max-width: 1180px) {
   .facts { grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -376,3 +377,26 @@ input { caret-color: var(--accent); }
 .md td code { white-space: nowrap; }
 
 .doc__head h1.doc__title--long { font-size: clamp(1.9rem, 3.4vw, 2.9rem); line-height: 1.08; max-width: 24ch; }
+
+
+/* ---- inspector pass: figures read across, grid items may shrink, real measure, 13px floor ---------- */
+.facts p { display: flex; align-items: baseline; gap: .9rem; }
+.facts b { font-size: clamp(2.2rem, 4vw, 3.4rem); flex: none; }
+.facts span { font-size: 1rem; max-width: 16rem; }
+.how > *, .vet > *, .faq > *, .pending > *, .docs > *, .hero > * { min-width: 0; }
+.doc p, .doc li, .md p, .md li { max-width: 66ch; overflow-wrap: anywhere; }
+.doc li, .md li, .tbl > div > span { overflow-wrap: anywhere; }
+.cmd__prompt code { font: inherit; }
+@media (max-width: 960px) {
+  .docs { grid-template-columns: minmax(0, 1fr); }
+  .docs__nav { flex-wrap: wrap; overflow-x: visible; }
+  .docs__nav a { white-space: normal; font-size: .9rem; padding: .35rem .75rem; }
+  .how, .vet, .faq, .pending { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 560px) {
+  h1 { font-size: clamp(1.6rem, 7vw, 2.1rem); line-height: 1.1; }
+  .doc__head h1, .doc__head h1.doc__title--long { font-size: clamp(1.55rem, 6.6vw, 2rem); }
+}
+
+.doc { max-width: none; }
+.doc__head .lead { max-width: 40rem; }

@@ -79,7 +79,7 @@ const faqs = [
 
         <form class="cmd rise" style="--i:3" id="cmd" role="search" autocomplete="off">
           <label class="sr-only" for="q"><T vi="Tìm phần mềm theo tên, mã gói hoặc mô tả" en="Search software by name, package id or description" /></label>
-          <span class="cmd__prompt" aria-hidden="true">txapm install</span>
+          <span class="cmd__prompt" aria-hidden="true"><code>txapm install</code></span>
           <input id="q" name="q" type="search" spellcheck="false" autocapitalize="off" placeholder={aliases[0]} data-aliases={JSON.stringify(aliases)} />
           <button class="btn" type="submit" id="cmd-copy"><span class="on-idle"><T vi="Chép lệnh" en="Copy command" /></span><span class="on-done"><T vi="Đã chép" en="Copied" /></span></button>
         </form>
@@ -142,10 +142,10 @@ const faqs = [
               : <span class="tile" aria-hidden="true">{r.p.name.charAt(0).toUpperCase()}</span>}
             <div>
               <h3 class="pkg__name">{r.p.name}</h3>
-              <a class="pkg__id" href={`${api}/packages/${r.p.id}.json`} title="JSON">{r.p.id}</a>
+              <a class="pkg__id" href={`${api}/packages/${r.p.id}.json`} title="JSON"><code>{r.p.id}</code></a>
             </div>
             <p class="pkg__sum"><T vi={r.vi} en={r.en} /></p>
-            <div class="pkg__ver">{r.p.latest}<small>{r.arch}</small></div>
+            <div class="pkg__ver"><code>{r.p.latest}</code><small>{r.arch}</small></div>
             <Cmd text={r.cmd} />
           </li>
         ))}
