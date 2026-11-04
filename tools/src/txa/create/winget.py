@@ -721,6 +721,8 @@ def _real_size(url: str) -> int:
 
     Retried a few times; if the size still cannot be read this raises, so the package is
     skipped instead of being published with a made-up size (STEP 07 would reject it)."""
+    from txa.core import net
+
     last: Exception | str = "the server reported no size"
     for attempt in range(3):
         try:
