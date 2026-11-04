@@ -8,7 +8,7 @@ name: TXA Auto-Update (TXAVL)
 
 on:
   schedule:
-    - cron: "0 */6 * * *"
+    - cron: "17 */2 * * *"
   workflow_dispatch:
     inputs:
       package:
