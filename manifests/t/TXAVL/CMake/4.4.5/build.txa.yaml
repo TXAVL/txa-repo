@@ -1,0 +1,36 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/TXAVL/txa-repo/main/tools/src/txa/schemas/build.schema.json
+txa: 1
+kind: build
+ref: TXAVL.CMake@4.4.5
+platform:
+  os: windows
+  min_build: 10.0.17763
+scope: machine
+targets:
+  - arch: x64
+    engine: msi
+    source:
+      url: https://github.com/Kitware/CMake/releases/download/v4.4.5/cmake-4.4.5-windows-x86_64.msi
+      sha256: C18B52B4017C4E5FFCD7D516EA39C4E0ED37F58920B90A5C98A46280B1857145
+      size: 39153664
+    switches:
+      silent: /qn /norestart
+      progress: /qb! /norestart
+  - arch: arm64
+    engine: msi
+    source:
+      url: https://github.com/Kitware/CMake/releases/download/v4.4.5/cmake-4.4.5-windows-arm64.msi
+      sha256: FCBDBD8327F1416BB34C566F413A9F92F1E35B014909DEE89CE42035A131E206
+      size: 37224448
+    switches:
+      silent: /qn /norestart
+      progress: /qb! /norestart
+  - arch: x86
+    engine: msi
+    source:
+      url: https://github.com/Kitware/CMake/releases/download/v4.4.5/cmake-4.4.5-windows-i386.msi
+      sha256: 4A9FD1ECC6B42B8EE2764D4DAF030666C7393A5526D34C74ABEBF7328DDF0241
+      size: 36532224
+    switches:
+      silent: /qn /norestart
+      progress: /qb! /norestart

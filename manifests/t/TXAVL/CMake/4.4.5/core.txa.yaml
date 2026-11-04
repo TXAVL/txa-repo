@@ -1,0 +1,14 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/TXAVL/txa-repo/main/tools/src/txa/schemas/core.schema.json
+txa: 1
+kind: core
+package:
+  id: TXAVL.CMake
+  version: 4.4.5
+  channel: stable
+  alias: cmake
+locale:
+  default: en-US
+tags:
+  - compiler
+  - cross-platform
+  - foss

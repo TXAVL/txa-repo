@@ -1,0 +1,10 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/TXAVL/txa-repo/main/tools/src/txa/schemas/core.schema.json
+txa: 1
+kind: core
+package:
+  id: TXAVL.TXAWinSetup
+  version: 1.5.4
+  channel: stable
+  alias: txawinsetup
+locale:
+  default: en-US

@@ -729,6 +729,15 @@ def _real_size(url: str) -> int:
             length = net.probe(net.session(), url).length
             if length:
                 return length
+            # If probe got no Content-Length (e.g. transfer-encoding: chunked), stream GET to calculate
+            with net.session().get(url, stream=True, timeout=60) as r:
+                r.raise_for_status()
+                clen = r.headers.get("Content-Length")
+                if clen:
+                    return int(clen)
+                total = sum(len(chunk) for chunk in r.iter_content(chunk_size=1024 * 1024))
+                if total > 0:
+                    return total
         except Exception as exc:  # noqa: BLE001 - reported below after the retries
             last = exc
         time.sleep(2 * (attempt + 1))

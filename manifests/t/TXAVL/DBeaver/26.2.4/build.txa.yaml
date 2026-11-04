@@ -1,0 +1,27 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/TXAVL/txa-repo/main/tools/src/txa/schemas/build.schema.json
+txa: 1
+kind: build
+ref: TXAVL.DBeaver@26.2.4
+platform:
+  os: windows
+  min_build: 10.0.17763
+scope: machine
+targets:
+  - arch: x64
+    engine: nsis
+    source:
+      url: https://github.com/dbeaver/dbeaver/releases/download/26.2.4/dbeaver-ce-26.2.4-windows-x86_64.exe
+      sha256: 9F50CA4C9F84ABFDC6A27636206183B252A296D31157009418FFD15DB50353F9
+      size: 115077816
+    switches:
+      silent: /S
+      progress: /S
+  - arch: arm64
+    engine: nsis
+    source:
+      url: https://github.com/dbeaver/dbeaver/releases/download/26.2.4/dbeaver-ce-26.2.4-windows-aarch64.exe
+      sha256: 6FB336EDD8D9A26657C86EE2F48D0E9BA6943ADDCA45A827FED03323F3931D6B
+      size: 112682720
+    switches:
+      silent: /S
+      progress: /S

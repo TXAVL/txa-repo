@@ -1,0 +1,27 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/TXAVL/txa-repo/main/tools/src/txa/schemas/core.schema.json
+txa: 1
+kind: core
+package:
+  id: TXAVL.DBeaver
+  version: 26.2.4
+  channel: stable
+  alias: dbeaver
+locale:
+  default: en-US
+tags:
+  - apache-hive
+  - database
+  - db2
+  - firebird
+  - mssql
+  - mysql
+  - oracle
+  - phoenix
+  - postgres
+  - postgresql
+  - presto
+  - sql
+  - sqlite
+  - sybase
+  - teradata
+  - tool
