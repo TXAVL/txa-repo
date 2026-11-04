@@ -9,29 +9,29 @@ platform:
 scope: machine
 targets:
   - arch: x64
-    engine: exe
+    engine: msi
     source:
-      url: https://dl.google.com/release2/chrome/lzz46e6auim6sx75xrn7xp5hza_157.0.8103.39/157.0.8103.39_chrome_installer_uncompressed.exe
-      sha256: 389B9E21DE9A520A6E24BA807EE8760409CCC837457BBCC460D2FDCE0D5E8DF5
-      size: 530228648
+      url: https://dl.google.com/dl/chrome/install/googlechromestandaloneenterprise64.msi
+      sha256: 55EDACD348B4C1C9B291DAB19E4665929C7A127C013D9625970BE924F893273F
+      size: 171970560
     switches:
-      silent: /S
-      progress: /S
+      silent: /qn /norestart
+      progress: /qb! /norestart
   - arch: arm64
-    engine: exe
+    engine: msi
     source:
-      url: https://dl.google.com/release2/chrome/ad3ociixsmqni5nszryxv3xd22ha_157.0.8103.39/157.0.8103.39_chrome_installer_uncompressed.exe
-      sha256: 7F04727F6C1E5803C761F631008F64B8D26ADF3869C28EEB3077B90635B44804
-      size: 505155496
+      url: https://dl.google.com/dl/chrome/install/googlechromestandaloneenterprise_arm64.msi
+      sha256: C9D72C63776AA8A4B3212D413376CF1CE24CF007F9DBA9A048B73CB0F08F41B1
+      size: 176250880
     switches:
-      silent: /S
-      progress: /S
+      silent: /qn /norestart
+      progress: /qb! /norestart
   - arch: x86
-    engine: exe
+    engine: msi
     source:
-      url: https://dl.google.com/release2/chrome/b5nkgc5ojnyxf6fup2lbg7wu2i_157.0.8103.39/157.0.8103.39_chrome_installer_uncompressed.exe
-      sha256: B78EB6F41328178FE5051959DAF3A4193B10721E89BB7932228911A9F4B36FCA
-      size: 454242728
+      url: https://dl.google.com/dl/chrome/install/googlechromestandaloneenterprise.msi
+      sha256: D57347B99605CD231726FDD605A0F21C6BA9750F3B688697F8F008E2B96984FA
+      size: 161386496
     switches:
-      silent: /S
-      progress: /S
+      silent: /qn /norestart
+      progress: /qb! /norestart

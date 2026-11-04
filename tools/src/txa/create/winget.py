@@ -748,7 +748,7 @@ _HANDWRITTEN_APPS = {
 _TXAVL_WINGET_MAP: dict[str, str] = {
     "Audacity": "Audacity.Audacity",
     "Brave": "Brave.Brave",
-    "Chrome": "Google.Chrome.EXE",
+    "Chrome": "Google.Chrome",
     "Claude": "Anthropic.Claude",
     "Cloudflared": "Cloudflare.cloudflared",
     "CocCoc": "CocCoc.CocCoc",
