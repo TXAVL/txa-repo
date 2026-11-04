@@ -79,7 +79,7 @@ jobs:
             if ($LASTEXITCODE -ne 0) { Write-Host "::error::could not push $branch"; exit 1 }
             $open = gh pr list --head $branch --state open --json number --jq '.[0].number'
             if ($open) {
-              Write-Host "TXAVL.$name: pull request #$open already open - its branch was refreshed."
+              Write-Host "TXAVL.${name}: pull request #$open already open - its branch was refreshed."
             } else {
               gh pr create --base main --head $branch --title "Auto-update: TXAVL.$name" --body "Created by the scheduled TXA Auto-Update. The 16 bot checks run on this release; a code owner approves, then it merges. The repository keeps the newest 10 versions of each package; the oldest is removed when one is added."
               if ($LASTEXITCODE -ne 0) { Write-Host "::error::could not open the pull request for $name"; exit 1 }
