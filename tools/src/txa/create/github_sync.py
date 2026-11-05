@@ -62,8 +62,31 @@ def asset_pattern(name: str, old_version: str) -> re.Pattern[str]:
     return re.compile(f"^{escaped}$")
 
 
+def pick_latest(releases: list[dict]) -> dict | None:
+    """The highest version among published (not draft, not pre-release) releases.
+
+    GitHub's ``/releases/latest`` orders by the *commit date* of the tag, so a release whose tag points at an older
+    commit (a re-tagged or back-dated one) is never reported as latest. The version in the tag is what counts.
+    """
+    from txa.core import semver
+    from txa.create.winget import normalize_version
+
+    best: tuple | None = None
+    for rel in releases:
+        tag = str(rel.get("tag_name", ""))
+        if rel.get("draft") or rel.get("prerelease") or not re.search(r"\d+\.\d+", tag):
+            continue
+        version = normalize_version(tag)
+        if not semver.is_valid(version):
+            continue
+        key = semver.parse(version)
+        if best is None or key > best[0]:
+            best = (key, rel)
+    return best[1] if best else None
+
+
 def latest_release(repo: str, session=None) -> dict | None:
-    """The newest published (not draft, not pre-release) release, or None."""
+    """The newest published release of ``repo`` by version, or None."""
     from txa.core import net
 
     s = session or net.session()
@@ -71,11 +94,10 @@ def latest_release(repo: str, session=None) -> dict | None:
     token = os.environ.get("GH_TOKEN") or os.environ.get("GITHUB_TOKEN")
     if token:
         headers["Authorization"] = f"Bearer {token}"
-    response = s.get(f"https://api.github.com/repos/{repo}/releases/latest", headers=headers, timeout=30)
+    response = s.get(f"https://api.github.com/repos/{repo}/releases", params={"per_page": 50}, headers=headers, timeout=30)
     if response.status_code != 200:
         return None
-    data = response.json()
-    return None if data.get("draft") or data.get("prerelease") else data
+    return pick_latest(response.json())
 
 
 def _download_hash(url: str) -> tuple[str, int]:
