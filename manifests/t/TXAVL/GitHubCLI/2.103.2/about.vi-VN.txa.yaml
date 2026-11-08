@@ -1,0 +1,13 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/TXAVL/txa-repo/main/tools/src/txa/schemas/about.schema.json
+txa: 1
+kind: about
+ref: TXAVL.GitHubCLI@2.103.2
+lang: vi-VN
+name: GitHub CLI
+publisher: GitHub, Inc.
+author: GitHub, Inc.
+summary: GitHub CLI (lệnh gh) mang các tính năng của GitHub như PR, Issue, Release và Actions vào terminal (khác với Git CLI).
+homepage: https://cli.github.com/
+license:
+  name: MIT
+  url: https://github.com/cli/cli/blob/HEAD/LICENSE

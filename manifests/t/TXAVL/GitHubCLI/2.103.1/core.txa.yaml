@@ -1,0 +1,18 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/TXAVL/txa-repo/main/tools/src/txa/schemas/core.schema.json
+txa: 1
+kind: core
+package:
+  id: TXAVL.GitHubCLI
+  version: 2.103.1
+  channel: stable
+  alias: gh
+locale:
+  default: en-US
+tags:
+  - cli
+  - command-line
+  - developer
+  - git
+  - github
+  - terminal
+  - tool

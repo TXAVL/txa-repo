@@ -1,0 +1,15 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/TXAVL/txa-repo/main/tools/src/txa/schemas/about.schema.json
+txa: 1
+kind: about
+ref: TXAVL.GitHubCLI@2.103.3
+lang: vi-VN
+name: GitHub CLI
+publisher: GitHub, Inc.
+author: GitHub, Inc.
+summary: GitHub CLI (lệnh gh) mang các tính năng của GitHub như PR, Issue, Release và Actions vào terminal (khác với Git CLI).
+description: |-
+  GitHub CLI (lệnh `gh`) là công cụ dòng lệnh chính thức của GitHub giúp quản lý Pull Request, Issue, GitHub Actions, Repo và Release ngay trong terminal. Đây là công cụ riêng biệt với Git (công cụ quản lý phiên bản mã nguồn).
+homepage: https://cli.github.com/
+license:
+  name: MIT
+  url: https://github.com/cli/cli/blob/HEAD/LICENSE

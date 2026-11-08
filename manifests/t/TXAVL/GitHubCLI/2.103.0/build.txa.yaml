@@ -1,0 +1,36 @@
+# yaml-language-server: =https://raw.githubusercontent.com/TXAVL/txa-repo/main/tools/src/txa/schemas/build.schema.json
+txa: 1
+kind: build
+ref: TXAVL.GitHubCLI@2.103.0
+platform:
+  os: windows
+  min_build: 10.0.17763
+scope: machine
+targets:
+  - arch: x86
+    engine: msi
+    source:
+      url: https://github.com/cli/cli/releases/download/v2.103.0/gh_2.103.0_windows_386.msi
+      sha256: 77EA212A06350C9B10EAF6A64631A3F21927BA015F41C53B749AF72FFF7CC884
+      size: 15000000
+    switches:
+      silent: /qn /norestart
+      progress: /qb! /norestart
+  - arch: x64
+    engine: msi
+    source:
+      url: https://github.com/cli/cli/releases/download/v2.103.0/gh_2.103.0_windows_amd64.msi
+      sha256: 58A5E6620407F5A74F9C0E4A7DB21AEF2F18C655B5304BF78D2D9F0FEFC7A877
+      size: 15000000
+    switches:
+      silent: /qn /norestart
+      progress: /qb! /norestart
+  - arch: arm64
+    engine: msi
+    source:
+      url: https://github.com/cli/cli/releases/download/v2.103.0/gh_2.103.0_windows_arm64.msi
+      sha256: D6B25481791926E0E5A83F142C73B7DE1E161A9B7AB7D08B6132AD97C0D71E1D
+      size: 15000000
+    switches:
+      silent: /qn /norestart
+      progress: /qb! /norestart

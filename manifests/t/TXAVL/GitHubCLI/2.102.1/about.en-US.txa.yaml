@@ -1,0 +1,13 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/TXAVL/txa-repo/main/tools/src/txa/schemas/about.schema.json
+txa: 1
+kind: about
+ref: TXAVL.GitHubCLI@2.102.1
+lang: en-US
+name: GitHub CLI
+publisher: GitHub, Inc.
+author: GitHub, Inc.
+summary: GitHub CLI (gh) brings pull requests, issues, GitHub Actions, and more to your terminal (distinct from Git).
+homepage: https://cli.github.com/
+license:
+  name: MIT
+  url: https://github.com/cli/cli/blob/HEAD/LICENSE
