@@ -1,0 +1,27 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/TXAVL/txa-repo/main/tools/src/txa/schemas/build.schema.json
+txa: 1
+kind: build
+ref: TXAVL.Antigravity@2.29.0
+platform:
+  os: windows
+  min_build: 10.0.17763
+scope: user
+targets:
+  - arch: x64
+    engine: nsis
+    source:
+      url: https://storage.googleapis.com/antigravity-public/antigravity-hub/2.29.0-5723181030440960/windows-x64/Antigravity-x64.exe
+      sha256: 944B109BCB377F9F94F86EEEA7CFA9315D4B42D84FB9D5BAD689058FC11C12BA
+      size: 169295640
+    switches:
+      silent: /S
+      progress: /S
+  - arch: arm64
+    engine: nsis
+    source:
+      url: https://storage.googleapis.com/antigravity-public/antigravity-hub/2.29.0-5723181030440960/windows-arm/Antigravity-arm64.exe
+      sha256: 717840BB2C538715D2C6D1211F12D1056788337DAE4788F62B521B6419C49B81
+      size: 159737672
+    switches:
+      silent: /S
+      progress: /S

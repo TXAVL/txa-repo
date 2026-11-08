@@ -1,0 +1,24 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/TXAVL/txa-repo/main/tools/src/txa/schemas/core.schema.json
+txa: 1
+kind: core
+package:
+  id: TXAVL.Antigravity
+  version: 2.28.1
+  channel: stable
+  alias: antigravity
+  aliases:
+    - agy
+    - agy2
+locale:
+  default: en-US
+tags:
+  - agent
+  - agentic
+  - ai
+  - artificial-intelligence
+  - code
+  - coding
+  - develop
+  - development
+  - llm
+  - programming
