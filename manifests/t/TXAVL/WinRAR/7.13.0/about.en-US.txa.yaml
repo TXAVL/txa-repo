@@ -1,0 +1,13 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/TXAVL/txa-repo/main/tools/src/txa/schemas/about.schema.json
+txa: 1
+kind: about
+ref: TXAVL.WinRAR@7.13.0
+lang: en-US
+name: WinRAR
+publisher: win.rar GmbH
+author: win.rar GmbH
+summary: Powerful file archiver and data compression utility.
+homepage: https://www.rarlab.com
+license:
+  name: Shareware
+  url: https://www.rarlab.com

@@ -1,0 +1,18 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/TXAVL/txa-repo/main/tools/src/txa/schemas/build.schema.json
+txa: 1
+kind: build
+ref: TXAVL.Codex@0.166.0
+platform:
+  os: windows
+  min_build: 10.0.17763
+scope: user
+targets:
+  - arch: x64
+    engine: portable
+    source:
+      url: https://github.com/openai/codex/releases/download/rust-v0.166.0/codex-x86_64-pc-windows-msvc.exe.zip
+      sha256: BF67D9662ED539F305849B74AD6420CC7B23AA2BE07753710CA3DB9134A0246D
+      size: 207243835
+    portable:
+      path:
+        - .

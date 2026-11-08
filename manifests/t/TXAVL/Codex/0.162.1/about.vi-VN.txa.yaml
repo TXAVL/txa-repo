@@ -1,0 +1,13 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/TXAVL/txa-repo/main/tools/src/txa/schemas/about.schema.json
+txa: 1
+kind: about
+ref: TXAVL.Codex@0.162.1
+lang: vi-VN
+name: OpenAI Codex
+publisher: OpenAI
+author: OpenAI
+summary: OpenAI Codex CLI - Công cụ dòng lệnh AI hỗ trợ lập trình và tác vụ terminal.
+homepage: https://openai.com
+license:
+  name: Proprietary
+  url: https://openai.com/policies/terms-of-use

@@ -1,0 +1,29 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/TXAVL/txa-repo/main/tools/src/txa/schemas/build.schema.json
+txa: 1
+kind: build
+ref: TXAVL.WinRAR@7.13.0
+platform:
+  os: windows
+  min_build: 10.0.17763
+scope: machine
+targets:
+  - arch: x64
+    locale: vi
+    engine: exe
+    source:
+      url: https://www.rarlab.com/rar/winrar-x64-713vn.exe
+      sha256: 411B71DAC605D6286C46B983992DA2FF1B8E631F8B1EC862DA802F64AD54243D
+      size: 3831496
+    switches:
+      silent: /S
+      progress: /S
+  - arch: x64
+    locale: en
+    engine: exe
+    source:
+      url: https://www.rarlab.com/rar/winrar-x64-713.exe
+      sha256: 0C9A2A3D70D907CB8EE14AB00F6C97B17CE0E88D937A0F85B310698C2F2541DE
+      size: 3777128
+    switches:
+      silent: /S
+      progress: /S

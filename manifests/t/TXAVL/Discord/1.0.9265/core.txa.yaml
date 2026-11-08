@@ -1,0 +1,19 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/TXAVL/txa-repo/main/tools/src/txa/schemas/core.schema.json
+txa: 1
+kind: core
+package:
+  id: TXAVL.Discord
+  version: 1.0.9265
+  channel: stable
+  alias: discord
+locale:
+  default: en-US
+tags:
+  - chat
+  - community
+  - gaming
+  - hang-out
+  - talk
+  - video
+  - voice
+  - voice-chat

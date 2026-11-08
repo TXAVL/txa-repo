@@ -1,0 +1,13 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/TXAVL/txa-repo/main/tools/src/txa/schemas/about.schema.json
+txa: 1
+kind: about
+ref: TXAVL.Discord@1.0.9266
+lang: vi-VN
+name: Discord
+publisher: Discord Inc.
+author: Discord Inc.
+summary: Ứng dụng trò chuyện giọng nói, video và nhắn tin phổ biến dành cho cộng đồng và game thủ.
+homepage: https://discord.com/download
+license:
+  name: Proprietary
+  url: https://discord.com/terms

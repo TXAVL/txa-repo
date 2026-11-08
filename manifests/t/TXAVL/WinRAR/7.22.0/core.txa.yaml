@@ -1,0 +1,17 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/TXAVL/txa-repo/main/tools/src/txa/schemas/core.schema.json
+txa: 1
+kind: core
+package:
+  id: TXAVL.WinRAR
+  version: 7.22.0
+  channel: stable
+  alias: winrar
+locale:
+  default: en-US
+tags:
+  - archive
+  - compression
+  - rar
+  - tool
+  - utility
+  - zip

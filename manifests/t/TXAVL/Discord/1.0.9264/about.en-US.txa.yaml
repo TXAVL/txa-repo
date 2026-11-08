@@ -1,0 +1,13 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/TXAVL/txa-repo/main/tools/src/txa/schemas/about.schema.json
+txa: 1
+kind: about
+ref: TXAVL.Discord@1.0.9264
+lang: en-US
+name: Discord
+publisher: Discord Inc.
+author: Discord Inc.
+summary: Discord is the easiest way to talk over voice, video, and text.
+homepage: https://discord.com/download
+license:
+  name: Proprietary
+  url: https://discord.com/terms

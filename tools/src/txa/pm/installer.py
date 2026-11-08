@@ -49,7 +49,7 @@ def pick_target(build: dict, arch: str | None = None, language: str | None = Non
     groups: dict[str, list[dict]] = {}
     for target in build.get("targets", []):
         groups.setdefault(target["arch"], []).append(target)
-    language = (language or winos.ui_language()).split("-")[0].lower()
+    language = (language or config.lang() or winos.ui_language()).split("-")[0].lower()
     if arch:
         if arch not in groups:
             raise InstallError(f"no {arch} installer (available: {', '.join(groups)})")
@@ -129,6 +129,14 @@ def install_portable(package_id: str, version: str, target: dict, archive: Path,
         raise InstallError(f"could not unpack the archive: {exc}") from None
     folders = spec["path"]
     for folder in folders:
+        target_dir = dest if folder == "." else dest.joinpath(*PurePosixPath(folder).parts)
+        for exe_f in target_dir.glob("*-windows-msvc.exe"):
+            short_name = exe_f.name.split("-")[0] + ".exe"
+            if not (target_dir / short_name).exists():
+                try:
+                    shutil.copy2(exe_f, target_dir / short_name)
+                except OSError:
+                    pass
         if not portable.folder_exists_with_exe(dest, folder):
             shutil.rmtree(dest, ignore_errors=True)
             raise InstallError(f"after unpacking, '{folder}' holds no .exe - the manifest's strip/path are wrong")

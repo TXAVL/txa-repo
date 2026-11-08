@@ -1,0 +1,18 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/TXAVL/txa-repo/main/tools/src/txa/schemas/build.schema.json
+txa: 1
+kind: build
+ref: TXAVL.Discord@1.0.9266
+platform:
+  os: windows
+  min_build: 10.0.17763
+scope: machine
+targets:
+  - arch: x64
+    engine: exe
+    source:
+      url: https://stable.dl2.discordapp.net/distro/app/stable/win/x64/1.0.9266/DiscordSetup.exe
+      sha256: 972C5FF1A4778C9C231DCB6B80C2DC5AA50DB30060192338D5C82C4EBB3261A6
+      size: 161063864
+    switches:
+      silent: /S
+      progress: /S
