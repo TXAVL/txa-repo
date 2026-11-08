@@ -556,6 +556,7 @@ def convert_winget_to_draft(data: dict[str, Any], namespace: str = "TXAVL", over
 
     if override_id:
         pkg_id = override_id
+        pascal_app = override_id.split(".")[-1]
     else:
         pascal_app = derive_txa_app_name(pkg_id_raw, raw_name)
         pkg_id = f"{namespace}.{pascal_app}"
@@ -670,7 +671,7 @@ def convert_winget_to_draft(data: dict[str, Any], namespace: str = "TXAVL", over
 
     extra_abouts: dict[str, dict] = {}
     from txa.core import i18n
-    slug = pascal_app.lower()
+    slug = (pkg_id.split(".")[-1] if pkg_id else pascal_app).lower()
     vi_sum = i18n._SUMMARIES_VI.get(slug)
     if not vi_sum:
         out_sum = summary
