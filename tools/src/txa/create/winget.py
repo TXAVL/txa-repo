@@ -668,6 +668,35 @@ def convert_winget_to_draft(data: dict[str, Any], namespace: str = "TXAVL", over
             portable=portable_dict,
         ))
 
+    extra_abouts: dict[str, dict] = {}
+    from txa.core import i18n
+    slug = pascal_app.lower()
+    vi_sum = i18n._SUMMARIES_VI.get(slug)
+    if not vi_sum:
+        out_sum = summary
+        for pat, repl in i18n._SUMMARY_PATTERNS_VI:
+            out_sum = pat.sub(repl, out_sum)
+        if out_sum != summary and len(out_sum) >= 10:
+            vi_sum = out_sum
+    if not vi_sum:
+        vi_sum = f"Phần mềm {name} chính thức dành cho hệ điều hành Windows."
+        if len(vi_sum) > 160:
+            vi_sum = vi_sum[:157] + "..."
+
+    vi_card = {
+        "txa": 1,
+        "kind": "about",
+        "lang": "vi-VN",
+        "name": name,
+        "publisher": pub,
+        "author": author,
+        "summary": vi_sum,
+        "license": {"name": lic_name, "url": lic_url} if lic_url else {"name": lic_name},
+    }
+    if homepage:
+        vi_card["homepage"] = homepage
+    extra_abouts["vi-VN"] = vi_card
+
     return Draft(
         package_id=pkg_id,
         version=version,
@@ -682,6 +711,7 @@ def convert_winget_to_draft(data: dict[str, Any], namespace: str = "TXAVL", over
         alias=alias,
         tags=cleaned_tags,
         targets=target_drafts,
+        extra_abouts=extra_abouts,
     )
 
 
@@ -1021,6 +1051,10 @@ def sync_txavl_packages(
         if prev_lic.get("name"):
             draft.license_name = prev_lic["name"]
             draft.license_url = prev_lic.get("url")
+        # Carry over existing localized about cards (e.g. vi-VN)
+        for lang, card in bundle.abouts.items():
+            if lang != bundle.default_lang:
+                draft.extra_abouts[lang] = dict(card)
 
         errs = validate_draft(draft)
         if errs:

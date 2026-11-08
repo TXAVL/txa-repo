@@ -87,7 +87,7 @@ jobs:
               git checkout -q -- $dir; git clean -fdq -- $dir
               continue
             }
-            git add $dir
+            git add -A $dir
             git commit -q -m "chore(manifests): auto-update TXAVL.$name to the latest upstream version"
             # another commit can land on main while this one is being checked: rebase and retry
             $ok = $false
@@ -100,5 +100,19 @@ jobs:
             if (-not $ok) { Write-Host "::error::could not push TXAVL.$name to main"; $failures += $name; continue }
             $pushed++
           }
+
+          # Final sweep: strictly enforce the 10-version retention limit across the repository
+          txacli prune --keep 10
+          if (git status --porcelain manifests/) {
+            git add -A manifests/
+            git commit -q -m "chore(manifests): enforce 10-version retention limit across repository"
+            foreach ($try in 1..4) {
+              git pull -q --rebase origin main
+              git push -q origin HEAD:main
+              if ($LASTEXITCODE -eq 0) { break }
+              Start-Sleep -Seconds (3 * $try)
+            }
+          }
+
           Write-Host "Published $pushed package update(s) to main."
           if ($failures.Count) { Write-Host "::error::not updated: $($failures -join ', ')"; exit 1 }

@@ -117,7 +117,7 @@ def _install(src: Source, package_id: str, version: str | None, args, header: st
     # [1] resolve
     version, cards = src.release(package_id, version)
     build, about = cards["build"], _about(cards)
-    target = installer.pick_target(build, getattr(args, "arch", None))
+    target = installer.pick_target(build, getattr(args, "arch", None), getattr(args, "lang", None))
     engine, scope = target["engine"], build.get("scope", "machine")
     origin = "" if src.name == config.OFFICIAL_SOURCE else f" from source {P(src.name, 'magenta')}"
     fallback = P(" (via GitHub fallback)", "gray") if src.used_fallback else ""
@@ -435,7 +435,7 @@ def cmd_pin(args) -> int:
 def cmd_download(args) -> int:
     src, package_id = _pick(args, args.package)
     version, cards = src.release(package_id, args.version)
-    target = installer.pick_target(cards["build"], args.arch)
+    target = installer.pick_target(cards["build"], getattr(args, "arch", None), getattr(args, "lang", None))
     payload = installer.fetch(package_id, version, target, console.progress("download"), source=src)
     console.done_line()
     out = Path(args.dir).expanduser()
@@ -938,11 +938,135 @@ def cmd_winget(args) -> int:
     return 0
 
 
+def cmd_self_update(args) -> int:
+    """Update txapm, txacreate, and txacli to the latest release."""
+    import shutil
+    import subprocess
+    import tempfile
+    import zipfile
+    from txa.core import net, semver, winos
+
+    current_ver = __version__
+    method = updatecheck.install_method()
+    console.say(f"Checking for TXA updates (current: {P(current_ver, 'bold')}, method: {P(method, 'cyan')})...")
+
+    target_ver = getattr(args, "version", None)
+    upstream = config.get("upstream") or "TXAVL/txa-repo"
+    headers = {"User-Agent": f"txa/{current_ver}", "Accept": "application/vnd.github+json"}
+
+    if target_ver:
+        tag = f"v{target_ver.lstrip('v')}"
+        release_url = f"https://api.github.com/repos/{upstream}/releases/tags/{tag}"
+    else:
+        release_url = f"https://api.github.com/repos/{upstream}/releases/latest"
+
+    try:
+        resp = net.session().get(release_url, headers=headers, timeout=12)
+        if resp.status_code == 404:
+            return _die(f"release {tag if target_ver else 'latest'} not found in {upstream}")
+        resp.raise_for_status()
+        rel_data = resp.json()
+    except Exception as exc:
+        return _die(f"failed to query GitHub releases: {exc}")
+
+    latest_ver = str(rel_data.get("tag_name", "")).lstrip("v")
+    if not latest_ver:
+        return _die("failed to parse release tag from GitHub")
+
+    if not args.force and not target_ver:
+        if semver.is_valid(latest_ver) and semver.is_valid(current_ver) and semver.parse(latest_ver) <= semver.parse(current_ver):
+            console.say(f"✓ TXA is already up to date ({P(current_ver, 'green', 'bold')}).")
+            return 0
+
+    if getattr(args, "check", False):
+        console.say(f"→ New version available: {P(latest_ver, 'green', 'bold')} (current: {current_ver})")
+        return 0
+
+    console.say(f"→ Upgrading TXA: {P(current_ver, 'gray')} -> {P(latest_ver, 'green', 'bold')}...")
+
+    if method == "pipx":
+        res = subprocess.run(["pipx", "upgrade", "txa"], check=False)
+        return res.returncode
+    elif method == "pip":
+        res = subprocess.run([sys.executable, "-m", "pip", "install", "--upgrade", "txa"], check=False)
+        return res.returncode
+
+    # Standalone binary (.exe) update under TXA_HOME/bin
+    native = winos.native_arch()
+    arch = "arm64" if native == "arm64" else "x64"
+    asset_name = f"txa-windows-{arch}.zip"
+
+    asset = next((a for a in rel_data.get("assets", []) if a.get("name") == asset_name), None)
+    if not asset and arch == "arm64":
+        console.say("  (no native arm64 build, falling back to x64)")
+        asset_name = "txa-windows-x64.zip"
+        asset = next((a for a in rel_data.get("assets", []) if a.get("name") == asset_name), None)
+
+    if not asset:
+        return _die(f"release {rel_data.get('tag_name')} is missing asset {asset_name}")
+
+    sums_asset = next((a for a in rel_data.get("assets", []) if a.get("name") == "SHA256SUMS.txt"), None)
+    expected_hash = None
+    if sums_asset:
+        try:
+            s_resp = net.session().get(sums_asset["browser_download_url"], headers=headers, timeout=12)
+            for line in s_resp.text.splitlines():
+                parts = line.strip().split(None, 1)
+                if len(parts) == 2 and parts[1].lstrip("*") == asset_name:
+                    expected_hash = parts[0].upper()
+                    break
+        except Exception:
+            pass
+
+    bin_dir = config.txa_home() / "bin"
+    bin_dir.mkdir(parents=True, exist_ok=True)
+
+    with tempfile.TemporaryDirectory(prefix="txa-self-update-") as temp_dir:
+        temp_path = Path(temp_dir)
+        zip_path = temp_path / asset_name
+        console.say(f"  downloading {P(asset_name, 'cyan')} ({round(asset['size']/1048576, 1)} MB)...")
+        net.download(net.session(), asset["browser_download_url"], zip_path, 500 * 1024 * 1024)
+
+        if expected_hash:
+            actual_hash = net.sha256_of(zip_path).upper()
+            if actual_hash != expected_hash:
+                return _die(f"checksum mismatch: expected {expected_hash}, got {actual_hash}")
+            console.say(f"  SHA-256 verified ({actual_hash[:16]}...)")
+
+        with zipfile.ZipFile(zip_path) as z:
+            z.extractall(temp_path / "unpacked")
+
+        unpacked = temp_path / "unpacked"
+        updated_tools = []
+        for exe_name in ("txapm.exe", "txacreate.exe", "txacli.exe"):
+            src_exe = unpacked / exe_name
+            if not src_exe.is_file():
+                continue
+            dest_exe = bin_dir / exe_name
+            if dest_exe.is_file():
+                old_exe = bin_dir / f"{exe_name}.old"
+                try:
+                    if old_exe.is_file():
+                        old_exe.unlink(missing_ok=True)
+                except Exception:
+                    pass
+                try:
+                    dest_exe.rename(old_exe)
+                except Exception as exc:
+                    return _die(f"cannot replace {exe_name} (it may be running): {exc}")
+            shutil.copy2(src_exe, dest_exe)
+            updated_tools.append(exe_name)
+
+    console.say(f"✓ Successfully updated TXA to {P(latest_ver, 'green', 'bold')}! (Tools updated: {', '.join(updated_tools)})")
+    return 0
+
+
 # --------------------------------------------------------------------------- entry
 
 
 def _install_options(p: argparse.ArgumentParser) -> None:
     p.add_argument("--arch", choices=["x64", "x86", "arm64"])
+    p.add_argument("--lang", "-l", choices=["en", "vi"], help="installer locale for multilingual packages (e.g. WinRAR vi/en)")
     mode = p.add_mutually_exclusive_group()
     mode.add_argument("--progress", action="store_true", help="unattended, but show the installer's progress UI")
     mode.add_argument("--interactive", action="store_true", help="run the normal installer UI")
@@ -1044,6 +1168,7 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("package")
     p.add_argument("--version", dest="version")
     p.add_argument("--arch", choices=["x64", "x86", "arm64"])
+    p.add_argument("--lang", "-l", choices=["en", "vi"], help="installer locale")
     p.add_argument("-d", "--dir", default=str(Path.home() / "Downloads"), help="target folder (default Downloads)")
     p.set_defaults(func=cmd_download)
 
@@ -1100,6 +1225,12 @@ def main(argv: list[str] | None = None) -> int:
     p = sub.add_parser("lang", aliases=["language"], help="view or switch display language (en / vi)")
     p.add_argument("code", nargs="?", choices=["en", "vi"], help="en (English) or vi (Vietnamese)")
     p.set_defaults(func=cmd_lang)
+
+    p = sub.add_parser("self-update", aliases=["update-self", "upgrade-self"], help="update txapm, txacli and txacreate to the newest release")
+    p.add_argument("--check", action="store_true", help="only check if an update is available without downloading")
+    p.add_argument("--version", dest="version", help="install this specific version")
+    p.add_argument("--force", action="store_true", help="reinstall even if already at latest version")
+    p.set_defaults(func=cmd_self_update)
 
     p = sub.add_parser("help", help="show help for txapm or a specific command")
     p.add_argument("topic", nargs="?", help="command name")

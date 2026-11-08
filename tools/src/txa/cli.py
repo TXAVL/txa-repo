@@ -211,6 +211,29 @@ def main(argv: list[str] | None = None) -> int:
                 f"{len(res['up_to_date'])} up-to-date, {len(res['skipped'])} skipped (hand-written/pinned)."
             )
             return 1 if res["failed"] else 0
+        if first in ("self-update", "update-self", "upgrade-self"):
+            from txa.pm.cli import main as txapm_main
+
+            return txapm_main(["self-update", *args_list[1:]])
+        if first in ("prune", "retention"):
+            from txa.core import retention
+
+            ap = console.SmartArgumentParser(prog="txacli prune", description="Enforce retention policy (keep newest N versions, delete older)")
+            ap.add_argument("-r", "--repo", default=None, help="Repository root containing manifests/")
+            ap.add_argument("-k", "--keep", type=int, default=retention.KEEP, help="Number of newest versions to keep (default: 10)")
+            ap.add_argument("--dry-run", action="store_true", help="Report stale versions without deleting")
+            parsed = ap.parse_args(args_list[1:])
+            root = _resolve_repo_root(parsed.repo)
+            report = retention.prune_repo(root, keep=parsed.keep, dry_run=parsed.dry_run)
+            total_deleted = sum(len(v) for v in report.values())
+            if not report:
+                console.say(f"✓ All packages in {root} adhere to the retention policy (<= {parsed.keep} versions).")
+            else:
+                action = "Would prune" if parsed.dry_run else "Pruned"
+                console.say(f"✓ {action} {total_deleted} old version(s) across {len(report)} package(s):")
+                for pkg, versions in sorted(report.items()):
+                    console.say(f"  - {pkg}: {', '.join(versions)}")
+            return 0
         if first in ("submit", "pr", "push"):
             from txa.create.cli import main as txacreate_main
 

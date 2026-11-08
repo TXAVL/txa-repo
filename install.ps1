@@ -189,6 +189,23 @@ function Select-Language {
 }
 $script:UiLang = Select-Language
 
+# Persist the chosen UI language immediately into user environment & config.json
+[Environment]::SetEnvironmentVariable('TXA_LANG', $script:UiLang, 'User')
+$env:TXA_LANG = $script:UiLang
+try {
+    if (-not (Test-Path -LiteralPath $InstallDir)) {
+        New-Item -ItemType Directory -Path $InstallDir -Force | Out-Null
+    }
+    $cfgPath = Join-Path $InstallDir 'config.json'
+    $cfgObj = if (Test-Path -LiteralPath $cfgPath) {
+        Get-Content -LiteralPath $cfgPath -Raw -Encoding UTF8 | ConvertFrom-Json
+    } else {
+        New-Object PSObject
+    }
+    $cfgObj | Add-Member -MemberType NoteProperty -Name 'lang' -Value $script:UiLang -Force
+    ($cfgObj | ConvertTo-Json -Depth 10) | Set-Content -LiteralPath $cfgPath -Encoding UTF8
+} catch { }
+
 if ([Environment]::OSVersion.Platform -ne 'Win32NT') {
     throw (T 'notWindows')
 }
@@ -250,7 +267,21 @@ New-Item -ItemType Directory -Path $staging | Out-Null
 try {
     $zip = Join-Path $staging $asset.name
     Write-Step (T 'downloading' $asset.name, ([Math]::Round($asset.size / 1MB, 1)), $release.tag_name)
-    Invoke-WebRequest -Uri $asset.browser_download_url -OutFile $zip -Headers $headers -UseBasicParsing
+    $hasCurl = (Get-Command curl.exe -ErrorAction SilentlyContinue) -ne $null
+    if ($hasCurl) {
+        & curl.exe -fL --retry 3 --retry-delay 2 -s -o $zip $asset.browser_download_url
+        if ($LASTEXITCODE -ne 0 -or -not (Test-Path -LiteralPath $zip)) {
+            Invoke-WebRequest -Uri $asset.browser_download_url -OutFile $zip -Headers $headers -UseBasicParsing
+        }
+    } else {
+        try {
+            $wc = New-Object System.Net.WebClient
+            $wc.Headers.Add('User-Agent', 'txa-install')
+            $wc.DownloadFile($asset.browser_download_url, $zip)
+        } catch {
+            Invoke-WebRequest -Uri $asset.browser_download_url -OutFile $zip -Headers $headers -UseBasicParsing
+        }
+    }
     $sumsText = (Invoke-WebRequest -Uri $sums.browser_download_url -Headers $headers -UseBasicParsing).Content
     if ($sumsText -is [byte[]]) { $sumsText = [Text.Encoding]::UTF8.GetString($sumsText) }
 

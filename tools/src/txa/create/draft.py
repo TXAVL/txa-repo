@@ -150,7 +150,7 @@ class Draft:
             if lang != self.lang:
                 cards[about_file(lang)] = {**translated, "ref": self.ref, "license": about["license"]}
 
-        # Auto-generate vi-VN about card if default is en-US
+        # Auto-generate vi-VN about card if default is en-US and translation or pattern exists
         if self.lang.lower().startswith("en") and "vi-VN" not in self.extra_abouts:
             from txa.core import i18n
             vi_summary = i18n._SUMMARIES_VI.get(self.package_id.split(".")[-1].lower())
