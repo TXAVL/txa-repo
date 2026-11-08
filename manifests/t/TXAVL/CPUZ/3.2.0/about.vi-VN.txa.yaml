@@ -1,0 +1,14 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/TXAVL/txa-repo/main/tools/src/txa/schemas/about.schema.json
+# TXA about card · TXAVL.CPUZ@3.2.0
+txa: 1
+kind: about
+ref: TXAVL.CPUZ@3.2.0
+lang: vi-VN
+name: CPU-Z
+publisher: CPUID, Inc.
+author: CPUID, Inc.
+summary: Tiện ích miễn phí xem chi tiết thông số phần cứng CPU, Mainboard và RAM.
+homepage: https://www.cpuid.com/softwares/cpu-z.html
+license:
+  name: Freeware
+  url: https://www.cpuid.com/terms-of-service.html

@@ -1,0 +1,14 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/TXAVL/txa-repo/main/tools/src/txa/schemas/about.schema.json
+# TXA about card · TXAVL.RevoUninstaller@2.7.2
+txa: 1
+kind: about
+ref: TXAVL.RevoUninstaller@2.7.2
+lang: vi-VN
+name: Revo Uninstaller
+publisher: VS Revo Group, Ltd.
+author: VS Revo Group, Ltd.
+summary: Phần mềm gỡ cài đặt ứng dụng triệt để, dọn dẹp file rác và registry thừa.
+homepage: https://www.revouninstaller.com/products/revo-uninstaller-free/
+license:
+  name: Freeware
+  url: https://www.revouninstaller.com/products/revo-uninstaller-free/

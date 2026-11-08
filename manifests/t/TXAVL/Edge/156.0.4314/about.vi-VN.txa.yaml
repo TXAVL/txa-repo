@@ -1,0 +1,14 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/TXAVL/txa-repo/main/tools/src/txa/schemas/about.schema.json
+# TXA about card · TXAVL.Edge@156.0.4314
+txa: 1
+kind: about
+ref: TXAVL.Edge@156.0.4314
+lang: vi-VN
+name: Microsoft Edge
+publisher: Microsoft Corporation
+author: Microsoft
+summary: Trình duyệt web hiện đại từ Microsoft tích hợp AI Copilot và bảo mật cao.
+homepage: https://www.microsoft.com/en-us/edge
+license:
+  name: Proprietary
+  url: https://www.microsoft.com/en-us/servicesagreement

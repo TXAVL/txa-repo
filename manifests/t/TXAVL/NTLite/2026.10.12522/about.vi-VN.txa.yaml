@@ -1,0 +1,14 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/TXAVL/txa-repo/main/tools/src/txa/schemas/about.schema.json
+# TXA about card · TXAVL.NTLite@2026.10.12522
+txa: 1
+kind: about
+ref: TXAVL.NTLite@2026.10.12522
+lang: vi-VN
+name: NTLite
+publisher: Nlitesoft d.o.o.
+author: Nuhi
+summary: Công cụ tùy biến, tinh gọn và tích hợp driver cho bộ cài đặt Windows.
+homepage: https://ntlite.com/download/
+license:
+  name: Proprietary
+  url: https://ntlite.com/eula/

@@ -1,0 +1,14 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/TXAVL/txa-repo/main/tools/src/txa/schemas/about.schema.json
+# TXA about card · TXAVL.NotepadPlusPlus@8.9.8
+txa: 1
+kind: about
+ref: TXAVL.NotepadPlusPlus@8.9.8
+lang: vi-VN
+name: Notepad++
+publisher: Don HO
+author: Don HO
+summary: Trình soạn thảo mã nguồn và văn bản gọn nhẹ với tô màu cú pháp đa ngôn ngữ.
+homepage: https://notepad-plus-plus.org
+license:
+  name: GPL-3.0-or-later
+  url: https://github.com/notepad-plus-plus/notepad-plus-plus/blob/master/LICENSE

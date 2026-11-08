@@ -1,0 +1,14 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/TXAVL/txa-repo/main/tools/src/txa/schemas/about.schema.json
+# TXA about card · TXAVL.Signal@8.34.0
+txa: 1
+kind: about
+ref: TXAVL.Signal@8.34.0
+lang: vi-VN
+name: Signal
+publisher: Signal Messenger, LLC
+author: Signal Messenger, LLC
+summary: Ứng dụng nhắn tin và gọi điện thoại bảo mật mã hóa đầu cuối hàng đầu.
+homepage: https://www.signal.org/
+license:
+  name: AGPL-3.0-only
+  url: https://github.com/signalapp/Signal-Desktop/blob/HEAD/LICENSE

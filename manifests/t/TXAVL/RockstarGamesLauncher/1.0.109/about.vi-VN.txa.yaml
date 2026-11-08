@@ -1,0 +1,14 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/TXAVL/txa-repo/main/tools/src/txa/schemas/about.schema.json
+# TXA about card · TXAVL.RockstarGamesLauncher@1.0.109
+txa: 1
+kind: about
+ref: TXAVL.RockstarGamesLauncher@1.0.109
+lang: vi-VN
+name: Rockstar Games Launcher
+publisher: Rockstar Games Inc.
+author: Rockstar Games Inc.
+summary: Trình khởi chạy và quản lý các tựa game chính thức từ Rockstar Games.
+homepage: https://socialclub.rockstargames.com/rockstar-games-launcher
+license:
+  name: Proprietary
+  url: https://socialclub.rockstargames.com/rockstar-games-launcher

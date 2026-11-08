@@ -1,0 +1,14 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/TXAVL/txa-repo/main/tools/src/txa/schemas/about.schema.json
+# TXA about card · TXAVL.Etcher@2.1.9
+txa: 1
+kind: about
+ref: TXAVL.Etcher@2.1.9
+lang: vi-VN
+name: balenaEtcher
+publisher: Balena Ltd.
+author: Balena Ltd.
+summary: Công cụ ghi file ảnh ISO và IMG vào thẻ nhớ, USB nhanh chóng và an toàn.
+homepage: https://etcher.balena.io/
+license:
+  name: Apache-2.0
+  url: https://github.com/balena-io/etcher/blob/HEAD/LICENSE

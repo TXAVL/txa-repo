@@ -1,0 +1,14 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/TXAVL/txa-repo/main/tools/src/txa/schemas/about.schema.json
+# TXA about card · TXAVL.PuTTY@0.85.0
+txa: 1
+kind: about
+ref: TXAVL.PuTTY@0.85.0
+lang: vi-VN
+name: PuTTY
+publisher: Simon Tatham
+author: Simon Tatham
+summary: Trình kết nối đầu cuối hỗ trợ giao thức SSH, Telnet và Serial gọn nhẹ.
+homepage: https://www.chiark.greenend.org.uk/~sgtatham/putty/
+license:
+  name: MIT
+  url: https://www.chiark.greenend.org.uk/~sgtatham/putty/licence.html

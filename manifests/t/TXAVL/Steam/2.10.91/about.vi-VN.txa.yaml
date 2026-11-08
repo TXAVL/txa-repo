@@ -1,0 +1,14 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/TXAVL/txa-repo/main/tools/src/txa/schemas/about.schema.json
+# TXA about card · TXAVL.Steam@2.10.91
+txa: 1
+kind: about
+ref: TXAVL.Steam@2.10.91
+lang: vi-VN
+name: Steam
+publisher: Valve Corporation
+author: Valve Corporation
+summary: Nền tảng phân phối, mua sắm và chơi game trực tuyến lớn nhất thế giới.
+homepage: https://store.steampowered.com/about/
+license:
+  name: Proprietary
+  url: https://store.steampowered.com/subscriber_agreement/

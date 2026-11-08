@@ -1,0 +1,14 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/TXAVL/txa-repo/main/tools/src/txa/schemas/about.schema.json
+# TXA about card · TXAVL.TreeSizeFree@4.8.1
+txa: 1
+kind: about
+ref: TXAVL.TreeSizeFree@4.8.1
+lang: vi-VN
+name: TreeSize Free
+publisher: JAM Software
+author: JAM Software
+summary: Công cụ phân tích dung lượng ổ cứng và tìm kiếm tệp tin chiếm bộ nhớ.
+homepage: https://www.jam-software.com/treesize_free
+license:
+  name: Proprietary
+  url: https://www.jam-software.com/company/license_agreement.shtml

@@ -1,0 +1,14 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/TXAVL/txa-repo/main/tools/src/txa/schemas/about.schema.json
+# TXA about card · TXAVL.QEMUGuestAgent@110.0.2
+txa: 1
+kind: about
+ref: TXAVL.QEMUGuestAgent@110.0.2
+lang: vi-VN
+name: QEMU Guest Agent
+publisher: RedHat
+author: RedHat
+summary: Dịch vụ điều phối máy khách Windows trong máy ảo QEMU.
+homepage: https://wiki.qemu.org/Features/GuestAgent
+license:
+  name: GPL-2.0-or-later
+  url: https://git.qemu.org/?p=qemu.git;a=blob_plain;f=LICENSE;hb=HEAD

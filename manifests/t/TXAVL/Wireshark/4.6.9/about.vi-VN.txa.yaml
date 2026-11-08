@@ -1,0 +1,14 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/TXAVL/txa-repo/main/tools/src/txa/schemas/about.schema.json
+# TXA about card · TXAVL.Wireshark@4.6.9
+txa: 1
+kind: about
+ref: TXAVL.Wireshark@4.6.9
+lang: vi-VN
+name: Wireshark
+publisher: The Wireshark developer community
+author: The Wireshark Foundation
+summary: Công cụ phân tích gói tin giao thức mạng hàng đầu thế giới.
+homepage: https://www.wireshark.org/
+license:
+  name: GPL-2.0-only
+  url: https://gitlab.com/wireshark/wireshark/-/blob/HEAD/COPYING

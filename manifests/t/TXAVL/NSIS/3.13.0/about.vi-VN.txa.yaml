@@ -1,0 +1,14 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/TXAVL/txa-repo/main/tools/src/txa/schemas/about.schema.json
+# TXA about card · TXAVL.NSIS@3.13.0
+txa: 1
+kind: about
+ref: TXAVL.NSIS@3.13.0
+lang: vi-VN
+name: NSIS
+publisher: Nullsoft and Contributors
+author: Nullsoft and Contributors
+summary: Hệ thống tạo bộ cài đặt phần mềm chuyên nghiệp cho Windows mã nguồn mở.
+homepage: https://nsis.sourceforge.io/Download
+license:
+  name: Proprietary
+  url: https://nsis.sourceforge.io/License

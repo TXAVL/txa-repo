@@ -1,0 +1,14 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/TXAVL/txa-repo/main/tools/src/txa/schemas/about.schema.json
+# TXA about card · TXAVL.Zoom@7.2.51704
+txa: 1
+kind: about
+ref: TXAVL.Zoom@7.2.51704
+lang: vi-VN
+name: Zoom Workplace
+publisher: Zoom
+author: Zoom Video Communications, Inc.
+summary: Phần mềm hội nghị truyền hình, họp trực tuyến và hội thảo qua video.
+homepage: https://zoom.us/
+license:
+  name: Proprietary
+  url: https://explore.zoom.us/en/terms/

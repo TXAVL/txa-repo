@@ -1,0 +1,14 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/TXAVL/txa-repo/main/tools/src/txa/schemas/about.schema.json
+# TXA about card · TXAVL.SumatraPDF@3.6.1
+txa: 1
+kind: about
+ref: TXAVL.SumatraPDF@3.6.1
+lang: vi-VN
+name: SumatraPDF
+publisher: Krzysztof Kowalczyk
+author: Krzysztof Kowalczyk
+summary: Trình đọc tài liệu PDF, eBook, ePub và Mobi siêu nhẹ, khởi động tức thì.
+homepage: https://github.com/sumatrapdfreader/sumatrapdf
+license:
+  name: GPL-3.0-only
+  url: https://github.com/sumatrapdfreader/sumatrapdf/blob/3.6rel/COPYING

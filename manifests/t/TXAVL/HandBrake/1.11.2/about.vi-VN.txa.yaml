@@ -1,0 +1,14 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/TXAVL/txa-repo/main/tools/src/txa/schemas/about.schema.json
+# TXA about card · TXAVL.HandBrake@1.11.2
+txa: 1
+kind: about
+ref: TXAVL.HandBrake@1.11.2
+lang: vi-VN
+name: HandBrake
+publisher: The HandBrake Team
+author: The HandBrake Team
+summary: Phần mềm chuyển đổi định dạng video mã nguồn mở hỗ trợ đa định dạng.
+homepage: https://handbrake.fr/
+license:
+  name: GPL-2.0-only
+  url: https://github.com/HandBrake/HandBrake/blob/HEAD/LICENSE

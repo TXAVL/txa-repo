@@ -1,0 +1,14 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/TXAVL/txa-repo/main/tools/src/txa/schemas/about.schema.json
+# TXA about card · TXAVL.Sunshine@2026.914.233613
+txa: 1
+kind: about
+ref: TXAVL.Sunshine@2026.914.233613
+lang: vi-VN
+name: Sunshine
+publisher: LizardByte
+author: LizardByte
+summary: Máy chủ truyền phát game (game streaming) tự lưu trữ độ trễ cực thấp.
+homepage: https://github.com/LizardByte/Sunshine
+license:
+  name: GPL-3.0-only
+  url: https://github.com/LizardByte/Sunshine/blob/HEAD/LICENSE

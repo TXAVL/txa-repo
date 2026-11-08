@@ -1,0 +1,14 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/TXAVL/txa-repo/main/tools/src/txa/schemas/about.schema.json
+# TXA about card · TXAVL.FastStoneViewer@8.5.0
+txa: 1
+kind: about
+ref: TXAVL.FastStoneViewer@8.5.0
+lang: vi-VN
+name: FastStone Image Viewer
+publisher: FastStone Corporation
+author: FastStone Corporation
+summary: Trình duyệt, xem và chuyển đổi định dạng hình ảnh nhanh nhẹ và ổn định.
+homepage: https://www.faststone.org/FSViewerDetail.htm
+license:
+  name: Proprietary
+  url: https://www.faststone.org/order.htm

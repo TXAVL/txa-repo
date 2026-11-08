@@ -1,0 +1,14 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/TXAVL/txa-repo/main/tools/src/txa/schemas/about.schema.json
+# TXA about card · TXAVL.Neovim@0.12.6
+txa: 1
+kind: about
+ref: TXAVL.Neovim@0.12.6
+lang: vi-VN
+name: Neovim
+publisher: Neovim contributors
+author: Neovim contributors
+summary: Trình soạn thảo văn bản hiện đại dựa trên Vim với khả năng mở rộng mạnh mẽ.
+homepage: https://neovim.io/
+license:
+  name: Apache-2.0
+  url: https://github.com/neovim/neovim/blob/HEAD/LICENSE.txt

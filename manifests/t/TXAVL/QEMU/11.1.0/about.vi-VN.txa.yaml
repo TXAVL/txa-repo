@@ -1,0 +1,14 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/TXAVL/txa-repo/main/tools/src/txa/schemas/about.schema.json
+# TXA about card · TXAVL.QEMU@11.1.0
+txa: 1
+kind: about
+ref: TXAVL.QEMU@11.1.0
+lang: vi-VN
+name: QEMU
+publisher: Stefan Weil
+author: QEMU Project
+summary: Phần mềm giả lập máy ảo và ảo hóa hệ thống mã nguồn mở.
+homepage: https://www.qemu.org
+license:
+  name: GPL-2.0-only
+  url: https://www.qemu.org/license/

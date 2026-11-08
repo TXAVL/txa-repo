@@ -1,0 +1,14 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/TXAVL/txa-repo/main/tools/src/txa/schemas/about.schema.json
+# TXA about card · TXAVL.ViGEmBus@1.22.0
+txa: 1
+kind: about
+ref: TXAVL.ViGEmBus@1.22.0
+lang: vi-VN
+name: ViGEm Bus Driver
+publisher: Nefarius Software Solutions e.U.
+author: Nefarius Software Solutions e.U.
+summary: Trình điều khiển kernel Windows mô phỏng tay cầm chơi game phổ biến.
+homepage: https://vigem.org/projects/ViGEm
+license:
+  name: BSD-3-Clause
+  url: https://github.com/ViGEm/ViGEmBus/blob/master/LICENSE

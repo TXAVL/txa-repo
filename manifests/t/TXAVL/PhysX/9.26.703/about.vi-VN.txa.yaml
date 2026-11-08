@@ -1,0 +1,14 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/TXAVL/txa-repo/main/tools/src/txa/schemas/about.schema.json
+# TXA about card · TXAVL.PhysX@9.26.703
+txa: 1
+kind: about
+ref: TXAVL.PhysX@9.26.703
+lang: vi-VN
+name: NVIDIA PhysX System Software
+publisher: NVIDIA Corporation
+author: NVIDIA Corporation
+summary: Phần mềm hệ thống NVIDIA PhysX hỗ trợ tính toán vật lý chân thực cho game.
+homepage: https://www.nvidia.com/en-us/drivers/physx/physx-9-26-0703-driver/
+license:
+  name: Proprietary
+  url: https://www.nvidia.com/en-us/drivers/physx/physx-9-26-0703-driver/

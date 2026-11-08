@@ -1,0 +1,14 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/TXAVL/txa-repo/main/tools/src/txa/schemas/about.schema.json
+# TXA about card · TXAVL.TeamViewer@15.83.5
+txa: 1
+kind: about
+ref: TXAVL.TeamViewer@15.83.5
+lang: vi-VN
+name: TeamViewer
+publisher: TeamViewer
+author: TeamViewer Germany GmbH
+summary: Giải pháp truy cập, điều khiển máy tính từ xa và hỗ trợ trực tuyến.
+homepage: https://www.teamviewer.com/en/download/windows/
+license:
+  name: Proprietary
+  url: https://www.teamviewer.com/en/legal/eula/

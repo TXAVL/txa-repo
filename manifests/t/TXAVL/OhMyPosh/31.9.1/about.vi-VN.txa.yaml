@@ -1,0 +1,14 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/TXAVL/txa-repo/main/tools/src/txa/schemas/about.schema.json
+# TXA about card · TXAVL.OhMyPosh@31.9.1
+txa: 1
+kind: about
+ref: TXAVL.OhMyPosh@31.9.1
+lang: vi-VN
+name: Oh My Posh
+publisher: Jan De Dobbeleer
+author: Jan De Dobbeleer
+summary: Công cụ tùy biến giao diện thanh lệnh (prompt) đẹp mắt cho mọi shell.
+homepage: https://ohmyposh.dev/
+license:
+  name: MIT
+  url: https://github.com/JanDeDobbeleer/oh-my-posh/raw/main/COPYING

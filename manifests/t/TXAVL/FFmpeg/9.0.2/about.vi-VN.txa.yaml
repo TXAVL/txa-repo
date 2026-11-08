@@ -1,0 +1,14 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/TXAVL/txa-repo/main/tools/src/txa/schemas/about.schema.json
+# TXA about card · TXAVL.FFmpeg@9.0.2
+txa: 1
+kind: about
+ref: TXAVL.FFmpeg@9.0.2
+lang: vi-VN
+name: FFmpeg
+publisher: FFmpeg Developers
+author: FFmpeg Developers
+summary: Bộ giải pháp hoàn chỉnh để ghi hình, chuyển đổi định dạng và phát âm thanh/video.
+homepage: https://ffmpeg.org
+license:
+  name: GPL-3.0-or-later
+  url: https://www.gyan.dev/ffmpeg/builds/#license

@@ -1,0 +1,14 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/TXAVL/txa-repo/main/tools/src/txa/schemas/about.schema.json
+# TXA about card · TXAVL.GitHubDesktop@3.6.10
+txa: 1
+kind: about
+ref: TXAVL.GitHubDesktop@3.6.10
+lang: vi-VN
+name: GitHub Desktop
+publisher: GitHub, Inc.
+author: GitHub, Inc.
+summary: Ứng dụng máy tính chính thức của GitHub giúp quản lý kho mã nguồn trực quan.
+homepage: https://github.com/apps/desktop
+license:
+  name: MIT
+  url: https://github.com/desktop/desktop/blob/HEAD/LICENSE

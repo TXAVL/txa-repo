@@ -1,0 +1,14 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/TXAVL/txa-repo/main/tools/src/txa/schemas/about.schema.json
+# TXA about card · TXAVL.Git@2.56.0
+txa: 1
+kind: about
+ref: TXAVL.Git@2.56.0
+lang: vi-VN
+name: Git
+publisher: The Git Development Community
+author: The Git Development Community
+summary: Hệ thống quản lý phiên bản phân tán phổ biến nhất cho lập trình viên.
+homepage: https://gitforwindows.org
+license:
+  name: GPL-2.0-only
+  url: https://github.com/git-for-windows/git/blob/main/COPYING

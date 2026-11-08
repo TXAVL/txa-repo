@@ -1,0 +1,14 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/TXAVL/txa-repo/main/tools/src/txa/schemas/about.schema.json
+# TXA about card · TXAVL.VLC@3.0.24
+txa: 1
+kind: about
+ref: TXAVL.VLC@3.0.24
+lang: vi-VN
+name: VLC media player
+publisher: VideoLAN
+author: VideoLAN
+summary: Trình phát đa phương tiện mã nguồn mở miễn phí, tương thích hầu hết định dạng audio/video.
+homepage: https://www.videolan.org/vlc/
+license:
+  name: GPL-2.0-or-later
+  url: https://www.videolan.org/legal.html

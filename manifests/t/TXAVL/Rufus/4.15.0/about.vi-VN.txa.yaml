@@ -1,0 +1,14 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/TXAVL/txa-repo/main/tools/src/txa/schemas/about.schema.json
+# TXA about card · TXAVL.Rufus@4.15.0
+txa: 1
+kind: about
+ref: TXAVL.Rufus@4.15.0
+lang: vi-VN
+name: Rufus
+publisher: pbatard
+author: Pete Batard
+summary: Tiện ích ghi và tạo USB khởi động cài đặt Windows hoặc Linux nhanh chóng.
+homepage: https://rufus.ie/
+license:
+  name: GPL-3.0-or-later
+  url: https://github.com/pbatard/rufus/blob/HEAD/LICENSE.txt

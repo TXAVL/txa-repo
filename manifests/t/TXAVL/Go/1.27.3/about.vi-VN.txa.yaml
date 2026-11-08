@@ -1,0 +1,14 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/TXAVL/txa-repo/main/tools/src/txa/schemas/about.schema.json
+# TXA about card · TXAVL.Go@1.27.3
+txa: 1
+kind: about
+ref: TXAVL.Go@1.27.3
+lang: vi-VN
+name: Go
+publisher: The Go Authors
+author: The Go Authors
+summary: "Ngôn ngữ lập trình Go mã nguồn mở từ Google: đơn giản, nhanh và tin cậy."
+homepage: https://go.dev/dl/
+license:
+  name: BSD-3-Clause
+  url: https://github.com/golang/go/blob/HEAD/LICENSE

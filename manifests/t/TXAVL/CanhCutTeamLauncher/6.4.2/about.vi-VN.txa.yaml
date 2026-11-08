@@ -1,0 +1,14 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/TXAVL/txa-repo/main/tools/src/txa/schemas/about.schema.json
+# TXA about card · TXAVL.CanhCutTeamLauncher@6.4.2
+txa: 1
+kind: about
+ref: TXAVL.CanhCutTeamLauncher@6.4.2
+lang: vi-VN
+name: CanhCutTeam Launcher
+publisher: Cánh Cụt Team
+author: Cánh Cụt Team
+summary: Launcher chính thức của Cánh Cụt Team để tải và quản lý game PC.
+homepage: https://canhcutteam.com/launcher
+license:
+  name: Freeware
+  url: https://canhcutteam.com/launcher

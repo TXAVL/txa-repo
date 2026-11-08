@@ -1,0 +1,14 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/TXAVL/txa-repo/main/tools/src/txa/schemas/about.schema.json
+# TXA about card · TXAVL.Inkscape@1.4.4
+txa: 1
+kind: about
+ref: TXAVL.Inkscape@1.4.4
+lang: vi-VN
+name: Inkscape
+publisher: Inkscape
+author: Inkscape
+summary: Phần mềm chỉnh sửa đồ họa vector mã nguồn mở chuyên nghiệp.
+homepage: https://inkscape.org/release/
+license:
+  name: GPL-2.0-only
+  url: https://inkscape.org/about/license/

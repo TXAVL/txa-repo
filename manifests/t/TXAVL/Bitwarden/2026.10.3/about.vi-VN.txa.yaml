@@ -1,0 +1,14 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/TXAVL/txa-repo/main/tools/src/txa/schemas/about.schema.json
+# TXA about card · TXAVL.Bitwarden@2026.10.3
+txa: 1
+kind: about
+ref: TXAVL.Bitwarden@2026.10.3
+lang: vi-VN
+name: Bitwarden
+publisher: Bitwarden Inc.
+author: Bitwarden Inc.
+summary: Trình quản lý mật khẩu mã nguồn mở an toàn, miễn phí cho mọi thiết bị.
+homepage: https://bitwarden.com/
+license:
+  name: GPL-3.0-or-later
+  url: https://github.com/bitwarden/clients/blob/HEAD/LICENSE.txt

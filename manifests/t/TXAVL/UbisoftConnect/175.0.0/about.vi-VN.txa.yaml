@@ -1,0 +1,14 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/TXAVL/txa-repo/main/tools/src/txa/schemas/about.schema.json
+# TXA about card · TXAVL.UbisoftConnect@175.0.0
+txa: 1
+kind: about
+ref: TXAVL.UbisoftConnect@175.0.0
+lang: vi-VN
+name: Ubisoft Connect
+publisher: Ubisoft
+author: Ubisoft
+summary: Hệ sinh thái kết nối cộng đồng và khởi chạy game chính thức của Ubisoft.
+homepage: https://ubisoftconnect.com/
+license:
+  name: Proprietary
+  url: https://legal.ubi.com/LegalInfoUbisoftEMEA

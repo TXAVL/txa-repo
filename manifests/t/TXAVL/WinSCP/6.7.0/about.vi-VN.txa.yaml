@@ -1,0 +1,14 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/TXAVL/txa-repo/main/tools/src/txa/schemas/about.schema.json
+# TXA about card · TXAVL.WinSCP@6.7.0
+txa: 1
+kind: about
+ref: TXAVL.WinSCP@6.7.0
+lang: vi-VN
+name: WinSCP
+publisher: Martin Prikryl
+author: Martin Prikryl
+summary: Trình truyền tải tệp tin đồ họa mã nguồn mở hỗ trợ SFTP, FTP, WebDAV và S3.
+homepage: https://winscp.net/
+license:
+  name: GPL-3.0-or-later
+  url: https://github.com/winscp/winscp/blob/HEAD/license.txt

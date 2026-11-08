@@ -1,0 +1,14 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/TXAVL/txa-repo/main/tools/src/txa/schemas/about.schema.json
+# TXA about card · TXAVL.CrystalDiskInfo@9.9.4
+txa: 1
+kind: about
+ref: TXAVL.CrystalDiskInfo@9.9.4
+lang: vi-VN
+name: CrystalDiskInfo
+publisher: Crystal Dew World
+author: Noriyuki Miyazaki
+summary: Tiện ích kiểm tra thông số, nhiệt độ và theo dõi sức khỏe ổ cứng HDD/SSD.
+homepage: https://crystalmark.info/en/software/crystaldiskinfo/
+license:
+  name: MIT
+  url: https://crystalmark.info/en/software/crystaldiskinfo/crystaldiskinfo-license/

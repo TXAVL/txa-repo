@@ -1,0 +1,14 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/TXAVL/txa-repo/main/tools/src/txa/schemas/about.schema.json
+# TXA about card · TXAVL.Warframe@1.0.0
+txa: 1
+kind: about
+ref: TXAVL.Warframe@1.0.0
+lang: vi-VN
+name: Warframe
+publisher: Digital Extremes
+author: Digital Extremes
+summary: Game hành động bắn súng góc nhìn thứ ba miễn phí trong bối cảnh khoa học viễn tưởng.
+homepage: https://www.warframe.com/
+license:
+  name: Proprietary
+  url: https://www.warframe.com/eula

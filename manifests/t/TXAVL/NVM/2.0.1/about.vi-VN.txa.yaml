@@ -1,0 +1,14 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/TXAVL/txa-repo/main/tools/src/txa/schemas/about.schema.json
+# TXA about card · TXAVL.NVM@2.0.1
+txa: 1
+kind: about
+ref: TXAVL.NVM@2.0.1
+lang: vi-VN
+name: NVM for Windows
+publisher: Corey Butler
+author: Corey Butler
+summary: Tiện ích quản lý và chuyển đổi nhanh giữa nhiều phiên bản Node.js trên Windows.
+homepage: https://github.com/coreybutler/nvm-windows
+license:
+  name: MIT
+  url: https://github.com/coreybutler/nvm-windows/blob/master/LICENSE

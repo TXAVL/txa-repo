@@ -1,0 +1,14 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/TXAVL/txa-repo/main/tools/src/txa/schemas/about.schema.json
+# TXA about card · TXAVL.CMake@4.4.5
+txa: 1
+kind: about
+ref: TXAVL.CMake@4.4.5
+lang: vi-VN
+name: CMake
+publisher: Kitware
+author: Kitware
+summary: Bộ công cụ mã nguồn mở đa nền tảng để xây dựng, kiểm thử và đóng gói phần mềm.
+homepage: https://cmake.org/
+license:
+  name: BSD-3-Clause
+  url: https://github.com/Kitware/CMake/blob/HEAD/LICENSE.rst

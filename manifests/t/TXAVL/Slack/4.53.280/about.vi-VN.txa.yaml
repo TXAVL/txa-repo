@@ -1,0 +1,14 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/TXAVL/txa-repo/main/tools/src/txa/schemas/about.schema.json
+# TXA about card · TXAVL.Slack@4.53.280
+txa: 1
+kind: about
+ref: TXAVL.Slack@4.53.280
+lang: vi-VN
+name: Slack
+publisher: Slack Technologies Inc.
+author: Slack Technologies, LLC
+summary: Nền tảng làm việc nhóm, trao đổi tin nhắn và cộng tác doanh nghiệp.
+homepage: https://slack.com/
+license:
+  name: Proprietary
+  url: https://slack.com/terms-of-service/user

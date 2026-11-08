@@ -1,0 +1,14 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/TXAVL/txa-repo/main/tools/src/txa/schemas/about.schema.json
+# TXA about card · TXAVL.MicrosoftBuildOfOpenJDKWithHotspot17@17.0.21
+txa: 1
+kind: about
+ref: TXAVL.MicrosoftBuildOfOpenJDKWithHotspot17@17.0.21
+lang: vi-VN
+name: Microsoft Build of OpenJDK 17
+publisher: Microsoft
+author: Microsoft
+summary: Bản phân phối OpenJDK 17 LTS miễn phí được tối ưu và hỗ trợ bởi Microsoft.
+homepage: https://www.microsoft.com/openjdk
+license:
+  name: GPL-3.0-or-later
+  url: https://openjdk.java.net/legal/gplv2+ce.html

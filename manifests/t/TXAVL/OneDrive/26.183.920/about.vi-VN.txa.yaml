@@ -1,0 +1,14 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/TXAVL/txa-repo/main/tools/src/txa/schemas/about.schema.json
+# TXA about card · TXAVL.OneDrive@26.183.920
+txa: 1
+kind: about
+ref: TXAVL.OneDrive@26.183.920
+lang: vi-VN
+name: Microsoft OneDrive
+publisher: Microsoft Corporation
+author: Microsoft Corporation
+summary: Dịch vụ lưu trữ và đồng bộ hóa dữ liệu đám mây tích hợp của Microsoft.
+homepage: https://www.microsoft.com/microsoft-365/onedrive/download
+license:
+  name: Proprietary
+  url: https://www.microsoft.com/legal/terms-of-use

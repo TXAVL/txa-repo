@@ -1,0 +1,13 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/TXAVL/txa-repo/main/tools/src/txa/schemas/about.schema.json
+# TXA about card · TXAVL.Claude@2.42304.2
+txa: 1
+kind: about
+ref: TXAVL.Claude@2.42304.2
+lang: vi-VN
+name: Claude
+publisher: Anthropic, PBC
+author: Anthropic PBC
+summary: Trợ lý trí tuệ nhân tạo Claude từ Anthropic tối ưu cho làm việc trên desktop.
+license:
+  name: Proprietary
+  url: https://github.com/TXAVL/txa-repo

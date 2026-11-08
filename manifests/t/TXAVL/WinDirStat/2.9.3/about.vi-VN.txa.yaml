@@ -1,0 +1,14 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/TXAVL/txa-repo/main/tools/src/txa/schemas/about.schema.json
+# TXA about card · TXAVL.WinDirStat@2.9.3
+txa: 1
+kind: about
+ref: TXAVL.WinDirStat@2.9.3
+lang: vi-VN
+name: WinDirStat
+publisher: The WinDirStat Team
+author: The WinDirStat Team
+summary: Tiện ích quét biểu đồ trực quan dung lượng lưu trữ trên các ổ đĩa máy tính.
+homepage: https://github.com/windirstat/windirstat/releases/
+license:
+  name: GPL-3.0-only
+  url: https://github.com/windirstat/windirstat/blob/HEAD/LICENSE.md

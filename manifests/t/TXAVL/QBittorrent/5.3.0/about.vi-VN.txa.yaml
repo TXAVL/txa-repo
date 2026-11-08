@@ -1,0 +1,14 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/TXAVL/txa-repo/main/tools/src/txa/schemas/about.schema.json
+# TXA about card · TXAVL.QBittorrent@5.3.0
+txa: 1
+kind: about
+ref: TXAVL.QBittorrent@5.3.0
+lang: vi-VN
+name: qBittorrent
+publisher: The qBittorrent project
+author: The qBittorrent project
+summary: Ứng dụng tải torrent mã nguồn mở nhanh, nhẹ và hoàn toàn không quảng cáo.
+homepage: https://www.qbittorrent.org/
+license:
+  name: GPL-3.0-only
+  url: https://github.com/qbittorrent/qBittorrent/blob/master/COPYING

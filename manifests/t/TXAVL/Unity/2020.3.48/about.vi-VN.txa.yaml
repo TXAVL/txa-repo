@@ -1,0 +1,14 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/TXAVL/txa-repo/main/tools/src/txa/schemas/about.schema.json
+# TXA about card · TXAVL.Unity@2020.3.48
+txa: 1
+kind: about
+ref: TXAVL.Unity@2020.3.48
+lang: vi-VN
+name: Unity Hub
+publisher: Unity Technologies ApS
+author: Unity Technologies ApS
+summary: Nền tảng phát triển engine game 2D/3D hàng đầu thế giới.
+homepage: https://unity.com/download
+license:
+  name: Proprietary
+  url: https://unity.com/legal/terms-of-service
