@@ -790,11 +790,17 @@ def binary(ctx: Context, target: dict, out: Outcome) -> None:
             elif engine == "exe":
                 if found.engine != "exe":
                     out.warn(f"[{slot}] detected {found.label} - declare engine: {found.engine} to get verified default switches")
+            elif engine in ("nsis", "inno") and found.label == "7-Zip SFX":
+                # Mozilla (Firefox, Thunderbird) wraps its NSIS setup.exe in a 7-Zip SFX that forwards the switches
+                out.warn(f"[{slot}] 7-Zip SFX wrapper around a {engine} setup - switches are forwarded to the inner setup")
             else:
                 out.fail(f"[{slot}] engine '{engine}' declared but {found.label} detected")
                 continue
         if found.format == "msi":
-            if found.payload_arch and found.payload_arch != arch:
+            if found.payload_arch == "x64" and arch == "arm64":
+                # x64 template runs on ARM64 through emulation; some vendors (Blender) tag their ARM64 MSI this way
+                out.warn(f"[{slot}] MSI template targets x64 but manifest says arm64 - runs through emulation, confirm the payload is native")
+            elif found.payload_arch and found.payload_arch != arch:
                 out.fail(f"[{slot}] MSI template targets {found.payload_arch}, manifest says {arch}")
                 continue
             out.ok(f"[{slot}] {found.label}, template '{found.msi.get('template')}'")
