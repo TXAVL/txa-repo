@@ -800,10 +800,14 @@ def binary(ctx: Context, target: dict, out: Outcome) -> None:
             if found.payload_arch == "x64" and arch == "arm64":
                 # x64 template runs on ARM64 through emulation; some vendors (Blender) tag their ARM64 MSI this way
                 out.warn(f"[{slot}] MSI template targets x64 but manifest says arm64 - runs through emulation, confirm the payload is native")
+            elif found.payload_arch == "x86" and arch in ("x64", "arm64"):
+                # x86 MSI database template runs on x64/arm64 through WOW64; some vendors (Cloudflare) build with msitools this way
+                out.warn(f"[{slot}] 32-bit MSI installer installing on {arch} (template '{found.msi.get('template')}')")
             elif found.payload_arch and found.payload_arch != arch:
                 out.fail(f"[{slot}] MSI template targets {found.payload_arch}, manifest says {arch}")
                 continue
-            out.ok(f"[{slot}] {found.label}, template '{found.msi.get('template')}'")
+            else:
+                out.ok(f"[{slot}] {found.label}, template '{found.msi.get('template')}'")
             continue
         machine = found.machine
         if machine == arch:
