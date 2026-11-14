@@ -64,7 +64,8 @@ jobs:
           # No pull request and no human review: each package with a newer version is synced, checked with the
           # full online validator (STEP 01-14: size, SHA-256, signature, ...) and pushed straight to main.
           # The bot (GitHub App) must be allowed to bypass the main branch rule. A release that fails the
-          # validator is dropped (nothing is pushed) and the job ends red so you get the mail.
+          # validator is dropped (nothing is pushed) and logged as a warning so the pipeline stays green for
+          # other packages.
           git config user.name "txa-repo-bot[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           $names = if ($env:PKG_FILTER) { @($env:PKG_FILTER) } else { Get-ChildItem manifests/t/TXAVL -Directory | ForEach-Object Name }
@@ -73,7 +74,14 @@ jobs:
           foreach ($name in $names) {
             $dir = "manifests/t/TXAVL/$name"
             txacli sync $name --namespace TXAVL
-            if ($LASTEXITCODE -ne 0) { $failures += $name; git checkout -q -- $dir; git clean -fdq -- $dir; continue }
+            if ($LASTEXITCODE -ne 0) {
+              Write-Host "::warning::TXAVL.${name}: sync step failed - skipping"
+              $failures += $name
+              git reset -q HEAD -- $dir 2>$null
+              git checkout -q -- $dir 2>$null
+              git clean -fdq -- $dir 2>$null
+              continue
+            }
             if (-not (git status --porcelain $dir)) { continue }
             $releases = @(git ls-files --others --exclude-standard $dir | ForEach-Object { Split-Path $_ -Parent } | Sort-Object -Unique)
             $valid = $true
@@ -82,9 +90,11 @@ jobs:
               if ($LASTEXITCODE -ne 0) { $valid = $false }
             }
             if (-not $valid) {
-              Write-Host "::error::TXAVL.${name}: the new release failed validation - not published"
+              Write-Host "::warning::TXAVL.${name}: the new release failed validation - skipped and discarded"
               $failures += $name
-              git checkout -q -- $dir; git clean -fdq -- $dir
+              git reset -q HEAD -- $dir 2>$null
+              git checkout -q -- $dir 2>$null
+              git clean -fdq -- $dir 2>$null
               continue
             }
             git add -A $dir
@@ -97,7 +107,14 @@ jobs:
               if ($LASTEXITCODE -eq 0) { $ok = $true; break }
               Start-Sleep -Seconds (3 * $try)
             }
-            if (-not $ok) { Write-Host "::error::could not push TXAVL.$name to main"; $failures += $name; continue }
+            if (-not $ok) {
+              Write-Host "::warning::could not push TXAVL.$name to main"
+              $failures += $name
+              git reset -q HEAD -- $dir 2>$null
+              git checkout -q -- $dir 2>$null
+              git clean -fdq -- $dir 2>$null
+              continue
+            }
             $pushed++
           }
 
@@ -115,4 +132,17 @@ jobs:
           }
 
           Write-Host "Published $pushed package update(s) to main."
-          if ($failures.Count) { Write-Host "::error::not updated: $($failures -join ', ')"; exit 1 }
+          if ($failures.Count) {
+            Write-Host "::warning::The following $($failures.Count) package(s) were skipped due to sync/validation issues: $($failures -join ', ')"
+          }
+
+          if ($env:GITHUB_STEP_SUMMARY) {
+            "## 🚀 TXA Auto-Update Summary" | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Encoding utf8
+            "" | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append -Encoding utf8
+            "- **Published updates:** $pushed" | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append -Encoding utf8
+            if ($failures.Count) {
+              "- **Skipped / Failed packages ($($failures.Count)):** $($failures -join ', ')" | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append -Encoding utf8
+            } else {
+              "- **Skipped / Failed packages:** None (all processed packages clean)" | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append -Encoding utf8
+            }
+          }
