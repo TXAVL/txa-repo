@@ -1,14 +1,31 @@
 # TXA
 
-Cài phần mềm Windows bằng một dòng lệnh. TXA tải bộ cài từ trang chính thức của nhà phát hành,
-kiểm tra chữ ký số và mã SHA-256, rồi cài **im lặng**, không phải bấm Next.
+**Cài phần mềm Windows bằng một dòng lệnh.** TXA tải bộ cài trực tiếp từ trang chính thức của nhà phát hành,
+kiểm tra **chữ ký số và mã SHA-256**, rồi cài **im lặng**: không phải bấm Next, và TXA
+không lưu lại bộ cài của ai.
 
 ```powershell
-txapm install TXAVL.HelloTool
+txapm install vlc
 ```
 
 [![PyPI](https://img.shields.io/pypi/v/txa)](https://pypi.org/project/txa/)
 [![Release](https://img.shields.io/github/v/release/TXAVL/txa-repo)](https://github.com/TXAVL/txa-repo/releases)
+
+<p align="center">
+  <img src=".github/readme/txapm-install.gif" alt="txapm search và install: tìm, tải, kiểm tra SHA-256, cài im lặng" width="88%" />
+</p>
+
+## Vì sao dùng TXA
+
+- **Gõ ngắn, nhớ dễ.** Mỗi gói có tên ngắn (alias): `txapm install vscode`, `git`, `7zip`, `dotnet`, `vs`…
+  Không truyền phiên bản thì luôn lấy **bản mới nhất**; muốn bản cũ thì `--version 8` hoặc `--version 17.10`.
+- **An toàn theo mặc định.** Mỗi gói chỉ trỏ tới link tải chính thức, qua bot kiểm định 16 bước và có người duyệt
+  trước khi vào kho. Lệch một byte so với mã SHA-256 là TXA xoá file và dừng.
+- **Gói portable không cần quyền admin.** Giải nén vào thư mục của riêng bạn và tự thêm vào PATH (FFmpeg, …).
+- **Mang cả bộ phần mềm sang máy mới.** `txapm export` rồi `txapm import`.
+- **Có cầu nối WinGet.** Chưa có trong kho TXA thì `txapm wg install <id>` lấy từ WinGet, vẫn kiểm tra SHA-256.
+- **Kho riêng của bạn.** `txapm source add` thêm kho công ty hoặc thư mục trên ổ mạng, xem
+  [docs/custom-source.md](docs/custom-source.md).
 
 ---
 
@@ -42,102 +59,259 @@ pipx install txa
 
 Chưa có pipx thì chạy `python -m pip install --user pipx` rồi `python -m pipx ensurepath`, sau đó mở terminal mới.
 
-Kiểm tra:
+### Thử ngay
 
 ```powershell
 txapm --version
+txapm search vlc
+txapm install vlc
 ```
+
+Nâng cấp chính TXA: cài bằng PowerShell thì chạy lại lệnh ở Cách 1, cài bằng pipx thì `pipx upgrade txa`.
+
+---
+
+## Xem thử
+
+<table>
+  <tr>
+    <td width="50%"><img src=".github/readme/txapm-versions.gif" alt="Chọn đúng phiên bản: dotnet, vs2022 --version 17.10" /><br /><sub><b>Chọn đúng phiên bản.</b> Không truyền thì lấy bản mới nhất; <code>--version 17.10</code> lấy bản 17.10.x mới nhất.</sub></td>
+    <td width="50%"><img src=".github/readme/txapm-upgrade.gif" alt="Nâng cấp, export và import" /><br /><sub><b>Nâng cấp và sao lưu.</b> <code>upgrade</code>, <code>export</code>, <code>import</code> cả bộ phần mềm.</sub></td>
+  </tr>
+</table>
 
 ---
 
 ## Dùng `txapm`
 
+Gói nào có tên ngắn (alias) thì gõ tên ngắn cũng được, ví dụ `txapm install hellotool`.
+Một số lệnh có tên viết tắt: `add` = install, `rm` = uninstall, `ls` = list, `find` = search.
+
+### Tìm và cài
+
 | Muốn làm gì | Lệnh |
 |---|---|
 | Tìm phần mềm | `txapm search notepad` |
 | Xem thông tin một gói | `txapm show TXAVL.HelloTool` |
-| Xem kho đang có những phiên bản nào | `txapm show TXAVL.HelloTool --versions` (kèm CPU/ngôn ngữ, đánh dấu bản mới nhất và bản đã cài) |
+| Xem các phiên bản trong kho | `txapm show TXAVL.HelloTool --versions` (kèm CPU/ngôn ngữ, đánh dấu bản mới nhất và bản đã cài) |
 | Cài bản mới nhất | `txapm install TXAVL.HelloTool` |
 | Cài một phiên bản cụ thể | `txapm install TXAVL.HelloTool --version 1.4.2` |
+| Cài bản mới nhất của một dòng phiên bản | `txapm install dotnet-sdk-8 --version 8` · `txapm install vs2022 --version 17.10` |
 | Chọn phiên bản từ danh sách trong kho | `txapm install TXAVL.HelloTool --choose` |
 | Cài nhưng vẫn xem tiến trình | `txapm install TXAVL.HelloTool --progress` |
 | Cài với giao diện gốc của bộ cài | `txapm install TXAVL.HelloTool --interactive` |
+| Không tạo shortcut ngoài desktop mà gói khai báo | `txapm install TXAVL.HelloTool --no-shortcut` |
 | Chỉ tải về, không cài | `txapm install TXAVL.HelloTool --download-only` |
+| Tải bộ cài và manifest về thư mục (mặc định Downloads) | `txapm download TXAVL.HelloTool -d D:\setup` |
 | Thử một manifest trên máy trước khi gửi | `txapm install --manifest <thư-mục>` |
+
+### Quản lý phần mềm đã cài
+
+| Muốn làm gì | Lệnh |
+|---|---|
 | Xem gói đã cài | `txapm list` |
 | Xem gói có bản mới | `txapm list --upgrade-available` |
-| Nâng cấp một gói | `txapm upgrade TXAVL.HelloTool` |
-| Nâng cấp tất cả | `txapm upgrade --all` |
-| Gỡ cài đặt | `txapm uninstall TXAVL.HelloTool` |
-| Sao lưu danh sách gói | `txapm export pkgs.json` |
-| Cài lại cả bộ trên máy mới | `txapm import pkgs.json` |
 | Xem **mọi** phần mềm trên máy, đánh dấu cái nào có trong TXA | `txapm list --all` |
+| Nâng cấp một gói / tất cả | `txapm upgrade TXAVL.HelloTool` · `txapm upgrade --all` |
 | Giữ nguyên phiên bản, không cho `upgrade --all` đụng vào | `txapm pin add TXAVL.HelloTool` |
 | Bỏ giữ / xem danh sách đang giữ | `txapm pin remove TXAVL.HelloTool` · `txapm pin list` |
-| Tải bộ cài + manifest về thư mục (mặc định Downloads) | `txapm download TXAVL.HelloTool -d D:\setup` |
-| Xem các kho nguồn | `txapm source` (xem mục [Kho nguồn riêng](#kho-nguồn-riêng)) |
-| Tìm kiếm / cài trực tiếp gói từ WinGet qua `txapm` | `txapm wg search <từ-khóa>` · `txapm wg install <id>` |
-| Kiểm tra sức khỏe hệ thống, kho nguồn, WinGet & cache | `txapm doctor` |
-| Dọn dẹp bộ cài tải tạm và file log cài đặt | `txapm clean` · `txapm clean --all` |
+| Gỡ cài đặt | `txapm uninstall TXAVL.HelloTool` |
+| Xem vị trí cài, PATH và nguồn của một gói | `txapm which <tên-gói>` (thêm `--json` cho ứng dụng đọc, xem [docs/app-integration.md](docs/app-integration.md)) |
+
+### Sao lưu và chuyển máy
+
+| Muốn làm gì | Lệnh |
+|---|---|
+| Sao lưu danh sách gói | `txapm export pkgs.json` |
+| Cài lại cả bộ trên máy mới | `txapm import pkgs.json` (thêm `--exact-versions` để cài đúng phiên bản đã xuất) |
+
+### Kho nguồn và WinGet
+
+| Muốn làm gì | Lệnh |
+|---|---|
+| Xem / thêm các kho nguồn | `txapm source` · xem [docs/custom-source.md](docs/custom-source.md) |
+| Tìm / cài trực tiếp gói từ WinGet qua `txapm` | `txapm wg search <từ-khóa>` · `txapm wg install <id>` |
+
+### Chẩn đoán và dọn dẹp
+
+| Muốn làm gì | Lệnh |
+|---|---|
+| Kiểm tra sức khỏe hệ thống, kho nguồn, WinGet và cache | `txapm doctor` |
+| Dọn bộ cài tải tạm và file log cài đặt | `txapm clean` · `txapm clean --all` |
 | Xem danh sách hoặc đọc nội dung log cài đặt | `txapm log` · `txapm log <tên-gói>` |
-| Xem chi tiết vị trí cài đặt, PATH và nguồn của một gói | `txapm which <tên-gói>` |
 | Thông tin cài đặt, đường dẫn, tài khoản | `txapm --info` |
 
-Gói nào có tên ngắn (alias) thì gõ tên ngắn cũng được, ví dụ `txapm install hellotool`.
-Một số lệnh có tên viết tắt: `add` = install, `rm` = uninstall, `ls` = list, `find` = search.
+---
 
-### Phần mềm có sẵn trong kho
+## Phần mềm có sẵn trong kho
 
-| Gói (`txapm install …`) | Tên ngắn | Phần mềm | Phiên bản |
-|---|---|---|---|
-| `TXAVL.NotepadPlusPlus` | `notepadpp` | Notepad++ — trình soạn thảo mã nguồn | 8.9.8 |
-| `TXAVL.SevenZip` | `7zip` | 7-Zip — nén và giải nén | 26.5.0 |
-| `TXAVL.VLC` | `vlc` | VLC media player | 3.0.24 |
-| `TXAVL.Firefox` | `firefox` | Mozilla Firefox | 158.0.1 |
-| `TXAVL.Git` | `git` | Git cho Windows | 2.56.0 |
-| `TXAVL.Python` | `python` | Python | 3.14.10 |
-| `TXAVL.NodeJS` | `nodejs`, `node`, `npm`, `npx` | Node.js (đã kèm npm) | 24.22.1 |
-| `TXAVL.NVM` | `nvm` | NVM for Windows — quản lý nhiều bản Node.js | 2.0.1 |
-| `TXAVL.FFmpeg` | `ffmpeg`, `ffprobe`, `ffplay` | FFmpeg — xử lý video và âm thanh (gói portable) | 9.0.2 |
-| `TXAVL.OBSStudio` | `obs` | OBS Studio — quay và phát trực tiếp | 33.0.0 |
-| `TXAVL.ShareX` | `sharex` | ShareX — chụp và quay màn hình | 21.0.0 |
-| `TXAVL.Audacity` | `audacity` | Audacity — chỉnh sửa âm thanh | 4.0.1 |
-| `TXAVL.Obsidian` | `obsidian` | Obsidian — ghi chú Markdown | 1.14.5 |
-| `TXAVL.Chrome` | `chrome` | Google Chrome — trình duyệt web | 156.0.8078 |
-| `TXAVL.VisualStudioCode` | `vscode` | Visual Studio Code — trình soạn thảo mã nguồn | 1.142.0 |
-| `TXAVL.Brave` | `brave` | Brave Browser — trình duyệt web bảo mật | 155.1.97 |
-| `TXAVL.Spotify` | `spotify` | Spotify — nghe nhạc trực tuyến | 1.3.6 |
-| `TXAVL.Discord` | `discord` | Discord — trò chuyện và giao tiếp | 1.0.9266 |
-| `TXAVL.TelegramDesktop` | `telegram` | Telegram — nhắn tin bảo mật | 7.3.3 |
-| `TXAVL.PuTTY` | `putty` | PuTTY — SSH và telnet client | 0.85.0 |
-| `TXAVL.Rustup` | `rustup` | Rustup — bộ cài đặt và quản lý Rust | 1.29.1 |
-| `TXAVL.GIMP` | `gimp` | GIMP — phần mềm chỉnh sửa ảnh mã nguồn mở | 3.2.6 |
-| `TXAVL.OhMyPosh` | `ohmyposh` | Oh My Posh — tùy biến giao diện terminal | 31.9.1 |
-| `TXAVL.WinSCP` | `winscp` | WinSCP — SFTP, FTP, WebDAV client | 6.7.0 |
-| `TXAVL.PowerToys` | `powertoys` | Microsoft PowerToys — bộ công cụ tiện ích nâng cao cho Windows | 0.101.2362 |
-| `TXAVL.Postman` | `postman` | Postman — nền tảng phát triển và kiểm thử API | 12.34.2 |
-| `TXAVL.GitHubCLI` | `gh` | GitHub CLI — làm việc với GitHub từ dòng lệnh | 2.101.0 |
-| `TXAVL.GitHubDesktop` | `githubdesktop` | GitHub Desktop — quản lý Git trực quan | 3.6.7 |
-| `TXAVL.DockerDesktop` | `docker` | Docker Desktop — quản lý container trên Windows | 4.80.0 |
-| `TXAVL.CMake` | `cmake` | CMake — hệ thống quản lý build đa nền tảng | 4.4.2 |
-| `TXAVL.Blender` | `blender` | Blender — dựng hình và hoạt hình 3D mã nguồn mở | 5.2.0 |
-| `TXAVL.Steam` | `steam` | Steam — nền tảng quản lý và chơi game | 2.10.91 |
-| `TXAVL.UnityHub` | `unityhub` | Unity Hub — quản lý các phiên bản Unity Editor và dự án | 3.22.2 |
-| `TXAVL.Cloudflared` | `cloudflared` | Cloudflare Tunnel client | 2026.10.1 |
-| `TXAVL.VietTelex` | `viettelex` | VietTelex — bộ gõ tiếng Việt gọn nhẹ | 1.3.2 |
+Bảng dưới là các gói đang có trong kho, chia theo nhóm; bấm vào từng nhóm để mở. **Không ghi số phiên bản** vì
+kho tự cập nhật nhiều lần mỗi ngày: xem bản mới nhất bằng `txapm show <gói>` hoặc trên
+[trang chỉ mục](https://txavl.github.io/txa-repo/), cũng là nơi tìm kiếm toàn bộ kho.
 
-Ví dụ: `txapm install vlc` hoặc `txapm install TXAVL.VLC`. Danh sách đầy đủ và mới nhất: `txapm search "" `
-hoặc xem [trang chỉ mục](https://txavl.github.io/txa-repo/). Mỗi gói chỉ trỏ tới link tải **chính thức** của nhà
+<details>
+<summary><b>Dev & CLI</b> (46 gói)</summary>
+
+| Phần mềm | Cài bằng |
+|---|---|
+| Git | `txapm install git` |
+| GitHub CLI | `txapm install gh` |
+| GitHub Desktop | `txapm install github-desktop` |
+| Python | `txapm install python` |
+| Node.js | `txapm install nodejs` (cũng gõ được: `node`, `npm`, `npx`) |
+| NVM for Windows | `txapm install nvm` (cũng gõ được: `nvm-windows`) |
+| Go | `txapm install go` |
+| Rustup: the Rust toolchain installer | `txapm install rustup` |
+| CMake | `txapm install cmake` |
+| MSYS2 | `txapm install msys2` |
+| Oh My Posh | `txapm install ohmyposh` |
+| Neovim | `txapm install nvim` |
+| Notepad++ | `txapm install notepadpp` |
+| Sublime Text 4 | `txapm install sublimetext4` |
+| Microsoft Visual Studio Code | `txapm install vscode` |
+| Visual Studio Community 2026 | `txapm install vs18-community` (cũng gõ được: `vs`, `visualstudio`, `vs2026`) |
+| Visual Studio Community 2022 | `txapm install vs17-community` (cũng gõ được: `vs2022`, `vs2022-community`) |
+| Visual Studio Community 2019 | `txapm install vs16-community` (cũng gõ được: `vs2019`, `vs2019-community`) |
+| Microsoft .NET SDK 11.0 | `txapm install dotnet-sdk-11` (cũng gõ được: `dotnet`, `dotnet-sdk`) |
+| Microsoft .NET SDK | `txapm install dotnet-sdk-10` |
+| Microsoft .NET SDK 9.0 | `txapm install dotnet-sdk-9` |
+| Microsoft .NET SDK 8.0 | `txapm install dotnet-sdk-8` |
+| Microsoft .NET SDK 7.0 | `txapm install dotnet-sdk-7` |
+| Microsoft .NET SDK 6.0 | `txapm install dotnet-sdk-6` |
+| Microsoft .NET Windows Desktop Runtime | `txapm install dotnet-desktop-8` |
+| Microsoft Build of OpenJDK 17 | `txapm install openjdk` |
+| Update Watcher for AdoptOpenJDK | `txapm install ajupdatewatcher` |
+| NSIS | `txapm install nsis` |
+| Postman | `txapm install postman` |
+| DBeaver | `txapm install dbeaver` |
+| Docker Desktop | `txapm install docker` |
+| QEMU | `txapm install qemu` |
+| QEMU Guest Agent | `txapm install qemuguestagent` |
+| cloudflared | `txapm install cloudflared` |
+| JetBrains Toolbox | `txapm install jetbrains-toolbox` |
+| PuTTY | `txapm install putty` |
+| WinSCP | `txapm install winscp` |
+| Wireshark | `txapm install wireshark` |
+| Antigravity 2.0 | `txapm install antigravity` (cũng gõ được: `agy`, `agy2`) |
+| Antigravity IDE | `txapm install antigravityide` |
+| OpenAI Codex | `txapm install codex` |
+| Claude | `txapm install claude` |
+| AutoHotkey | `txapm install ahk` |
+| Unity Hub | `txapm install unity` |
+| Unity Hub | `txapm install unityhub` |
+| T-Drop | `txapm install tdrop` |
+
+</details>
+
+<details>
+<summary><b>Trình duyệt, mạng & liên lạc</b> (21 gói)</summary>
+
+| Phần mềm | Cài bằng |
+|---|---|
+| Google Chrome | `txapm install chrome` |
+| Cốc Cốc | `txapm install coccoc` |
+| Cốc Cốc Beta | `txapm install coccoc-beta` (cũng gõ được: `coccocbeta`) |
+| Mozilla Firefox | `txapm install firefox` |
+| Microsoft Edge | `txapm install edge` |
+| Brave | `txapm install brave` |
+| Mozilla Thunderbird | `txapm install thunderbird` |
+| qBittorrent | `txapm install qbittorrent` |
+| AnyDesk | `txapm install anydesk` |
+| TeamViewer | `txapm install teamviewer` |
+| LocalSend | `txapm install localsend` |
+| Discord | `txapm install discord` |
+| Slack | `txapm install slack` |
+| Zoom Workplace | `txapm install zoom` |
+| Telegram Desktop | `txapm install telegram` |
+| Signal | `txapm install signal` |
+| Zalo | `txapm install zalo` |
+| Google Drive | `txapm install google-drive` |
+| Microsoft OneDrive | `txapm install onedrive` |
+| Bitwarden | `txapm install bitwarden` |
+| KeePassXC | `txapm install keepassxc` |
+
+</details>
+
+<details>
+<summary><b>Đa phương tiện & đồ họa</b> (14 gói)</summary>
+
+| Phần mềm | Cài bằng |
+|---|---|
+| VLC media player | `txapm install vlc` |
+| FFmpeg | `txapm install ffmpeg` (cũng gõ được: `ffprobe`, `ffplay`) |
+| OBS Studio | `txapm install obs` |
+| ShareX | `txapm install sharex` |
+| Audacity | `txapm install audacity` |
+| HandBrake | `txapm install handbrake` |
+| CapCut | `txapm install capcut` |
+| Spotify | `txapm install spotify` |
+| GIMP | `txapm install gimp` |
+| Inkscape | `txapm install inkscape` |
+| Krita | `txapm install krita` |
+| Blender | `txapm install blender` |
+| FastStone Image Viewer | `txapm install fsviewer` |
+| SumatraPDF | `txapm install sumatrapdf` |
+
+</details>
+
+<details>
+<summary><b>Tiện ích hệ thống & tiếng Việt</b> (19 gói)</summary>
+
+| Phần mềm | Cài bằng |
+|---|---|
+| 7-Zip | `txapm install 7zip` |
+| WinRAR | `txapm install winrar` |
+| PeaZip | `txapm install peazip` |
+| PowerToys | `txapm install powertoys` |
+| Everything | `txapm install everything` |
+| WinDirStat | `txapm install windirstat` |
+| TreeSize Free | `txapm install treesizefree` |
+| CPU-Z | `txapm install cpu-z` |
+| HWiNFO | `txapm install hwinfo` |
+| CrystalDiskInfo | `txapm install crystaldiskinfo` |
+| CrystalDiskMark | `txapm install crystaldiskmark` |
+| Rufus | `txapm install rufus` |
+| balenaEtcher | `txapm install etcher` |
+| Revo Uninstaller | `txapm install revo` |
+| NTLite | `txapm install ntlite` |
+| TXA WinSetup | `txapm install txawinsetup` |
+| UniKey | `txapm install unikey` |
+| Obsidian | `txapm install obsidian` |
+| Notion | `txapm install notion` |
+
+</details>
+
+<details>
+<summary><b>Game & nền tảng game</b> (9 gói)</summary>
+
+| Phần mềm | Cài bằng |
+|---|---|
+| Steam | `txapm install steam` |
+| Garena | `txapm install garena` |
+| Rockstar Games Launcher | `txapm install rockstargameslauncher` |
+| Ubisoft Connect | `txapm install ubisoft-connect` |
+| Warframe | `txapm install warframe` |
+| CanhCutTeam Launcher | `txapm install canhcutteam-launcher` |
+| Sunshine | `txapm install sunshine` |
+| ViGEm Bus Driver | `txapm install vigembus` |
+| NVIDIA PhysX System Software | `txapm install physx` |
+
+</details>
+
+
+Ví dụ: `txapm install vlc` hoặc `txapm install TXAVL.VLC`. Mỗi gói chỉ trỏ tới link tải **chính thức** của nhà
 phát hành; TXA không lưu lại bộ cài, và luôn đối chiếu SHA-256 trước khi chạy.
 
-`npm` không có bộ cài riêng, nó đi kèm Node.js: `txapm install npm` sẽ cài Node.js (có sẵn `node`, `npm`, `npx`).
-Cần đổi giữa nhiều bản Node.js thì dùng thêm `txapm install nvm`.
+- `npm` không có bộ cài riêng, nó đi kèm Node.js: `txapm install npm` sẽ cài Node.js (có sẵn `node`, `npm`, `npx`).
+  Cần đổi giữa nhiều bản Node.js thì dùng thêm `txapm install nvm`.
+- Nhiều bản .NET SDK và Visual Studio cùng có trong kho: `txapm install dotnet` luôn là .NET mới nhất, còn
+  `dotnet-sdk-6` … `dotnet-sdk-11` chọn từng bản; `txapm install vs` là Visual Studio mới nhất, còn `vs2019`, `vs2022` chọn đời cũ hơn.
 
 ### Kho giữ bao nhiêu phiên bản?
 
 Mỗi gói giữ **10 phiên bản mới nhất** (bản mới nhất trừ đi 9 bản). Thêm một bản mới thì bản cũ nhất bị xoá
 trong cùng Pull Request (hoặc lần tự cập nhật). Cài bản cũ hơn bất kỳ lúc nào miễn bản đó còn trong kho:
-`txapm install <gói> --version <bản>`.
+`txapm install <gói> --version <bản>`. `--version` nhận cả đầu số: `--version 8` lấy bản 8.x.y mới nhất trong kho.
 
 Một số gói (ví dụ Cốc Cốc) có bộ cài riêng cho từng **ngôn ngữ**: `txapm` tự chọn bản đúng với ngôn ngữ hiển thị
 của Windows (trong manifest: `locale: vi-VN` / `en-US` trên từng target; ngôn ngữ khác dùng bản tiếng Anh).
@@ -158,50 +332,31 @@ thêm thư mục chương trình vào PATH của **riêng bạn** (không cần 
 
 ---
 
+## Cho nhà phát triển: để ứng dụng của bạn cập nhật qua TXA
+
+Ứng dụng có thể hỏi `txapm which <Id> --json` để biết mình có được cài bằng TXA không và có bản mới không, rồi gọi
+`txapm upgrade <Id>` thay vì dùng bộ cập nhật riêng. Chi tiết: [docs/app-integration.md](docs/app-integration.md).
+
 ## Kho nguồn riêng
 
-Ngoài kho chính `txa`, bạn có thể thêm kho riêng: phần mềm nội bộ công ty, bản build riêng của nhóm…
-Kho riêng chỉ cần phục vụ cùng REST API `txa.v1` (hai file JSON tĩnh), hoặc đơn giản là một thư mục chứa `manifests/`.
-
-| Muốn làm gì | Lệnh |
-|---|---|
-| Xem các kho | `txapm source` |
-| Thêm kho HTTPS | `txapm source add congty https://pkgs.congty.vn/api/txa/v1` |
-| Thêm kho là thư mục (ổ mạng, máy cá nhân) | `txapm source add noibo \\server\share\txa` |
-| Kho riêng tư cần token | `txapm source add congty <url> --token-env CONGTY_TOKEN` |
-| Cho phép tải bộ cài từ máy chủ LAN | `txapm source add congty <url> --allow-lan` |
-| Tắt / bật một kho | `txapm source disable txa` · `txapm source enable txa` |
-| Xoá kho | `txapm source remove congty` |
-| Làm mới / sao lưu cấu hình | `txapm source update` · `txapm source export` |
-| Về mặc định (chỉ kho `txa`) | `txapm source reset` |
-| Chỉ tìm / cài từ một kho | `txapm search app -s congty` · `txapm install App -s congty` |
-
-- Kho được hỏi theo thứ tự: `txa` trước, rồi các kho thêm sau. Nếu cùng một Id có ở nhiều kho,
-  TXA dừng và yêu cầu chọn bằng `-s <kho>` để tránh cài nhầm.
-- Gói nhớ nó được cài từ kho nào, nên `txapm upgrade` luôn lấy bản mới từ đúng kho đó.
-- Token không bao giờ được ghi vào file cấu hình: TXA chỉ lưu **tên biến môi trường**, và chỉ gửi
-  token tới đúng máy chủ của kho đó.
-- Kho phải dùng HTTPS (ngoại trừ `http://localhost` để thử nghiệm).
-
-### Tự dựng một kho
-
-1. Tạo thư mục có `manifests/<chữ-cái>/<Namespace>/<AppName>/<X.Y.Z>/` (soạn card bằng
-   `txacreate new <url> --dry-run --out <thư-mục>` cho nhanh).
-2. Dùng ngay dạng thư mục: `txapm source add noibo D:\kho-txa`. Hoặc sinh REST API tĩnh:
-   ```powershell
-   txaci build-api --root D:\kho-txa --out D:\kho-txa-site
-   ```
-3. Đưa thư mục `D:\kho-txa-site` lên bất kỳ máy chủ HTTPS nào (IIS, nginx, GitHub Pages, S3…), rồi
-   `txapm source add congty https://<máy-chủ>/api/txa/v1`.
-
-Muốn có cả bot kiểm định 16 bước như kho chính: fork repo này, thay namespace trong `policy.txa.yaml`,
-chạy `scripts/setup-github.ps1 -Owner <tổ-chức>`.
+Muốn phân phối phần mềm nội bộ hoặc bản build riêng của nhóm? Thêm kho bằng `txapm source add <tên> <url-hoặc-thư-mục>`,
+hoặc tự dựng kho bằng `txaci build-api`. Hướng dẫn đầy đủ (token, `--allow-lan`, dựng bot kiểm định riêng):
+[docs/custom-source.md](docs/custom-source.md).
 
 ---
 
 ## Đóng góp một phần mềm vào kho — `txacreate`
 
-Ai có tài khoản GitHub cũng gửi được, không cần biết viết YAML.
+Ai có tài khoản GitHub cũng gửi được, không cần biết viết YAML. **Mới bắt đầu thì chạy thử với `--dry-run` trước:**
+TXA chỉ tạo file để bạn xem, chưa gửi gì lên GitHub, nên làm sai cũng không sao.
+
+```powershell
+txacreate new https://vendor.example/app-2.1.0-x64.exe --dry-run
+```
+
+<p align="center">
+  <img src=".github/readme/txacreate-contribute.gif" alt="txacreate new --dry-run, cấp quyền GitHub, bot kiểm tra và xuất bản" width="88%" />
+</p>
 
 **1. Gửi bộ cài** (link tải `.exe`/`.msi` chính thức, phải là HTTPS) — không cần đăng nhập trước:
 
@@ -294,7 +449,7 @@ Khi bạn đã đồng ý và tick hết các ô, bot đăng một **bảng ti�
 🔄 Running step 09 · Binary Stream Integrity & Download Verification
 ```
 
-Bot kiểm tra tự động **16 bước**: mã hoá file, cú pháp, tên gói, phiên bản, giấy phép, HTTPS,
+Bot kiểm tra tự động **16 bước** (14 bước kiểm tra, rồi phân loại và gộp): mã hoá file, cú pháp, tên gói, phiên bản, giấy phép, HTTPS,
 dung lượng, CDN ở 6 khu vực, tải về, chữ ký số, SHA-256, kiến trúc, phiên bản Windows, tham số cài im lặng,
 rồi gắn nhãn và bật tự gộp. Xong, bình luận được thay bằng **báo cáo đầy đủ**: bảng thông tin bộ cài
 (loại, CPU, dung lượng, chữ ký, SHA-256), kết quả và thời gian từng bước, và mục "Full output of every check"
@@ -350,17 +505,16 @@ Cài bằng pipx thì gỡ bằng `pipx uninstall txa`.
 
 ---
 
-<details>
-<summary>Dành cho người phát triển / quản trị kho</summary>
+## Tài liệu thêm
 
-- `manifests/t/TXAVL/<AppName>/<X.Y.Z>/` — mỗi phiên bản gồm `core.txa.yaml`, `build.txa.yaml`,
-  `about.<lang>.txa.yaml` (mẫu có chú thích: [examples](examples/manifests/t/TXAVL/HelloTool/1.4.2/build.txa.yaml)).
-- `tools/` — mã nguồn Python của `txapm`, `txacreate`, `txaci`
-  (`cd tools && python -m pip install -e .`).
-- `.github/workflows/` — bot kiểm định (`txa-validate`, `txa-gate`), API (`txa-publish-api`),
-  phát hành (`txa-release`, `txa-pypi` — chạy khi push tag `vX.Y.Z`).
-- `policy.txa.yaml` — giới hạn dung lượng, namespace, vùng kiểm tra CDN.
-- `scripts/setup-github.ps1` — cấu hình nhãn, CODEOWNERS, branch protection.
-- API công khai: `https://txavl.github.io/txa-repo/api/txa/v1/index.json`.
+| Chủ đề | Tài liệu |
+|---|---|
+| Cấu trúc manifest và từng trường | [docs/manifest-schema.md](docs/manifest-schema.md) |
+| Nhập gói từ WinGet, quét máy bằng `txacli` | [docs/winget-import.md](docs/winget-import.md) |
+| Kho nguồn riêng, tự dựng kho | [docs/custom-source.md](docs/custom-source.md) |
+| Tích hợp cập nhật qua TXA vào ứng dụng | [docs/app-integration.md](docs/app-integration.md) |
+| Thỏa thuận Người đóng góp | [docs/contributor-agreement.md](docs/contributor-agreement.md) |
+| Bot hiện tên riêng (GitHub App) | [docs/github-app.md](docs/github-app.md) |
+| Cấu trúc repo, workflow, phát hành (dành cho quản trị) | [docs/maintainers.md](docs/maintainers.md) |
 
-</details>
+Mỗi tài liệu có bản tiếng Anh (đuôi `.en.md`). API công khai: `https://txavl.github.io/txa-repo/api/txa/v1/index.json`.
