@@ -123,7 +123,15 @@ def install_portable(package_id: str, version: str, target: dict, archive: Path,
     dest = apps_root() / package_id / version
     previous = installed().get(package_id) or {}
     try:
-        files = portable.extract(archive, dest, int(spec.get("strip", 0)), on_progress)
+        if spec.get("name") and not zipfile.is_zipfile(archive):
+            # a single program, not an archive: copy it in under the declared name
+            if dest.exists():
+                shutil.rmtree(dest)
+            dest.mkdir(parents=True)
+            shutil.copy2(archive, dest / spec["name"])
+            files = 1
+        else:
+            files = portable.extract(archive, dest, int(spec.get("strip", 0)), on_progress)
     except (portable.ZipProblem, OSError, zipfile.BadZipFile) as exc:
         shutil.rmtree(dest, ignore_errors=True)
         raise InstallError(f"could not unpack the archive: {exc}") from None

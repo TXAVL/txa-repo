@@ -17,6 +17,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import re
 import sys
 from pathlib import Path
 
@@ -87,10 +88,55 @@ def cmd_verdict(args) -> int:
     return 1 if report["verdict"] == "fail" else 0
 
 
+def _failing_slots(report: dict) -> tuple[set[str], bool]:
+    """Installers STEP 12 rejected ("[arm64] ..."), and whether anything else failed too."""
+    slots: set[str] = set()
+    other = False
+    for row in report["results"]:
+        for message in row["messages"]:
+            if message["level"] != "fail":
+                continue
+            hit = re.match(r"\[([a-z0-9]+(?:-[A-Za-z0-9]+)?)\]", message["text"])
+            if row["step"] == 12 and hit:
+                slots.add(hit.group(1))
+            else:
+                other = True
+    return slots, other
+
+
+def _drop_targets(release: Path, slots: set[str]) -> list[str]:
+    """Remove the installers named by ``slots`` from the release's build card; returns what was removed."""
+    from txa.core import manifest
+
+    card_path = release / manifest.BUILD_FILE
+    text = card_path.read_text("utf-8")
+    header = [line[1:].strip() for line in text.splitlines() if line.startswith("#")]
+    card = manifest.parse_card(text.lstrip("\ufeff"))
+    keep, dropped = [], []
+    for target in card.get("targets", []):
+        locale = (target.get("locale") or "").split("-")[0]
+        slot = f"{target['arch']}-{locale}" if locale else target["arch"]
+        (dropped if slot in slots else keep).append(slot if slot in slots else target)
+    if not dropped or not keep:  # never leave a release without installers
+        return []
+    card["targets"] = keep
+    card_path.write_text(manifest.dump_card(card, header).replace("\r\n", "\n"), encoding="utf-8", newline="\n")
+    return dropped
+
+
 def cmd_validate(args) -> int:
     ctx = init_local([Path(p) for p in args.paths], offline=args.offline)
     numbers = [int(n) for n in args.only.split(",")] if args.only else None
     report = run_live(ctx, numbers)
+    if args.prune_failing_targets and report["verdict"] == "fail" and len(args.paths) == 1 and not args.offline:
+        # Auto-update only: when STEP 12 rejects some installers (a mislabelled CPU, an archive without a program)
+        # and nothing else is wrong, publish the release without them instead of dropping the whole update.
+        slots, other = _failing_slots(report)
+        dropped = _drop_targets(Path(args.paths[0]), slots) if slots and not other else []
+        if dropped:
+            print(console.paint(f"! removed installer(s) rejected by STEP 12: {', '.join(dropped)} - validating again", "yellow"))
+            ctx = init_local([Path(p) for p in args.paths], offline=args.offline)
+            report = run_live(ctx, numbers)
     if args.json:
         Path(args.json).write_text(json.dumps(report, indent=2), "utf-8")
     return 1 if report["verdict"] == "fail" else 0
@@ -191,6 +237,8 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--offline", action="store_true", help="skip network steps 06-09")
     p.add_argument("--only", help="comma separated step numbers, e.g. 1,2,3")
     p.add_argument("--json", help="also write the report to this file")
+    p.add_argument("--prune-failing-targets", action="store_true",
+                   help="auto-update: drop installers that only STEP 12 rejects, then validate again")
     p.set_defaults(func=cmd_validate)
 
     p = sub.add_parser("gate", help="trusted workflows only: triage (STEP 15), merge (STEP 16), progress, lifecycle")

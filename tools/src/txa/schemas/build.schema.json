@@ -93,6 +93,12 @@
           "additionalProperties": false,
           "required": ["path"],
           "properties": {
+            "name": {
+              "type": "string",
+              "maxLength": 64,
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]*\\.exe$",
+              "description": "Only for a payload that is a single .exe (no ZIP): the file name it is installed as, e.g. rufus.exe. Use together with path: [\".\"]."
+            },
             "strip": {
               "type": "integer",
               "minimum": 0,

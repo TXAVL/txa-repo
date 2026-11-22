@@ -58,6 +58,8 @@ class TargetDraft:
     switches: dict[str, str] = field(default_factory=dict)
     mirrors: list[str] = field(default_factory=list)
     portable: dict = field(default_factory=dict)  # {"strip": n, "path": [...]} - engine "portable" only
+    shortcut: dict = field(default_factory=dict)  # {"name": ..., "exe": ...} desktop shortcut txapm creates
+    success_codes: list = field(default_factory=list)  # extra installer exit codes that count as success
 
     def card(self) -> dict:
         source = {"url": self.url, "sha256": self.sha256, "size": self.size}
@@ -66,10 +68,16 @@ class TargetDraft:
         entry = {"arch": self.arch, "engine": self.engine, "source": source}
         if self.engine == "portable":
             entry["portable"] = {k: v for k, v in self.portable.items() if k != "strip" or v}
+            if self.shortcut:
+                entry["shortcut"] = dict(self.shortcut)
             return entry
         switches = {k: v for k, v in self.switches.items() if v}
         if switches:
             entry["switches"] = switches
+        if self.success_codes:
+            entry["success_codes"] = list(self.success_codes)
+        if self.shortcut:
+            entry["shortcut"] = dict(self.shortcut)
         return entry
 
 

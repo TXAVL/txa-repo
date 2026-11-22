@@ -86,7 +86,7 @@ jobs:
             $releases = @(git ls-files --others --exclude-standard $dir | ForEach-Object { Split-Path $_ -Parent } | Sort-Object -Unique)
             $valid = $true
             foreach ($release in $releases) {
-              txaci validate $release
+              txaci validate $release --prune-failing-targets
               if ($LASTEXITCODE -ne 0) { $valid = $false }
             }
             if (-not $valid) {

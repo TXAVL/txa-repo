@@ -181,6 +181,16 @@ def parse_winget_show(text: str) -> dict[str, Any] | None:
     return data
 
 
+def derive_portable_name(url: str) -> str:
+    """File name a single-.exe portable program is installed as: rufus-4.16_arm64.exe -> rufus.exe."""
+    stem = url.split("?", 1)[0].rsplit("/", 1)[-1]
+    stem = re.sub(r"(?i)\.exe$", "", stem)
+    stem = re.sub(r"(?i)[-_. ](x86|x64|arm64|arm|win64|win32|amd64|32bit|64bit|portable)(?=$|[-_. ])", "", stem)
+    stem = re.sub(r"[-_. ]?v?\d+(\.\d+)*", "", stem)
+    stem = re.sub(r"[^A-Za-z0-9._-]+", "", stem).strip("-_.") or "app"
+    return f"{stem.lower()}.exe"
+
+
 def query_winget_package(package_id: str, arches: tuple[str, ...] = ("x64", "arm64", "x86")) -> dict[str, Any] | None:
     """Query WinGet CLI across CPU architectures and combine installer targets."""
     combined: dict[str, Any] = {}
@@ -208,8 +218,9 @@ def query_winget_package(package_id: str, arches: tuple[str, ...] = ("x64", "arm
         inst = parsed.get("Installer")
         if isinstance(inst, dict):
             inst_type = str(inst.get("Installer Type", "exe")).lower()
-            # If default installer is msix/appx, try traditional Win32 installer types
-            if inst_type in ("msix", "appx", "msstore"):
+            # If the default installer is msix/appx, or a ZIP that only wraps an installer (TeamViewer's
+            # Update_msi_*.zip), try the traditional Win32 installer types first
+            if inst_type in ("msix", "appx", "msstore", "zip"):
                 for alt_type in ("nullsoft", "inno", "wix", "msi", "exe", "burn", "zip", "portable"):
                     alt_parsed = _fetch_one(arch, alt_type)
                     if alt_parsed and isinstance(alt_parsed.get("Installer"), dict):
@@ -233,6 +244,8 @@ def query_winget_package(package_id: str, arches: tuple[str, ...] = ("x64", "arm
                     "engine": engine,
                     "switches": inst.get("Installer Switches") or {},
                 }
+                if engine == "portable" and clean_url.endswith(".exe"):
+                    targets_by_arch[arch]["portable_name"] = derive_portable_name(url)
 
     if not combined or not targets_by_arch:
         return None
@@ -636,11 +649,17 @@ def convert_winget_to_draft(data: dict[str, Any], namespace: str = "TXAVL", over
 
     targets_data = data.get("_targets") or {}
     target_drafts = []
+    seen_urls: set[str] = set()
 
     for arch, tinfo in targets_data.items():
         url = tinfo["url"]
         if not url.startswith("https://"):
             continue
+        if url in seen_urls:
+            # WinGet lists a universal installer once per CPU (Google Drive's setup.exe for x64 and arm64);
+            # the first CPU wins and Windows on the others falls back to it (arm64 -> x64 -> x86).
+            continue
+        seen_urls.add(url)
         sha = tinfo["sha256"]
         engine = tinfo.get("engine") or ENGINE_MAP.get(tinfo.get("type", "exe").lower(), "exe")
 
@@ -657,6 +676,8 @@ def convert_winget_to_draft(data: dict[str, Any], namespace: str = "TXAVL", over
         portable_dict = {}
         if engine == "portable":
             portable_dict = {"path": ["."]}
+            if tinfo.get("portable_name"):
+                portable_dict["name"] = tinfo["portable_name"]
 
         target_drafts.append(TargetDraft(
             url=url,
@@ -881,6 +902,48 @@ def _check_antigravity_ide_upstream() -> tuple[str, dict[str, str]] | None:
         return None
 
 
+def carry_over_curated(draft, bundle) -> None:
+    """Keep what people wrote by hand in the previous release: names, aliases, tags, texts, licence, localized
+    cards, and per-CPU extras of the build card (desktop shortcut, extra success exit codes)."""
+    prev_core = bundle.core or {}
+    prev_about = bundle.default_about() or {}
+    prev_pkg = prev_core.get("package") or {}
+    if prev_pkg.get("alias"):
+        draft.alias = prev_pkg["alias"]
+    if prev_pkg.get("aliases"):
+        draft.aliases = list(prev_pkg["aliases"])
+    if prev_core.get("tags"):
+        draft.tags = list(prev_core["tags"])
+    if prev_about.get("name"):
+        draft.name = prev_about["name"]
+    if prev_about.get("publisher"):
+        draft.publisher = prev_about["publisher"]
+    if prev_about.get("author"):
+        draft.author = prev_about["author"]
+    if prev_about.get("summary"):
+        draft.summary = prev_about["summary"]
+    if prev_about.get("description"):
+        draft.description = prev_about["description"]
+    if prev_about.get("homepage"):
+        draft.homepage = prev_about["homepage"]
+    prev_lic = prev_about.get("license") or {}
+    if prev_lic.get("name"):
+        draft.license_name = prev_lic["name"]
+        draft.license_url = prev_lic.get("url")
+    for lang, card in bundle.abouts.items():  # localized about cards (e.g. vi-VN)
+        if lang != bundle.default_lang:
+            draft.extra_abouts[lang] = dict(card)
+    prev_targets = bundle.targets()
+    for target in draft.targets:
+        old = next((t for t in prev_targets if t.get("arch") == target.arch), None) or (prev_targets[0] if prev_targets else None)
+        if not old:
+            continue
+        if old.get("shortcut") and not target.shortcut:
+            target.shortcut = dict(old["shortcut"])
+        if old.get("success_codes") and not target.success_codes and target.engine != "portable":
+            target.success_codes = list(old["success_codes"])
+
+
 def sync_txavl_packages(
     repo_root,
     namespace: str = "TXAVL",
@@ -1033,29 +1096,7 @@ def sync_txavl_packages(
             console.say(f"  {console.paint('[FAIL]', 'red')} {pkg_id}@{new_ver}: {exc}")
             failed.append(pkg_id)
             continue
-        # Preserve curated metadata from the existing TXAVL manifest
-        if prev_pkg.get("alias"):
-            draft.alias = prev_pkg["alias"]
-        if prev_pkg.get("aliases"):
-            draft.aliases = list(prev_pkg["aliases"])
-        if prev_core.get("tags"):
-            draft.tags = list(prev_core["tags"])
-        if prev_about.get("name"):
-            draft.name = prev_about["name"]
-        if prev_about.get("summary"):
-            draft.summary = prev_about["summary"]
-        if prev_about.get("description"):
-            draft.description = prev_about["description"]
-        if prev_about.get("homepage"):
-            draft.homepage = prev_about["homepage"]
-        prev_lic = prev_about.get("license") or {}
-        if prev_lic.get("name"):
-            draft.license_name = prev_lic["name"]
-            draft.license_url = prev_lic.get("url")
-        # Carry over existing localized about cards (e.g. vi-VN)
-        for lang, card in bundle.abouts.items():
-            if lang != bundle.default_lang:
-                draft.extra_abouts[lang] = dict(card)
+        carry_over_curated(draft, bundle)
 
         errs = validate_draft(draft)
         if errs:

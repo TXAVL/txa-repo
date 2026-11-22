@@ -491,7 +491,8 @@ def payload_headers(ctx: Context, target: dict, out: Outcome) -> None:
             out.fail(f"[{slot}] Content-Type '{ctype}' - the URL serves a web page, not an installer")
         elif not ctype:
             out.warn(f"[{slot}] no Content-Type header")
-        wanted = {"msi": ".msi", "portable": ".zip"}.get(item["engine"], ".exe")
+        single_exe = item["engine"] == "portable" and (item.get("portable") or {}).get("name")  # a lone program, not a ZIP
+        wanted = {"msi": ".msi", "portable": ".exe" if single_exe else ".zip"}.get(item["engine"], ".exe")
         names = [probe["final_url"].split("?", 1)[0].rsplit("/", 1)[-1]]
         disposition = headers.get("content-disposition", "")
         if "filename=" in disposition:
@@ -709,6 +710,18 @@ def _check_portable(item: dict, file: Path, found: engines.Inspection, out: Outc
     """Portable ZIP: safe to unpack, declared strip/PATH folders hold programs, CPU matches."""
     arch = item["arch"]
     slot = _slot(item)
+    if found.format == "pe" and (item.get("portable") or {}).get("name"):
+        # A single program (Rufus...): installed as <portable.name> into its own folder that goes on PATH.
+        spec = item["portable"]
+        if spec.get("path") != ["."]:
+            out.fail(f"[{slot}] a single-.exe portable payload needs path: ['.']")
+        elif found.machine == arch:
+            out.ok(f"[{slot}] single portable program {spec['name']}, native {found.machine}")
+        elif found.machine == "x86" and arch in ("x64", "arm64"):
+            out.warn(f"[{slot}] single portable program {spec['name']} is 32-bit")
+        else:
+            out.fail(f"[{slot}] program is {found.machine}, which cannot be declared as {arch}")
+        return
     if found.format != "zip":
         out.fail(f"[{slot}] engine 'portable' declared but the payload is {found.label}")
         return
@@ -815,6 +828,9 @@ def binary(ctx: Context, target: dict, out: Outcome) -> None:
         elif machine == "x86" and arch in ("x64", "arm64"):
             note = f"[{slot}] 32-bit {found.label} bootstrapper installing {arch} payload"
             (out.warn if engine == "exe" else out.ok)(note + ("" if engine != "exe" else " - confirm manually"))
+        elif machine == "x64" and arch == "arm64" and engine in ("inno", "nsis", "exe"):
+            # Inno Setup / NSIS can only build x64 or x86 stubs; Git for Windows ships its ARM64 setup this way
+            out.warn(f"[{slot}] x64 {found.label} bootstrapper installing an arm64 payload (runs through emulation)")
         else:
             out.fail(f"[{slot}] PE machine is {machine}, which cannot be declared as {arch}")
 
