@@ -7,6 +7,10 @@ package:
   version: 18.12.1
   channel: stable
   alias: vs18-community
+  aliases:
+    - vs
+    - visualstudio
+    - vs2026
 locale:
   default: en-US
 tags:

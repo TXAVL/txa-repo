@@ -70,6 +70,17 @@
             "custom": { "$ref": "#/$defs/switch" }
           }
         },
+        "shortcut": {
+          "type": "object",
+          "description": "Desktop shortcut txapm creates after a silent install, for installers that do not make one themselves.",
+          "additionalProperties": false,
+          "required": ["name", "exe"],
+          "properties": {
+            "name": { "type": "string", "minLength": 1, "maxLength": 64, "pattern": "^[^\\\\/:*?\"<>|]+$" },
+            "exe": { "type": "string", "maxLength": 260, "description": "Program path; %ENV% variables allowed (e.g. %LOCALAPPDATA%\\Programs\\App\\App.exe). For portable packages: path inside the unpacked folder." },
+            "args": { "type": "string", "maxLength": 256 }
+          }
+        },
         "success_codes": {
           "type": "array",
           "maxItems": 16,
