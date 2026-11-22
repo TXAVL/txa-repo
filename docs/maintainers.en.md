@@ -25,6 +25,11 @@ Tiếng Việt: [maintainers.md](maintainers.md)
 | `txa-pypi` | uploads the `txa` package to PyPI when a `vX.Y.Z` tag is pushed (the tag must equal `txa.__version__`; needs the `PYPI_API_TOKEN` secret) |
 | `txa-tools-ci` | smoke checks for `tools/`: the package installs, the commands start, every manifest in the repo still passes the offline checks |
 
+A package with no usable WinGet installer but with GitHub releases is followed by adding `owner/repo` to `GITHUB_REPOS` in
+`tools/src/txa/create/github_sync.py` (with the pattern a release tag must match); the bot reads that repository's newest release.
+Currently: Codex, FFmpeg, Oh My Posh, ViGEmBus, MSYS2. Repositories of `TXAVL` are followed by default. A third-party project
+**must be listed by hand**; the bot never trusts every GitHub link.
+
 Each package keeps its **10 newest versions**: adding a new one removes the oldest in the same PR (or auto-update run).
 
 ## Releasing a new `txa` version

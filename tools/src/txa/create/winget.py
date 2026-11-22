@@ -800,7 +800,6 @@ def _real_size(url: str) -> int:
 _HANDWRITTEN_APPS = {
     "CanhCutTeamLauncher",
     "Warframe",
-    "MSYS2",   # the only "MSYS2" id upstream belongs to an emulator build, not the MSYS2 project
     "UniKey",  # repackaged with install/uninstall scripts
 }
 
@@ -1051,10 +1050,10 @@ def sync_txavl_packages(
 
         # Own GitHub releases (T-Drop, TXAWinSetup...): the newest release links to an installer asset of a trusted
         # repository, so that repository's latest release is the upstream (see create/github_sync.py).
-        if app_name not in _TXAVL_WINGET_MAP:
-            from txa.create import github_sync
+        from txa.create import github_sync
 
-            gh_repo = github_sync.release_repo(latest_dir)
+        gh_repo = github_sync.release_repo(latest_dir)
+        if gh_repo and (app_name not in _TXAVL_WINGET_MAP or gh_repo in github_sync.GITHUB_REPOS):
             if gh_repo:
                 out = github_sync.sync_release(app_dir, latest_dir, gh_repo, dry_run=dry_run, keep_old=keep_old)
                 if out.status == "updated":

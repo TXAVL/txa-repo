@@ -25,6 +25,10 @@ English: [maintainers.en.md](maintainers.en.md)
 | `txa-pypi` | upload gói `txa` lên PyPI khi đẩy tag `vX.Y.Z` (tag phải khớp `txa.__version__`; cần secret `PYPI_API_TOKEN`) |
 | `txa-tools-ci` | kiểm tra nhanh `tools/`: gói cài được, các lệnh khởi động được, mọi manifest trong repo vẫn qua kiểm tra offline |
 
+Gói không có bộ cài dùng được trên WinGet nhưng có bản phát hành GitHub thì thêm `chủ/repo` vào `GITHUB_REPOS` trong
+`tools/src/txa/create/github_sync.py` (kèm mẫu thẻ tag hợp lệ); bot theo dõi bản phát hành mới nhất của repo đó. Hiện có: Codex, FFmpeg, Oh My Posh,
+ViGEmBus, MSYS2. Repo của `TXAVL` được theo dõi mặc định. Dự án bên thứ ba **phải được liệt kê tay**, không tự tin cậy mọi link GitHub.
+
 Mỗi gói giữ **10 phiên bản mới nhất**: thêm bản mới thì bản cũ nhất bị xoá trong cùng PR (hoặc lần tự cập nhật).
 
 ## Phát hành phiên bản `txa` mới

@@ -24,6 +24,17 @@ from typing import Callable
 # reviewed manifest vouches for them; an arbitrary GitHub project is never trusted just because it is linked.
 GITHUB_OWNERS = {"TXAVL"}
 
+# Third-party projects whose own GitHub Releases are followed, named one by one by a maintainer (never "every linked
+# repository"). They have no usable installer on WinGet. The value is the pattern a release tag must match, so a
+# tag for another component or an alpha is never taken for the next version.
+GITHUB_REPOS: dict[str, str] = {
+    "openai/codex": r"^rust-v\d+\.\d+\.\d+$",
+    "GyanD/codexffmpeg": r"^\d+\.\d+(\.\d+)?$",
+    "JanDeDobbeleer/oh-my-posh": r"^v\d+\.\d+\.\d+$",
+    "nefarius/ViGEmBus": r"^v\d+\.\d+\.\d+$",
+    "msys2/msys2-installer": r"^\d{4}-\d{2}-\d{2}$",
+}
+
 _ASSET_URL = re.compile(r"^https://github\.com/([^/\s]+)/([^/\s]+)/releases/download/([^/\s]+)/([^/\s?#]+)$")
 _URL_LINE = re.compile(r"^(?P<indent>\s*)url:\s*(?P<url>https://\S+)\s*$", re.M)
 _MAX_BYTES = 4 * 1024 * 1024 * 1024
@@ -47,7 +58,7 @@ def release_repo(release_dir: Path) -> str | None:
         return None
     for url in urls:
         m = _ASSET_URL.match(url)
-        if not m or m.group(1) not in GITHUB_OWNERS:
+        if not m or not (m.group(1) in GITHUB_OWNERS or f"{m.group(1)}/{m.group(2)}" in GITHUB_REPOS):
             return None
         repos.add(f"{m.group(1)}/{m.group(2)}")
     return repos.pop() if len(repos) == 1 else None
@@ -56,13 +67,17 @@ def release_repo(release_dir: Path) -> str | None:
 def asset_pattern(name: str, old_version: str) -> re.Pattern[str]:
     """The file name of the previous asset with its version number turned into a wildcard."""
     escaped = re.escape(name)
-    old = re.escape(old_version)
-    if old in escaped:
-        escaped = escaped.replace(old, r"\d+(?:\.\d+){1,3}")
+    parts = old_version.split(".")
+    shorter = old_version[:-2] if old_version.endswith(".0") else old_version          # 9.1.0 -> 9.1 (FFmpeg)
+    compact = f"{parts[0]}{int(parts[1]):02d}{int(parts[2]):02d}" if len(parts) == 3 and len(parts[0]) == 4 else ""  # 20260927 (MSYS2)
+    for candidate, wildcard in ((old_version, r"\d+(?:\.\d+){1,3}"), (shorter, r"\d+(?:\.\d+){1,3}"), (compact, r"\d{8}")):
+        if candidate and re.escape(candidate) in escaped:
+            escaped = escaped.replace(re.escape(candidate), wildcard)
+            break
     return re.compile(f"^{escaped}$")
 
 
-def pick_latest(releases: list[dict]) -> dict | None:
+def pick_latest(releases: list[dict], tag_filter: str | None = None) -> dict | None:
     """The highest version among published (not draft, not pre-release) releases.
 
     GitHub's ``/releases/latest`` orders by the *commit date* of the tag, so a release whose tag points at an older
@@ -74,7 +89,10 @@ def pick_latest(releases: list[dict]) -> dict | None:
     best: tuple | None = None
     for rel in releases:
         tag = str(rel.get("tag_name", ""))
-        if rel.get("draft") or rel.get("prerelease") or not re.search(r"\d+\.\d+", tag):
+        if rel.get("draft") or rel.get("prerelease"):
+            continue
+        # a tag the maintainer's pattern accepts is a version even without a dot (MSYS2: 2026-11-20)
+        if not (re.match(tag_filter, tag) if tag_filter else re.search(r"\d+\.\d+", tag)):
             continue
         version = normalize_version(tag)
         if not semver.is_valid(version):
@@ -97,7 +115,7 @@ def latest_release(repo: str, session=None) -> dict | None:
     response = s.get(f"https://api.github.com/repos/{repo}/releases", params={"per_page": 50}, headers=headers, timeout=30)
     if response.status_code != 200:
         return None
-    return pick_latest(response.json())
+    return pick_latest(response.json(), GITHUB_REPOS.get(repo))
 
 
 def _download_hash(url: str) -> tuple[str, int]:
@@ -136,7 +154,8 @@ def sync_release(
     if not release:
         return Outcome("skipped", detail=f"no published release found in {repo}")
     tag = str(release.get("tag_name", ""))
-    if not re.search(r"\d+\.\d+", tag):
+    tag_filter = GITHUB_REPOS.get(repo)
+    if not (re.match(tag_filter, tag) if tag_filter else re.search(r"\d+\.\d+", tag)):
         # normalize_version() turns "nightly" into 1.0.0: a tag without a dotted number is never a version
         return Outcome("skipped", detail=f"release tag {tag!r} is not a version")
     new_version = normalize_version(tag)
