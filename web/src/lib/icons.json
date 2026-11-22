@@ -107,5 +107,13 @@
   "WinSCP": "WinSCP.png",
   "Wireshark": "Wireshark.svg",
   "Zalo": "Zalo.svg",
-  "Zoom": "Zoom.svg"
+  "Zoom": "Zoom.svg",
+  "SQLServer2017Developer": "SQLServer2017Developer.svg",
+  "SQLServer2017Express": "SQLServer2017Express.svg",
+  "SQLServer2019Developer": "SQLServer2019Developer.svg",
+  "SQLServer2019Express": "SQLServer2019Express.svg",
+  "SQLServer2022Developer": "SQLServer2022Developer.svg",
+  "SQLServer2022Express": "SQLServer2022Express.svg",
+  "SQLServer2025Developer": "SQLServer2025Developer.svg",
+  "SQLServer2025Express": "SQLServer2025Express.svg"
 }
