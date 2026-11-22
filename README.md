@@ -25,7 +25,7 @@ txapm install vlc
 - **Mang cả bộ phần mềm sang máy mới.** `txapm export` rồi `txapm import`.
 - **Có cầu nối WinGet.** Chưa có trong kho TXA thì `txapm wg install <id>` lấy từ WinGet, vẫn kiểm tra SHA-256.
 - **Kho riêng của bạn.** `txapm source add` thêm kho công ty hoặc thư mục trên ổ mạng, xem
-  [docs/custom-source.md](docs/custom-source.md).
+  [Kho nguồn riêng trên trang Docs](https://txavl.github.io/txa-repo/docs/#kho-nguon).
 
 ---
 
@@ -116,7 +116,7 @@ Một số lệnh có tên viết tắt: `add` = install, `rm` = uninstall, `ls`
 | Giữ nguyên phiên bản, không cho `upgrade --all` đụng vào | `txapm pin add TXAVL.HelloTool` |
 | Bỏ giữ / xem danh sách đang giữ | `txapm pin remove TXAVL.HelloTool` · `txapm pin list` |
 | Gỡ cài đặt | `txapm uninstall TXAVL.HelloTool` |
-| Xem vị trí cài, PATH và nguồn của một gói | `txapm which <tên-gói>` (thêm `--json` cho ứng dụng đọc, xem [docs/app-integration.md](docs/app-integration.md)) |
+| Xem vị trí cài, PATH và nguồn của một gói | `txapm which <tên-gói>` (thêm `--json` cho ứng dụng đọc, xem [Tích hợp ứng dụng trên trang Docs](https://txavl.github.io/txa-repo/docs/app-integration/)) |
 
 ### Sao lưu và chuyển máy
 
@@ -129,7 +129,7 @@ Một số lệnh có tên viết tắt: `add` = install, `rm` = uninstall, `ls`
 
 | Muốn làm gì | Lệnh |
 |---|---|
-| Xem / thêm các kho nguồn | `txapm source` · xem [docs/custom-source.md](docs/custom-source.md) |
+| Xem / thêm các kho nguồn | `txapm source` · xem [Kho nguồn riêng trên trang Docs](https://txavl.github.io/txa-repo/docs/#kho-nguon) |
 | Tìm / cài trực tiếp gói từ WinGet qua `txapm` | `txapm wg search <từ-khóa>` · `txapm wg install <id>` |
 
 ### Chẩn đoán và dọn dẹp
@@ -335,13 +335,13 @@ thêm thư mục chương trình vào PATH của **riêng bạn** (không cần 
 ## Cho nhà phát triển: để ứng dụng của bạn cập nhật qua TXA
 
 Ứng dụng có thể hỏi `txapm which <Id> --json` để biết mình có được cài bằng TXA không và có bản mới không, rồi gọi
-`txapm upgrade <Id>` thay vì dùng bộ cập nhật riêng. Chi tiết: [docs/app-integration.md](docs/app-integration.md).
+`txapm upgrade <Id>` thay vì dùng bộ cập nhật riêng. Chi tiết: [Tích hợp ứng dụng trên trang Docs](https://txavl.github.io/txa-repo/docs/app-integration/).
 
 ## Kho nguồn riêng
 
 Muốn phân phối phần mềm nội bộ hoặc bản build riêng của nhóm? Thêm kho bằng `txapm source add <tên> <url-hoặc-thư-mục>`,
 hoặc tự dựng kho bằng `txaci build-api`. Hướng dẫn đầy đủ (token, `--allow-lan`, dựng bot kiểm định riêng):
-[docs/custom-source.md](docs/custom-source.md).
+[Kho nguồn riêng trên trang Docs](https://txavl.github.io/txa-repo/docs/#kho-nguon).
 
 ---
 
@@ -511,8 +511,8 @@ Cài bằng pipx thì gỡ bằng `pipx uninstall txa`.
 |---|---|
 | Cấu trúc manifest và từng trường | [docs/manifest-schema.md](docs/manifest-schema.md) |
 | Nhập gói từ WinGet, quét máy bằng `txacli` | [docs/winget-import.md](docs/winget-import.md) |
-| Kho nguồn riêng, tự dựng kho | [docs/custom-source.md](docs/custom-source.md) |
-| Tích hợp cập nhật qua TXA vào ứng dụng | [docs/app-integration.md](docs/app-integration.md) |
+| Kho nguồn riêng, tự dựng kho | [Kho nguồn riêng trên trang Docs](https://txavl.github.io/txa-repo/docs/#kho-nguon) |
+| Tích hợp cập nhật qua TXA vào ứng dụng | [Tích hợp ứng dụng trên trang Docs](https://txavl.github.io/txa-repo/docs/app-integration/) |
 | Thỏa thuận Người đóng góp | [docs/contributor-agreement.md](docs/contributor-agreement.md) |
 | Bot hiện tên riêng (GitHub App) | [docs/github-app.md](docs/github-app.md) |
 | Cấu trúc repo, workflow, phát hành (dành cho quản trị) | [docs/maintainers.md](docs/maintainers.md) |
