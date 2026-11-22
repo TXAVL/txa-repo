@@ -191,6 +191,12 @@ def _install(src: Source, package_id: str, version: str | None, args, header: st
             return _die(f"installer exited with {code}: {meaning} (log: {log})")
         console.say(f"      {P('finished in ' + console.human_time(busy.elapsed), 'gray')} · exit code {code} ({meaning})")
 
+    shortcut = target.get("shortcut")
+    if shortcut and not getattr(args, "no_shortcut", False):
+        link = installer.create_desktop_shortcut(shortcut, Path(extra["dir"]) if extra.get("dir") else None)
+        if link:
+            console.say(f"      {P('shortcut', 'gray')} {link}")
+
     # [5] record
     installer.record(package_id, version, target, code, about["name"], scope, src.name, extra)
     console.stage(5, total, "Recorded in the TXA install list")
@@ -785,6 +791,19 @@ def cmd_which(args) -> int:
     records = installer.installed()
     q = args.package.lower()
     pkg_id = next((k for k in records if k.lower() == q or k.split(".")[-1].lower() == q), None)
+    if getattr(args, "json", False):
+        # Stable contract for apps that want to know "was I installed by TXA?" (exit code 0 either way).
+        import json as _json
+
+        info = records.get(pkg_id) if pkg_id else None
+        out = {"managed": bool(info), "id": pkg_id or args.package, "version": None, "newest": None,
+               "update_available": False, "pinned": False, "dir": None}
+        if info:
+            newest = _available({pkg_id: info}).get(pkg_id)
+            out.update(version=info["version"], newest=newest or info["version"], update_available=bool(newest),
+                       pinned=pkg_id in installer.pins(), dir=info.get("dir"), source=info.get("source"))
+        print(_json.dumps(out))
+        return 0
     if not pkg_id:
         return _die(f"'{args.package}' is not recorded as installed through txapm (try `txapm list --all`)")
     info = records[pkg_id]
@@ -1073,6 +1092,7 @@ def _install_options(p: argparse.ArgumentParser) -> None:
     p.add_argument("--force", action="store_true", help="reinstall even if this version is recorded")
     p.add_argument("--ignore-checksum", action="store_true", help="bypass SHA-256 mismatch check")
     p.add_argument("--skip-os-check", action="store_true")
+    p.add_argument("--no-shortcut", action="store_true", help="do not create the desktop shortcut the package asks for")
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -1217,6 +1237,7 @@ def main(argv: list[str] | None = None) -> int:
 
     p = sub.add_parser("which", aliases=["where"], help="show local installation path, scope, and record of a package")
     p.add_argument("package", help="package id or short name")
+    p.add_argument("--json", action="store_true", help="machine-readable: {managed, version, newest, update_available, ...}")
     p.set_defaults(func=cmd_which)
 
     p = sub.add_parser("doctor", aliases=["check", "status"], help="check system health, sources, WinGet, and cache")

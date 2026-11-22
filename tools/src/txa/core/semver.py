@@ -23,6 +23,21 @@ def latest(versions) -> str | None:
     return max(valid, key=parse) if valid else None
 
 
+def resolve_prefix(requested: str, versions) -> str | None:
+    """Newest published version matching a partial request: '8' -> newest 8.x.y, '8.0' -> newest 8.0.y.
+
+    An exact X.Y.Z is returned as-is when published. None when nothing matches.
+    """
+    requested = (requested or "").strip().lstrip("vV")
+    pool = [v for v in versions if is_valid(v)]
+    if requested in pool:
+        return requested
+    if not re.fullmatch(r"\d+(\.\d+){0,1}", requested):
+        return None
+    hits = [v for v in pool if v == requested or v.startswith(requested + ".")]
+    return max(hits, key=parse) if hits else None
+
+
 def coerce(text: str | None) -> str | None:
     """Best-effort X.Y.Z from free text such as '1.4.2.0' or 'setup-1.4.2-x64.exe'.
 

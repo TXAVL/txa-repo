@@ -180,6 +180,8 @@ class Source:
         if document:
             versions = document.get("versions", {})
             chosen = version or document.get("latest") or semver.latest(versions)
+            if version and version not in versions:
+                chosen = semver.resolve_prefix(version, versions) or version  # '--version 8' = newest 8.x.y
             if chosen not in versions:
                 raise NotFound(f"{package_id} has no version {chosen} (available: {', '.join(versions)})")
             return chosen, versions[chosen]
