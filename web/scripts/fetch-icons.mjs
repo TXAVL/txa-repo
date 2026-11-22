@@ -31,6 +31,9 @@ const SLUGS = {
   RockstarGamesLauncher: ["rockstargames"], UbisoftConnect: ["ubisoft"], NotepadPlusPlus: ["notepadplusplus"],
   Postman: ["postman"], Obsidian: ["obsidian"], Claude: ["claude"], GIMP: ["gimp"], FFmpeg: ["ffmpeg"],
   VisualStudioCommunity2026: ["visualstudio"], QEMUGuestAgent: ["qemu"],
+  MicrosoftNETSDK6: ["dotnet"], MicrosoftNETSDK7: ["dotnet"], MicrosoftNETSDK8: ["dotnet"], MicrosoftNETSDK9: ["dotnet"],
+  MicrosoftNETSDK11: ["dotnet"], VisualStudioCommunity2022: ["visualstudio"], VisualStudioCommunity2019: ["visualstudio"],
+  LocalSend: ["localsend"], CocCocBeta: [],
   DockerDesktop: ["docker"], JetBrainsToolbox: ["jetbrains"], QBittorrent: ["qbittorrent"], KeePassXC: ["keepassxc"],
 };
 
