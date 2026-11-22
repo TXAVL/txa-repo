@@ -1,0 +1,19 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/TXAVL/txa-repo/main/tools/src/txa/schemas/build.schema.json
+txa: 1
+kind: build
+ref: TXAVL.TDrop@0.3.4
+platform:
+  os: windows
+  min_build: 10.0.17763
+scope: machine
+targets:
+  - arch: x64
+    engine: nsis
+    source:
+      url: https://github.com/TXAVL/T-Drop/releases/download/v0.3.4/T-Drop-Setup-0.3.4.exe
+      sha256: 6D0B9C7810254671E77FA6F01617F452A381536EC3A57C919E366F283CA13A09
+      size: 158143880
+    switches:
+      silent: /S
+      progress: /S
+
