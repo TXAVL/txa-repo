@@ -16,4 +16,7 @@ targets:
     switches:
       silent: /S
       progress: /S
+    shortcut:
+      name: T-Drop
+      exe: '%ProgramFiles%\T-Drop\T-Drop.exe'
 
