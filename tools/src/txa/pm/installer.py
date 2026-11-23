@@ -173,38 +173,6 @@ def uninstall_portable(package_id: str) -> Path | None:
     return root
 
 
-def create_desktop_shortcut(spec: dict, base_dir: Path | None = None) -> Path | None:
-    """Create <Desktop>\\<name>.lnk for installers that stay silent about it. Never raises; None if skipped."""
-    if sys.platform != "win32":
-        return None
-    import os
-
-    exe = os.path.expandvars(spec["exe"])
-    exe_path = Path(exe) if Path(exe).is_absolute() or not base_dir else base_dir / exe
-    if not exe_path.is_file():
-        return None
-    desktop = Path(os.path.expandvars("%USERPROFILE%")) / "Desktop"
-    try:  # honours OneDrive-redirected desktops
-        out = subprocess.run(["powershell", "-NoProfile", "-Command", "[Environment]::GetFolderPath('Desktop')"],
-                             capture_output=True, text=True, timeout=15).stdout.strip()
-        desktop = Path(out) if out else desktop
-    except (OSError, subprocess.SubprocessError):
-        pass
-    link = desktop / f"{spec['name']}.lnk"
-    if link.exists():
-        return link  # the installer (or the user) already has one
-    script = ("$s=(New-Object -ComObject WScript.Shell).CreateShortcut($env:TXA_LNK);"
-              "$s.TargetPath=$env:TXA_EXE;$s.Arguments=$env:TXA_ARGS;"
-              "$s.WorkingDirectory=(Split-Path $env:TXA_EXE);$s.Save()")
-    env = {**os.environ, "TXA_LNK": str(link), "TXA_EXE": str(exe_path), "TXA_ARGS": spec.get("args", "")}
-    try:  # values travel through env vars, never through the command line, so no quoting/injection issues
-        subprocess.run(["powershell", "-NoProfile", "-Command", script], env=env, check=True,
-                       capture_output=True, timeout=30)
-    except (OSError, subprocess.SubprocessError):
-        return None
-    return link if link.exists() else None
-
-
 def wait_for_old_uninstallers(timeout: float = 120.0) -> None:
     """NSIS installers (electron-builder) copy the previous version's uninstaller to %TEMP% and run it before copying
     the new files. When that uninstaller is still busy deleting while the new installer already writes, it removes

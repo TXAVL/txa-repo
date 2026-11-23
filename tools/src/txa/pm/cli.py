@@ -206,12 +206,6 @@ def _install(src: Source, package_id: str, version: str | None, args, header: st
                 if code not in set(target.get("success_codes") or []) | installer.SUCCESS or not program.is_file():
                     return _die(f"{program} is still missing after installing twice (installer exit code {code}, log: {log})")
 
-    shortcut = target.get("shortcut")
-    if shortcut and not getattr(args, "no_shortcut", False):
-        link = installer.create_desktop_shortcut(shortcut, Path(extra["dir"]) if extra.get("dir") else None)
-        if link:
-            console.say(f"      {P('shortcut', 'gray')} {link}")
-
     # [5] record
     installer.record(package_id, version, target, code, about["name"], scope, src.name, extra)
     console.stage(5, total, "Recorded in the TXA install list")
@@ -1107,7 +1101,6 @@ def _install_options(p: argparse.ArgumentParser) -> None:
     p.add_argument("--force", action="store_true", help="reinstall even if this version is recorded")
     p.add_argument("--ignore-checksum", action="store_true", help="bypass SHA-256 mismatch check")
     p.add_argument("--skip-os-check", action="store_true")
-    p.add_argument("--no-shortcut", action="store_true", help="do not create the desktop shortcut the package asks for")
 
 
 def main(argv: list[str] | None = None) -> int:

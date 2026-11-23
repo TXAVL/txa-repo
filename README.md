@@ -100,7 +100,6 @@ Một số lệnh có tên viết tắt: `add` = install, `rm` = uninstall, `ls`
 | Chọn phiên bản từ danh sách trong kho | `txapm install TXAVL.HelloTool --choose` |
 | Cài nhưng vẫn xem tiến trình | `txapm install TXAVL.HelloTool --progress` |
 | Cài với giao diện gốc của bộ cài | `txapm install TXAVL.HelloTool --interactive` |
-| Không tạo shortcut ngoài desktop mà gói khai báo | `txapm install TXAVL.HelloTool --no-shortcut` |
 | Chỉ tải về, không cài | `txapm install TXAVL.HelloTool --download-only` |
 | Tải bộ cài và manifest về thư mục (mặc định Downloads) | `txapm download TXAVL.HelloTool -d D:\setup` |
 | Thử một manifest trên máy trước khi gửi | `txapm install --manifest <thư-mục>` |

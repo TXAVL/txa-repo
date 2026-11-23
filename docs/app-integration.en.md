@@ -51,5 +51,4 @@ Without `--version` the newest version is always used.
 
 ## Desktop shortcut
 
-Some silent installers do not create a shortcut. A package can declare `shortcut` in its `build` card so that
-`txapm` creates it; users opt out with `--no-shortcut`. See [manifest-schema.en.md](manifest-schema.en.md).
+A package can declare `shortcut` (`name`, `exe`) in its `build` card. `txapm` does not create the shortcut; it uses `exe` to check that the program exists after the install and installs once more if an old uninstaller removed it. See [manifest-schema.en.md](manifest-schema.en.md).

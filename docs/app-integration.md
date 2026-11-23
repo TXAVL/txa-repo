@@ -50,5 +50,4 @@ Không truyền `--version` thì luôn lấy bản mới nhất.
 
 ## Phím tắt ngoài desktop
 
-Một số bộ cài chạy im lặng không tạo shortcut. Gói có thể khai báo `shortcut` trong card `build` để `txapm`
-tạo giúp; người dùng tắt bằng `--no-shortcut`. Xem [manifest-schema.md](manifest-schema.md).
+Gói có thể khai báo `shortcut` (`name`, `exe`) trong card `build`. `txapm` không tự tạo shortcut; nó dùng `exe` để kiểm tra chương trình có tồn tại sau khi cài và cài lại một lần nếu bộ gỡ cũ xoá mất. Xem [manifest-schema.md](manifest-schema.md).

@@ -105,7 +105,7 @@ targets:
 | `targets[].source.url` | Yes | `string` | HTTPS link to download the installer directly from the official site. |
 | `targets[].source.sha256` | Yes | `string` | SHA-256 hash (64 uppercase hex characters). |
 | `targets[].switches.silent` | By type | `string` | Silent install switches (required for `exe`, for example `/S`, `/VERYSILENT`). |
-| `targets[].shortcut` | No | `object` | Desktop shortcut `txapm` creates after install, for silent installers that do not make one. Fields: `name` (the `.lnk` file name), `exe` (program path, `%ENV%` variables allowed; for portable packages a path inside the unpacked folder) and optional `args`. Skipped when a shortcut of that name exists; users can opt out with `--no-shortcut`. `exe` is also checked after the install: if the program is not there (the previous version's uninstaller deleted new files during an upgrade) `txapm` installs once more. |
+| `targets[].shortcut` | No | `object` | Where the program lands: `name` (shortcut/app name) and `exe` (program path, `%ENV%` variables allowed). `txapm` does not create a shortcut; it checks `exe` after the install and, if the program is not there (the previous version's uninstaller deleted new files during an upgrade), installs once more. Optional `args`. |
 
 ---
 

@@ -105,7 +105,7 @@ targets:
 | `targets[].source.url` | Có | `string` | Đường dẫn HTTPS tải bộ cài trực tiếp từ trang chính thức. |
 | `targets[].source.sha256` | Có | `string` | Mã băm SHA-256 (64 ký tự hex viết hoa). |
 | `targets[].switches.silent` | Tuỳ loại | `string` | Tham số cài đặt im lặng (với `exe` bắt buộc phải có, ví dụ `/S`, `/VERYSILENT`). |
-| `targets[].shortcut` | Không | `object` | Phím tắt ngoài desktop mà `txapm` tạo sau khi cài, dành cho bộ cài chạy im lặng không tự tạo. Gồm `name` (tên file `.lnk`), `exe` (đường dẫn chương trình, cho phép biến như `%LOCALAPPDATA%`; với gói portable là đường dẫn trong thư mục đã giải nén) và `args` (tuỳ chọn). Đã có shortcut cùng tên thì bỏ qua; người dùng tắt bằng `--no-shortcut`. `exe` còn dùng để kiểm tra sau khi cài: nếu chương trình không có ở đó (bộ cài cũ xoá nhầm file mới khi nâng cấp) thì `txapm` cài lại một lần. |
+| `targets[].shortcut` | Không | `object` | Nơi chương trình được cài: `name` (tên shortcut/ứng dụng) và `exe` (đường dẫn chương trình, cho phép biến như `%LOCALAPPDATA%`). `txapm` không tự tạo shortcut; nó kiểm tra `exe` sau khi cài và nếu chương trình không có ở đó (bộ gỡ cũ xoá nhầm file mới khi nâng cấp) thì cài lại một lần. `args` tuỳ chọn. |
 
 ---
 
