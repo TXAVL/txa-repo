@@ -16,6 +16,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import re
 import shutil
 import sys
@@ -190,6 +191,20 @@ def _install(src: Source, package_id: str, version: str | None, args, header: st
         if code not in set(target.get("success_codes") or []) | installer.SUCCESS:
             return _die(f"installer exited with {code}: {meaning} (log: {log})")
         console.say(f"      {P('finished in ' + console.human_time(busy.elapsed), 'gray')} · exit code {code} ({meaning})")
+        probe = (target.get("shortcut") or {}).get("exe")
+        if probe:
+            # The package says where its program lands. A silent upgrade can lose the race against the previous
+            # version's uninstaller (it deletes the new files too): wait for it, check, and install once more.
+            program = Path(os.path.expandvars(probe))
+            installer.wait_for_old_uninstallers()
+            if not program.is_file():
+                console.say(P(f"      ! {program.name} is missing after the install (the old version's uninstaller removed "
+                              f"files while the new ones were copied) - installing again", "yellow"))
+                with console.working("installing again…", "      "):
+                    code = installer.run(executable, params, elevate)
+                installer.wait_for_old_uninstallers()
+                if code not in set(target.get("success_codes") or []) | installer.SUCCESS or not program.is_file():
+                    return _die(f"{program} is still missing after installing twice (installer exit code {code}, log: {log})")
 
     shortcut = target.get("shortcut")
     if shortcut and not getattr(args, "no_shortcut", False):

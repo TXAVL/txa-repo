@@ -205,6 +205,26 @@ def create_desktop_shortcut(spec: dict, base_dir: Path | None = None) -> Path | 
     return link if link.exists() else None
 
 
+def wait_for_old_uninstallers(timeout: float = 120.0) -> None:
+    """NSIS installers (electron-builder) copy the previous version's uninstaller to %TEMP% and run it before copying
+    the new files. When that uninstaller is still busy deleting while the new installer already writes, it removes
+    the new files too. Wait until no such process is left."""
+    if sys.platform != "win32":
+        return
+    import time
+
+    deadline = time.monotonic() + timeout
+    while time.monotonic() < deadline:
+        try:
+            out = subprocess.run(["tasklist", "/FI", "IMAGENAME eq old-uninstaller.exe", "/NH"], capture_output=True,
+                                 text=True, timeout=15).stdout
+        except (OSError, subprocess.SubprocessError):
+            return
+        if "old-uninstaller.exe" not in out.lower():
+            return
+        time.sleep(0.5)
+
+
 def build_command(target: dict, payload: Path, mode: str, log: Path) -> tuple[str, str]:
     """Return (executable, parameters). mode: silent | progress | interactive."""
     engine = target["engine"]
