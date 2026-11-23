@@ -8,7 +8,13 @@ name: TXA Auto-Update (TXAVL)
 
 on:
   schedule:
-    - cron: "17 */2 * * *"
+    # GitHub delays and sometimes drops scheduled runs (a "every 2 hours" cron really ran every 5-12 hours), so ask
+    # often: most runs end after finding nothing new.
+    - cron: "7,27,47 * * * *"
+  # A TXAVL repository tells this one the moment it publishes a release (see docs/maintainers.md):
+  #   gh api repos/TXAVL/txa-repo/dispatches -f event_type=upstream-release -f 'client_payload[package]=TDrop'
+  repository_dispatch:
+    types: [upstream-release]
   workflow_dispatch:
     inputs:
       package:
@@ -58,7 +64,7 @@ jobs:
       - name: Update each package and commit it straight to main
         shell: pwsh
         env:
-          PKG_FILTER: ${{ inputs.package }}
+          PKG_FILTER: ${{ inputs.package || github.event.client_payload.package }}
           GH_TOKEN: ${{ steps.app.outputs.token || github.token }}
         run: |
           # No pull request and no human review: each package with a newer version is synced, checked with the

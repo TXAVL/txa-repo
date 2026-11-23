@@ -35,7 +35,28 @@ def set_lang(code: str) -> str:
     cfg = load_config()
     cfg["lang"] = norm
     save_config(cfg)
+    _sync_lang_env(norm)
     return norm
+
+
+def _sync_lang_env(norm: str) -> None:
+    """install.ps1 stores the chosen language in the User variable TXA_LANG, and a variable beats config.json. Without
+    updating it, `txapm lang vi` would be ignored for good. Only touch it when it already exists (or is set for this run)."""
+    if "TXA_LANG" in os.environ:
+        os.environ["TXA_LANG"] = norm
+    if sys.platform != "win32":
+        return
+    try:
+        import winreg
+
+        with winreg.OpenKey(winreg.HKEY_CURRENT_USER, "Environment", 0, winreg.KEY_READ | winreg.KEY_SET_VALUE) as key:
+            try:
+                winreg.QueryValueEx(key, "TXA_LANG")
+            except FileNotFoundError:
+                return
+            winreg.SetValueEx(key, "TXA_LANG", 0, winreg.REG_SZ, norm)
+    except OSError:
+        pass  # config.json is still written; the next install.ps1 run or `setx TXA_LANG` fixes the variable
 
 
 def txa_home() -> Path:
