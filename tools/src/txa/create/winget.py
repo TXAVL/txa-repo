@@ -837,6 +837,8 @@ _TXAVL_WINGET_MAP: dict[str, str] = {
     "PowerToys": "Microsoft.PowerToys",
     "PuTTY": "PuTTY.PuTTY",
     "Python": "Python.Python.3.14",
+    "Python312": "Python.Python.3.12",  # stays on 3.12.x; the PSF ships no Windows installer after 3.12.10
+    "Python314": "Python.Python.3.14",  # stays on 3.14.x
     "QEMUGuestAgent": "RedHat.QemuGA",
     "RockstarGamesLauncher": "RockstarGames.Launcher",
     "Rustup": "Rustlang.Rustup",
