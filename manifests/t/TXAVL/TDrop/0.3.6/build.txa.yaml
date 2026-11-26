@@ -11,8 +11,8 @@ targets:
     engine: nsis
     source:
       url: https://github.com/TXAVL/T-Drop/releases/download/v0.3.6/T-Drop-Setup-0.3.6.exe
-      sha256: E415876B1841DB42FA817C37A5BD9BB6412BC045279EA61C8BE805603C995DA7
-      size: 158286141
+      sha256: EB1229DD7B18114C982767B47D0315052859483D679DD6511859EC3B72388CE1
+      size: 158325513
     switches:
       silent: /S
       progress: /S
