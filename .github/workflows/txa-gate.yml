@@ -57,9 +57,9 @@ jobs:
       - name: Bot identity (GitHub App - optional, falls back to the workflow token)
         id: app
         if: env.APP_ID != ''
-        uses: actions/create-github-app-token@v2
+        uses: actions/create-github-app-token@v3
         with:
-          app-id: ${{ secrets.TXA_APP_ID }}
+          client-id: ${{ secrets.TXA_APP_ID }}  # App ID works too: GitHub takes either as the JWT issuer
           private-key: ${{ secrets.TXA_APP_PRIVATE_KEY }}
 
       - name: Download validation report (untrusted)
