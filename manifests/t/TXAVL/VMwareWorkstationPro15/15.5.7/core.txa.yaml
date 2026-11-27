@@ -1,0 +1,17 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/TXAVL/txa-repo/main/tools/src/txa/schemas/core.schema.json
+# auto-update: false (hand-written; Broadcom requires portal login)
+txa: 1
+kind: core
+package:
+  id: TXAVL.VMwareWorkstationPro15
+  version: 15.5.7
+  channel: stable
+  alias: vmware-15
+locale:
+  default: en-US
+tags:
+  - virtualization
+  - vm
+  - hypervisor
+  - vmware
+  - workstation

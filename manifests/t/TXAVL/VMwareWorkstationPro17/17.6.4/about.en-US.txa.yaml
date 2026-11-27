@@ -1,0 +1,13 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/TXAVL/txa-repo/main/tools/src/txa/schemas/about.schema.json
+txa: 1
+kind: about
+ref: TXAVL.VMwareWorkstationPro17@17.6.4
+lang: en-US
+name: VMware Workstation Pro 17
+publisher: Broadcom Inc.
+author: VMware, Inc.
+summary: Free desktop hypervisor by Broadcom for running multiple virtual machines on Windows (v17.6 release line).
+homepage: https://www.vmware.com/products/desktop-hypervisor/workstation-and-fusion
+license:
+  name: Proprietary
+  url: https://www.broadcom.com/company/legal/licensing

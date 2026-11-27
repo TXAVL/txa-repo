@@ -1,0 +1,21 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/TXAVL/txa-repo/main/tools/src/txa/schemas/build.schema.json
+txa: 1
+kind: build
+ref: TXAVL.VMwareWorkstationPro12@12.5.9
+platform:
+  os: windows
+  min_build: 10.0.17763
+scope: machine
+targets:
+  - arch: x64
+    engine: exe
+    source:
+      url: https://github.com/201853910/VMwareWorkstation/releases/download/12.0/VMware-workstation-full-12.5.9-7535481.exe
+      sha256: 1E12E17CAF5C4359DA2F7EC5E2F5EF4CF297EDB38B4C96F0FD6B20B04B5A172E
+      size: 420333000
+    switches:
+      silent: '/s /v"/qn EULAS_AGREED=1 AUTOSOFTWAREUPDATE=0 DATACOLLECTION=0 REBOOT=ReallySuppress"'
+      progress: '/s /v"/qb! EULAS_AGREED=1 AUTOSOFTWAREUPDATE=0 DATACOLLECTION=0 REBOOT=ReallySuppress"'
+    success_codes:
+      - 0
+      - 3010

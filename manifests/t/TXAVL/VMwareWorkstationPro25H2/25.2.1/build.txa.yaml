@@ -1,0 +1,21 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/TXAVL/txa-repo/main/tools/src/txa/schemas/build.schema.json
+txa: 1
+kind: build
+ref: TXAVL.VMwareWorkstationPro25H2@25.2.1
+platform:
+  os: windows
+  min_build: 10.0.17763
+scope: machine
+targets:
+  - arch: x64
+    engine: exe
+    source:
+      url: https://github.com/201853910/VMwareWorkstation/releases/download/25H2/VMware-Workstation-Full-25H2u1-25219725.exe
+      sha256: B592C47756D47C932A3CE2C2B83AD3AF1FA23CCC1DD1D3166A51BCC1D2BD58E0
+      size: 291831176
+    switches:
+      silent: '/s /v"/qn EULAS_AGREED=1 AUTOSOFTWAREUPDATE=0 DATACOLLECTION=0 REBOOT=ReallySuppress"'
+      progress: '/s /v"/qb! EULAS_AGREED=1 AUTOSOFTWAREUPDATE=0 DATACOLLECTION=0 REBOOT=ReallySuppress"'
+    success_codes:
+      - 0
+      - 3010

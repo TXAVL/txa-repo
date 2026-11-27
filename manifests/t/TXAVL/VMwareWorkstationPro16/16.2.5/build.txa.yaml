@@ -1,0 +1,21 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/TXAVL/txa-repo/main/tools/src/txa/schemas/build.schema.json
+txa: 1
+kind: build
+ref: TXAVL.VMwareWorkstationPro16@16.2.5
+platform:
+  os: windows
+  min_build: 10.0.17763
+scope: machine
+targets:
+  - arch: x64
+    engine: exe
+    source:
+      url: https://github.com/201853910/VMwareWorkstation/releases/download/16.0/VMware-workstation-full-16.2.5-20904516.exe
+      sha256: 380B0FA8A0F37ADE496573CDC2AD922D3985BC83664F94431A9E513444B6C377
+      size: 645480472
+    switches:
+      silent: '/s /v"/qn EULAS_AGREED=1 AUTOSOFTWAREUPDATE=0 DATACOLLECTION=0 REBOOT=ReallySuppress"'
+      progress: '/s /v"/qb! EULAS_AGREED=1 AUTOSOFTWAREUPDATE=0 DATACOLLECTION=0 REBOOT=ReallySuppress"'
+    success_codes:
+      - 0
+      - 3010

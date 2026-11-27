@@ -1,0 +1,13 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/TXAVL/txa-repo/main/tools/src/txa/schemas/about.schema.json
+txa: 1
+kind: about
+ref: TXAVL.VMwareWorkstationPro12@12.5.9
+lang: vi-VN
+name: VMware Workstation Pro 12
+publisher: VMware, Inc.
+author: VMware, Inc.
+summary: Phần mềm tạo và chạy máy ảo chuyên nghiệp trên Windows (dòng 2016, bản cuối 12.5.9).
+homepage: https://www.vmware.com/products/desktop-hypervisor/workstation-and-fusion
+license:
+  name: Proprietary
+  url: https://www.broadcom.com/company/legal/licensing

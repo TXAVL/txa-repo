@@ -1,0 +1,20 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/TXAVL/txa-repo/main/tools/src/txa/schemas/core.schema.json
+# auto-update: false (hand-written; Broadcom requires portal login)
+txa: 1
+kind: core
+package:
+  id: TXAVL.VMwareWorkstationPro
+  version: 26.1.1
+  channel: stable
+  alias: vmware
+  aliases:
+    - vmware-workstation
+    - vmware-26h1
+locale:
+  default: en-US
+tags:
+  - virtualization
+  - vm
+  - hypervisor
+  - vmware
+  - workstation

@@ -1,0 +1,13 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/TXAVL/txa-repo/main/tools/src/txa/schemas/about.schema.json
+txa: 1
+kind: about
+ref: TXAVL.VMwareWorkstationPro16@16.2.5
+lang: en-US
+name: VMware Workstation Pro 16
+publisher: VMware, Inc.
+author: VMware, Inc.
+summary: Desktop hypervisor for running multiple operating systems as virtual machines on Windows (v16.2 release line).
+homepage: https://www.vmware.com/products/desktop-hypervisor/workstation-and-fusion
+license:
+  name: Proprietary
+  url: https://www.broadcom.com/company/legal/licensing

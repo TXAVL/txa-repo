@@ -1,0 +1,13 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/TXAVL/txa-repo/main/tools/src/txa/schemas/about.schema.json
+txa: 1
+kind: about
+ref: TXAVL.VMwareWorkstationPro@26.1.1
+lang: vi-VN
+name: VMware Workstation Pro
+publisher: Broadcom Inc.
+author: Broadcom Inc.
+summary: Phần mềm tạo và chạy máy ảo 64-bit miễn phí từ Broadcom trên Windows (bản mới nhất 26H1u1).
+homepage: https://www.vmware.com/products/desktop-hypervisor/workstation-and-fusion
+license:
+  name: Proprietary
+  url: https://www.broadcom.com/company/legal/licensing

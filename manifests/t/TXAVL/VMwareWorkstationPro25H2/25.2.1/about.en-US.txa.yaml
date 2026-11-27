@@ -1,0 +1,13 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/TXAVL/txa-repo/main/tools/src/txa/schemas/about.schema.json
+txa: 1
+kind: about
+ref: TXAVL.VMwareWorkstationPro25H2@25.2.1
+lang: en-US
+name: VMware Workstation Pro 25H2
+publisher: Broadcom Inc.
+author: Broadcom Inc.
+summary: Free desktop hypervisor by Broadcom for running multiple virtual machines on Windows (25H2u1 release line).
+homepage: https://www.vmware.com/products/desktop-hypervisor/workstation-and-fusion
+license:
+  name: Proprietary
+  url: https://www.broadcom.com/company/legal/licensing
