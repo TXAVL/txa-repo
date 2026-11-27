@@ -1,0 +1,22 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/TXAVL/txa-repo/main/tools/src/txa/schemas/core.schema.json
+# auto-update: false (hand-written; game / launcher package)
+txa: 1
+kind: core
+package:
+  id: TXAVL.LeagueOfLegends
+  version: 143.0.0
+  channel: stable
+  alias: lol
+  aliases:
+    - lmht
+    - league-of-legends
+locale:
+  default: en-US
+tags:
+  - game
+  - games
+  - moba
+  - esports
+  - riot-games
+  - lol
+  - lmht

@@ -1,0 +1,13 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/TXAVL/txa-repo/main/tools/src/txa/schemas/about.schema.json
+txa: 1
+kind: about
+ref: TXAVL.EAApp@13.836.0
+lang: vi-VN
+name: EA App
+publisher: Electronic Arts
+author: Electronic Arts
+summary: Trình khởi chạy game chính thức của Electronic Arts (EA FC, Apex Legends, Battlefield, The Sims).
+homepage: https://www.ea.com/ea-app
+license:
+  name: Freeware
+  url: https://www.ea.com/legal/user-agreement

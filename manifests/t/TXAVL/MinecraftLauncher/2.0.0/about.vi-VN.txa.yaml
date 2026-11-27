@@ -1,0 +1,13 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/TXAVL/txa-repo/main/tools/src/txa/schemas/about.schema.json
+txa: 1
+kind: about
+ref: TXAVL.MinecraftLauncher@2.0.0
+lang: vi-VN
+name: Minecraft Launcher
+publisher: Mojang Studios
+author: Mojang Studios
+summary: Trình khởi chạy chính thức cho Minecraft Java Edition, Bedrock Edition, Dungeons và Legends.
+homepage: https://www.minecraft.net/
+license:
+  name: Proprietary
+  url: https://www.minecraft.net/en-us/eula

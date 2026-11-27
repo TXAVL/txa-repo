@@ -1,0 +1,13 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/TXAVL/txa-repo/main/tools/src/txa/schemas/about.schema.json
+txa: 1
+kind: about
+ref: TXAVL.LeagueOfLegends@143.0.0
+lang: vi-VN
+name: Liên Minh Huyền Thoại (LoL)
+publisher: Riot Games, Inc.
+author: Riot Games, Inc.
+summary: Game MOBA chiến thuật đồng đội 5v5 Liên Minh Huyền Thoại của Riot Games (máy chủ Việt Nam).
+homepage: https://www.leagueoflegends.com/
+license:
+  name: Freeware
+  url: https://www.riotgames.com/en/terms-of-service

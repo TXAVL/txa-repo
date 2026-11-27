@@ -1,0 +1,18 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/TXAVL/txa-repo/main/tools/src/txa/schemas/build.schema.json
+txa: 1
+kind: build
+ref: TXAVL.MinecraftLauncher@2.0.0
+platform:
+  os: windows
+  min_build: 10.0.17763
+scope: machine
+targets:
+  - arch: x86
+    engine: msi
+    source:
+      url: https://launcher.mojang.com/download/MinecraftInstaller.msi
+      sha256: E7040ADDF5FBB1DAC0D7E61D0793B1550526ACCAF80A315E36B636285BD9D90E
+      size: 2248704
+    switches:
+      silent: /qn /norestart
+      progress: /qb! /norestart

@@ -1,0 +1,13 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/TXAVL/txa-repo/main/tools/src/txa/schemas/about.schema.json
+txa: 1
+kind: about
+ref: TXAVL.GooglePlayGames@159.0.8140
+lang: vi-VN
+name: Google Play Games trên PC
+publisher: Google LLC
+author: Google LLC
+summary: Ứng dụng chính chủ từ Google giúp tải và chơi game di động Android mượt mà trên máy tính Windows.
+homepage: https://play.google.com/googleplaygames
+license:
+  name: Freeware
+  url: https://play.google.com/about/play-terms/

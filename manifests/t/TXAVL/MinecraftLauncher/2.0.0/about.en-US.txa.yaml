@@ -1,0 +1,13 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/TXAVL/txa-repo/main/tools/src/txa/schemas/about.schema.json
+txa: 1
+kind: about
+ref: TXAVL.MinecraftLauncher@2.0.0
+lang: en-US
+name: Minecraft Launcher
+publisher: Mojang Studios
+author: Mojang Studios
+summary: 'Official launcher for Minecraft: Java Edition, Minecraft for Windows, Minecraft Dungeons, and Legends.'
+homepage: https://www.minecraft.net/
+license:
+  name: Proprietary
+  url: https://www.minecraft.net/en-us/eula

@@ -1,0 +1,20 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/TXAVL/txa-repo/main/tools/src/txa/schemas/core.schema.json
+# auto-update: false (hand-written; game / launcher package)
+txa: 1
+kind: core
+package:
+  id: TXAVL.EAApp
+  version: 13.836.0
+  channel: stable
+  alias: ea-app
+  aliases:
+    - ea
+    - ea-desktop
+locale:
+  default: en-US
+tags:
+  - game
+  - games
+  - game-launcher
+  - store
+  - ea

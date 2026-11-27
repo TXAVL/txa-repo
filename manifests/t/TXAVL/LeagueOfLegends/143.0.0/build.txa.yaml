@@ -1,0 +1,18 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/TXAVL/txa-repo/main/tools/src/txa/schemas/build.schema.json
+txa: 1
+kind: build
+ref: TXAVL.LeagueOfLegends@143.0.0
+platform:
+  os: windows
+  min_build: 10.0.17763
+scope: machine
+targets:
+  - arch: x64
+    engine: exe
+    source:
+      url: https://lol.secure.dyn.riotcdn.net/channels/public/x/installer/current/live.vn2.exe
+      sha256: 04C46BB54222A4249F91E66008DF1BB2A6569CE4C113ED387B728BD6801C37CA
+      size: 76714752
+    switches:
+      silent: --skip-to-install
+      progress: --skip-to-install

@@ -1,0 +1,18 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/TXAVL/txa-repo/main/tools/src/txa/schemas/build.schema.json
+txa: 1
+kind: build
+ref: TXAVL.Roblox@0.747.0
+platform:
+  os: windows
+  min_build: 10.0.17763
+scope: machine
+targets:
+  - arch: x64
+    engine: exe
+    source:
+      url: https://setup.rbxcdn.com/version-4ea8e85481e34f46-RobloxPlayerInstaller.exe
+      sha256: C73A11FE230A8900A2E2447874D05D29134603F549E29983C47EB906DC25FC33
+      size: 13768656
+    switches:
+      silent: -install -silent
+      progress: -install -silent

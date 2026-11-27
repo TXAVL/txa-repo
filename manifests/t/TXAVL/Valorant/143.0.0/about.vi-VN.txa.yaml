@@ -1,0 +1,13 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/TXAVL/txa-repo/main/tools/src/txa/schemas/about.schema.json
+txa: 1
+kind: about
+ref: TXAVL.Valorant@143.0.0
+lang: vi-VN
+name: VALORANT
+publisher: Riot Games, Inc.
+author: Riot Games, Inc.
+summary: Game bắn súng chiến thuật 5v5 miễn phí của Riot Games (máy chủ Châu Á - Thái Bình Dương / Việt Nam).
+homepage: https://playvalorant.com/vi-vn/
+license:
+  name: Freeware
+  url: https://www.riotgames.com/en/terms-of-service

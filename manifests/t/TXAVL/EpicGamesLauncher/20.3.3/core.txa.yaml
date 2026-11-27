@@ -1,0 +1,20 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/TXAVL/txa-repo/main/tools/src/txa/schemas/core.schema.json
+# auto-update: false (hand-written; game / launcher package)
+txa: 1
+kind: core
+package:
+  id: TXAVL.EpicGamesLauncher
+  version: 20.3.3
+  channel: stable
+  alias: epic-games
+  aliases:
+    - epic
+    - epicgames
+locale:
+  default: en-US
+tags:
+  - game
+  - games
+  - game-launcher
+  - store
+  - unreal-engine

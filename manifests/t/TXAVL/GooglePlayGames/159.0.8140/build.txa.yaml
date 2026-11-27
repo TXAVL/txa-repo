@@ -1,0 +1,18 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/TXAVL/txa-repo/main/tools/src/txa/schemas/build.schema.json
+txa: 1
+kind: build
+ref: TXAVL.GooglePlayGames@159.0.8140
+platform:
+  os: windows
+  min_build: 10.0.17763
+scope: machine
+targets:
+  - arch: x64
+    engine: exe
+    source:
+      url: https://dl.google.com/tag/s/appguid=%7B47B07D71-505D-4665-AFD4-4972A30C6530%7D&appname=GPG&needsadmin=true&ap=beta/play/games/Install-GooglePlayGames.exe
+      sha256: A483167FECBC569FCFF25A92C8A633BE90B6000FE53ECA094426351D5E91F05A
+      size: 13036976
+    switches:
+      silent: --silent
+      progress: --silent

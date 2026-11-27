@@ -1,0 +1,13 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/TXAVL/txa-repo/main/tools/src/txa/schemas/about.schema.json
+txa: 1
+kind: about
+ref: TXAVL.LeagueOfLegends@143.0.0
+lang: en-US
+name: League of Legends
+publisher: Riot Games, Inc.
+author: Riot Games, Inc.
+summary: Team-based 5v5 MOBA strategy game by Riot Games (Vietnam server, installed via Riot Client).
+homepage: https://www.leagueoflegends.com/
+license:
+  name: Freeware
+  url: https://www.riotgames.com/en/terms-of-service

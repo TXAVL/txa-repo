@@ -1,0 +1,13 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/TXAVL/txa-repo/main/tools/src/txa/schemas/about.schema.json
+txa: 1
+kind: about
+ref: TXAVL.EpicGamesLauncher@20.3.3
+lang: vi-VN
+name: Epic Games Launcher
+publisher: Epic Games, Inc.
+author: Epic Games, Inc.
+summary: Nền tảng phân phối và khởi chạy game bản quyền của Epic Games với kho game miễn phí hàng tuần.
+homepage: https://store.epicgames.com/
+license:
+  name: Freeware
+  url: https://www.epicgames.com/site/en-US/tos

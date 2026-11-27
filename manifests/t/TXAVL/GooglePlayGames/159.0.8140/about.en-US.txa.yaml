@@ -1,0 +1,13 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/TXAVL/txa-repo/main/tools/src/txa/schemas/about.schema.json
+txa: 1
+kind: about
+ref: TXAVL.GooglePlayGames@159.0.8140
+lang: en-US
+name: Google Play Games on PC
+publisher: Google LLC
+author: Google LLC
+summary: Official Windows application from Google to browse, download, and play Android mobile games on PC.
+homepage: https://play.google.com/googleplaygames
+license:
+  name: Freeware
+  url: https://play.google.com/about/play-terms/

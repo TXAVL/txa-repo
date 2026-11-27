@@ -1,0 +1,18 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/TXAVL/txa-repo/main/tools/src/txa/schemas/build.schema.json
+txa: 1
+kind: build
+ref: TXAVL.EAApp@13.836.0
+platform:
+  os: windows
+  min_build: 10.0.17763
+scope: machine
+targets:
+  - arch: x64
+    engine: wix
+    source:
+      url: https://origin-a.akamaihd.net/EA-Desktop-Client-Download/installer-releases/EAappInstaller-13.836.0.6349-16817646.exe
+      sha256: A9874BFE31F058559A5A85B3B0DC349D8BC7F21DF9B86092938471264CAB54FD
+      size: 2141208
+    switches:
+      silent: /quiet /norestart
+      progress: /passive /norestart

@@ -1,0 +1,18 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/TXAVL/txa-repo/main/tools/src/txa/schemas/build.schema.json
+txa: 1
+kind: build
+ref: TXAVL.BattleNet@2.0.0
+platform:
+  os: windows
+  min_build: 10.0.17763
+scope: machine
+targets:
+  - arch: x64
+    engine: exe
+    source:
+      url: https://downloader.battle.net/download/getInstaller?os=win&installer=Battle.net-Setup.exe
+      sha256: F4643A2086C0CECB1AB68CC601BF38C1A0A6F7EF5914AD03375CC9449385BEC6
+      size: 4700880
+    switches:
+      silent: '--lang=enUS --installpath="C:\Program Files (x86)\Battle.net"'
+      progress: '--lang=enUS --installpath="C:\Program Files (x86)\Battle.net"'
