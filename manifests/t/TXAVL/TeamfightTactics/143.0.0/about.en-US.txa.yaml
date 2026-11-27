@@ -1,0 +1,13 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/TXAVL/txa-repo/main/tools/src/txa/schemas/about.schema.json
+txa: 1
+kind: about
+ref: TXAVL.TeamfightTactics@143.0.0
+lang: en-US
+name: Teamfight Tactics
+publisher: Riot Games, Inc.
+author: Riot Games, Inc.
+summary: Round-based strategy auto-battler by Riot Games (Vietnam server, installed via Riot Client).
+homepage: https://teamfighttactics.leagueoflegends.com/
+license:
+  name: Freeware
+  url: https://www.riotgames.com/en/terms-of-service

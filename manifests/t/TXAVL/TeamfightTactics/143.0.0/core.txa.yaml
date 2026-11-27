@@ -1,0 +1,22 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/TXAVL/txa-repo/main/tools/src/txa/schemas/core.schema.json
+# auto-update: false (hand-written; Riot CDN Vietnam server installer)
+txa: 1
+kind: core
+package:
+  id: TXAVL.TeamfightTactics
+  version: 143.0.0
+  channel: stable
+  alias: tft
+  aliases:
+    - dtcl
+    - teamfight-tactics
+locale:
+  default: en-US
+tags:
+  - game
+  - games
+  - auto-battler
+  - strategy
+  - riot-games
+  - tft
+  - dtcl
